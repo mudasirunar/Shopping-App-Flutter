@@ -52,7 +52,7 @@ class AccountScreen extends StatelessWidget {
     final user = auth.currentUser;
     final isGuest = user == null;
 
-    final displayName = user?.displayName ?? (isGuest ? 'Guest Shopper' : 'Shoply Member');
+    final displayName = user?.displayName ?? (isGuest ? 'Guest Shopper' : 'Registered Member');
     final email = user?.email ?? (isGuest ? 'Browsing in Guest Mode' : '');
 
     return Scaffold(
@@ -216,7 +216,7 @@ class AccountScreen extends StatelessWidget {
                       onTap: () {
                         showAboutDialog(
                           context: context,
-                          applicationName: 'Shoply Mobile',
+                          applicationName: 'Shopping App',
                           applicationVersion: '1.0.0',
                           children: const [
                             Text('Standard Delivery: Flat PKR 200 within Pakistan.\n\nFree Delivery: Orders PKR 5,000 and above qualify for 100% free delivery.\n\nPayment: Cash on Delivery (COD) supported nationwide.'),
@@ -273,8 +273,18 @@ class AccountScreen extends StatelessWidget {
             const SizedBox(height: 28),
 
             // App Footer
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                'assets/icon/app_icon.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 8),
             const Text(
-              'Shoply Mobile E-Commerce',
+              'Shopping App',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.secondary),
             ),
             const SizedBox(height: 4),

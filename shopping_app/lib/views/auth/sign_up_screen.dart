@@ -79,6 +79,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // App Icon / Logo
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          width: 64,
+                          height: 64,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+
                   const Text(
                     'Create Account',
                     textAlign: TextAlign.center,
@@ -91,7 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Join Shoply to track orders and save your favorites.',
+                    'Create an account to track orders and save your delivery addresses.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: AppTheme.secondary),
                   ),
@@ -103,7 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _nameController,
                     decoration: const InputDecoration(
                       labelText: 'Full Name',
-                      hintText: 'Bilal Ahmed',
+                      hintText: 'Enter your full name',
                       prefixIcon: Icon(Icons.person_outline, size: 20, color: AppTheme.secondary),
                     ),
                     validator: (val) => (val == null || val.trim().isEmpty) ? 'Enter your name' : null,

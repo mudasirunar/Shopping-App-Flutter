@@ -120,14 +120,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
         elevation: 0,
         title: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: AppTheme.primary,
-                borderRadius: BorderRadius.circular(8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/icon/app_icon.png',
+                width: 32,
+                height: 32,
+                fit: BoxFit.cover,
               ),
-              child: const Icon(Icons.storefront, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 10),
             const Text(

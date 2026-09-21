@@ -87,13 +87,25 @@ class _SignInScreenState extends State<SignInScreen> {
                   // App Icon / Logo
                   Center(
                     child: Container(
-                      width: 56,
-                      height: 56,
                       decoration: BoxDecoration(
-                        color: AppTheme.primary,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(Icons.storefront, color: Colors.white, size: 30),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          width: 64,
+                          height: 64,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
 
