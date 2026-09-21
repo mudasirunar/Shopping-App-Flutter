@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/cart_item.dart';
 import '../models/delivery_info.dart';
@@ -17,6 +19,7 @@ class OrderProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('OrderProvider initialization notice: $e');
     }
+    _loadLocalOrders('guest');
   }
 
   FirebaseFirestore? get _safeFirestore {
@@ -33,9 +36,36 @@ class OrderProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  /// Loads orders for the given user from Firestore.
+  Future<void> _loadLocalOrders(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = 'local_orders_$userId';
+      final raw = prefs.getString(key);
+      if (raw != null && raw.isNotEmpty) {
+        final List<dynamic> decoded = json.decode(raw) as List<dynamic>;
+        _userOrders = decoded
+            .map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList();
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveLocalOrders(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = 'local_orders_$userId';
+      final encoded = json.encode(_userOrders.map((e) => e.toJson()).toList());
+      await prefs.setString(key, encoded);
+    } catch (_) {}
+  }
+
+  /// Loads orders for the given user from Firestore or local storage.
   Future<void> fetchOrders(String? userId) async {
-    if (userId == null || userId.isEmpty || userId == 'guest') {
+    final effectiveUserId = (userId == null || userId.isEmpty) ? 'guest' : userId;
+
+    if (effectiveUserId == 'guest') {
+      await _loadLocalOrders('guest');
       return;
     }
 
@@ -52,23 +82,24 @@ class OrderProvider extends ChangeNotifier {
 
       final snapshot = await firestore
           .collection('orders')
-          .where('userId', isEqualTo: userId)
+          .where('userId', isEqualTo: effectiveUserId)
           .orderBy('createdAt', descending: true)
           .get();
 
       _userOrders = snapshot.docs
           .map((doc) => OrderModel.fromFirestore(doc))
           .toList();
+      await _saveLocalOrders(effectiveUserId);
     } catch (e) {
-      // If composite index is pending or Firestore is offline, keep existing
-      _errorMessage = 'Could not load order history.';
+      // If Firestore is offline or query index pending, fall back to local saved orders
+      await _loadLocalOrders(effectiveUserId);
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Places a simulated Cash on Delivery order.
+  /// Places a Cash on Delivery order.
   /// Generates a human-friendly order ID e.g. "SH-84920".
   Future<OrderModel?> placeOrder({
     required String? userId,
@@ -113,8 +144,9 @@ class OrderProvider extends ChangeNotifier {
         }
       }
 
-      // Add to beginning of local orders list
+      // Add to beginning of local orders list and persist
       _userOrders.insert(0, newOrder);
+      await _saveLocalOrders(effectiveUserId);
       return newOrder;
     } catch (e) {
       _errorMessage = 'Failed to place order. Please try again.';

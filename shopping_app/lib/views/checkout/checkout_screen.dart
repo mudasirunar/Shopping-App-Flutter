@@ -226,8 +226,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               const SizedBox(height: 12),
 
-              // Demo Checkout Notice Banner
-              _buildDemoBanner(),
+              // Payment Notice Banner
+              _buildPaymentNoticeBanner(),
 
               const SizedBox(height: 16),
 
@@ -376,7 +376,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildDemoBanner() {
+  Widget _buildPaymentNoticeBanner() {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -394,12 +394,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Demo Checkout Environment',
+                  'Cash on Delivery',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.primary),
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Cash on Delivery only. No real banking credentials or online payments required for this assignment.',
+                  'Pay securely with cash upon delivery of your parcel at your doorstep.',
                   style: TextStyle(fontSize: 11, color: AppTheme.secondary, height: 1.3),
                 ),
               ],
@@ -627,7 +627,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.secondary),
                       ),
                       Text(
-                        'Offline for simulated internship demo',
+                        'Service not available',
                         style: TextStyle(fontSize: 10, color: AppTheme.outline),
                       ),
                     ],

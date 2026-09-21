@@ -229,9 +229,9 @@ class AccountScreen extends StatelessWidget {
               'Shoply Mobile E-Commerce',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.secondary),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             const Text(
-              'Task 04 · Anas Technologies Flutter Internship',
+              'Version 1.0.0',
               style: TextStyle(fontSize: 11, color: AppTheme.outline),
             ),
           ],

@@ -103,6 +103,50 @@ class OrderModel {
     };
   }
 
+  /// Serializes order model to JSON map for local storage.
+  Map<String, dynamic> toJson() {
+    return {
+      'orderId': orderId,
+      'userId': userId,
+      'items': items.map((e) => e.toJson()).toList(),
+      'deliveryInfo': deliveryInfo.toJson(),
+      'subtotalPaisa': subtotalPaisa,
+      'deliveryPaisa': deliveryPaisa,
+      'totalPaisa': totalPaisa,
+      'status': status,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory OrderModel.fromJson(Map<String, dynamic> json) {
+    final rawItems = json['items'] as List<dynamic>? ?? [];
+    final itemsList = rawItems
+        .map((e) => OrderSnapshotItem.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+
+    DateTime parsedDate;
+    final rawDate = json['createdAt'];
+    if (rawDate is String) {
+      parsedDate = DateTime.tryParse(rawDate) ?? DateTime.now();
+    } else {
+      parsedDate = DateTime.now();
+    }
+
+    return OrderModel(
+      orderId: json['orderId'] as String? ?? '',
+      userId: json['userId'] as String? ?? '',
+      items: itemsList,
+      deliveryInfo: DeliveryInfo.fromJson(
+        Map<String, dynamic>.from(json['deliveryInfo'] as Map? ?? {}),
+      ),
+      subtotalPaisa: (json['subtotalPaisa'] as num?)?.toInt() ?? 0,
+      deliveryPaisa: (json['deliveryPaisa'] as num?)?.toInt() ?? 0,
+      totalPaisa: (json['totalPaisa'] as num?)?.toInt() ?? 0,
+      status: json['status'] as String? ?? 'placed',
+      createdAt: parsedDate,
+    );
+  }
+
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
     final rawItems = data['items'] as List<dynamic>? ?? [];
