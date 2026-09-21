@@ -401,7 +401,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               else
                 ResponsiveProductGrid(
                   products: products,
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
                   onProductTap: (product) {
                     Navigator.push(
                       context,

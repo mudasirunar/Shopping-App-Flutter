@@ -10,6 +10,7 @@ import '../providers/wishlist_provider.dart';
 import 'account/account_screen.dart';
 import 'cart/cart_screen.dart';
 import 'catalog/catalog_screen.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 class MainShell extends StatefulWidget {
   final int initialIndex;
@@ -135,6 +136,7 @@ class _MainShellState extends State<MainShell> {
     final cart = context.watch<CartProvider>();
     final cartCount = cart.totalItemCount;
 
+
     final pages = [
       CatalogScreen(
         onOpenAccount: () => nav.openAccount(),
@@ -148,71 +150,15 @@ class _MainShellState extends State<MainShell> {
     ];
 
     return Scaffold(
+      extendBody: true,
       body: IndexedStack(
         index: currentIndex,
         children: pages,
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: _onTabTapped,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: AppTheme.surfaceContainerLowest,
-          selectedItemColor: AppTheme.primaryContainer,
-          unselectedItemColor: AppTheme.secondary,
-          selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
-          unselectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.storefront_outlined),
-              activeIcon: Icon(Icons.storefront),
-              label: 'Shop',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.category_outlined),
-              activeIcon: Icon(Icons.category),
-              label: 'Categories',
-            ),
-            BottomNavigationBarItem(
-              icon: Badge(
-                isLabelVisible: cartCount > 0,
-                backgroundColor: AppTheme.tertiary,
-                textColor: Colors.white,
-                label: Text(
-                  '$cartCount',
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-                child: const Icon(Icons.shopping_bag_outlined),
-              ),
-              activeIcon: Badge(
-                isLabelVisible: cartCount > 0,
-                backgroundColor: AppTheme.tertiary,
-                textColor: Colors.white,
-                label: Text(
-                  '$cartCount',
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-                child: const Icon(Icons.shopping_bag),
-              ),
-              label: 'Cart',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Account',
-            ),
-          ],
-        ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: currentIndex,
+        cartCount: cartCount,
+        onTabSelected: _onTabTapped,
       ),
     );
   }

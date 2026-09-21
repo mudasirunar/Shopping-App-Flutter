@@ -62,7 +62,7 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 110),
         child: Column(
           children: [
             // User Header Profile Card
