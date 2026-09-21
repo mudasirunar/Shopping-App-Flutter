@@ -4,6 +4,9 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../models/cart_item.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/navigation_provider.dart';
+import '../../widgets/app_confirmation_dialog.dart';
+import '../../widgets/app_network_image.dart';
 import '../checkout/checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
@@ -15,34 +18,16 @@ class CartScreen extends StatelessWidget {
   });
 
   void _confirmClearCart(BuildContext context) {
-    showDialog(
+    AppConfirmationDialog.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surfaceContainerLowest,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Clear Cart?',
-          style: TextStyle(fontWeight: FontWeight.w700, color: AppTheme.primary),
-        ),
-        content: const Text('Are you sure you want to remove all items from your cart?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.secondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.error,
-              minimumSize: const Size(90, 36),
-            ),
-            onPressed: () {
-              context.read<CartProvider>().clearCart();
-              Navigator.pop(ctx);
-            },
-            child: const Text('Clear All'),
-          ),
-        ],
-      ),
+      icon: Icons.remove_shopping_cart_outlined,
+      title: 'Clear Cart?',
+      message: 'Are you sure you want to remove all items from your cart?',
+      confirmLabel: 'Clear All',
+      isDestructive: true,
+      onConfirm: () {
+        context.read<CartProvider>().clearCart();
+      },
     );
   }
 
@@ -53,7 +38,13 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
-        titleSpacing: 16,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primary, size: 20),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+        titleSpacing: Navigator.canPop(context) ? 0 : 16,
         backgroundColor: AppTheme.surfaceContainerLowest,
         elevation: 0,
         title: Row(
@@ -278,20 +269,14 @@ class _CartItemCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Thumbnail
-          ClipRRect(
+          AppNetworkImage(
+            imageUrl: product.image,
+            width: 72,
+            height: 72,
+            fit: BoxFit.cover,
             borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 72,
-              height: 72,
-              color: AppTheme.surfaceContainerLow,
-              child: Image.network(
-                product.image,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Center(
-                  child: Icon(Icons.image_not_supported_outlined, size: 24, color: AppTheme.secondary),
-                ),
-              ),
-            ),
+            category: product.category,
+            iconSize: 24,
           ),
 
           const SizedBox(width: 12),
@@ -604,7 +589,14 @@ class _EmptyCartView extends StatelessWidget {
                 minimumSize: const Size(180, 46),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: onExplore,
+              onPressed: () {
+                if (onExplore != null) {
+                  onExplore!();
+                } else {
+                  context.read<NavigationProvider>().openShop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
               child: const Text(
                 'Explore Products',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),

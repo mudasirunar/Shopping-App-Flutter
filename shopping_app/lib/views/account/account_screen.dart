@@ -3,52 +3,44 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/wishlist_provider.dart';
+import '../../widgets/app_confirmation_dialog.dart';
 import '../address/addresses_screen.dart';
 import '../auth/sign_in_screen.dart';
 import '../orders/order_history_screen.dart';
+import '../wishlist/wishlist_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
   void _confirmSignOut(BuildContext context) {
-    showDialog(
+    AppConfirmationDialog.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out? Your session will end.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.secondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.error,
-              foregroundColor: Colors.white,
+      icon: Icons.logout_rounded,
+      title: 'Sign Out?',
+      message: 'Are you sure you want to sign out? Your current session will end.',
+      confirmLabel: 'Sign Out',
+      isDestructive: true,
+      onConfirm: () async {
+        await context.read<AuthProvider>().signOut();
+        if (context.mounted) {
+          context.read<CartProvider>().setUserId('guest');
+          context.read<WishlistProvider>().setUserId('guest');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfully signed out.'),
+              backgroundColor: AppTheme.primary,
             ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<AuthProvider>().signOut();
-              if (context.mounted) {
-                context.read<CartProvider>().setUserId('guest');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Successfully signed out.'),
-                    backgroundColor: AppTheme.primary,
-                  ),
-                );
-              }
-            },
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final wishlist = context.watch<WishlistProvider>();
     final user = auth.currentUser;
     final isGuest = user == null;
 
@@ -176,6 +168,49 @@ class AccountScreen extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite_rounded, color: Colors.redAccent),
+                      title: const Text('My Wishlist', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                      subtitle: Text(
+                        wishlist.isEmpty
+                            ? 'No items saved yet'
+                            : '${wishlist.itemCount} item${wishlist.itemCount == 1 ? '' : 's'} saved',
+                        style: const TextStyle(fontSize: 12, color: AppTheme.secondary),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (wishlist.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${wishlist.itemCount}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.secondary),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const WishlistScreen()),
+                        );
+                      },
+                    ),
+                  ),
+                  const Divider(height: 1),
                   Material(
                     color: Colors.transparent,
                     child: ListTile(

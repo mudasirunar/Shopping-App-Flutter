@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/currency_formatter.dart';
-import '../../models/product.dart';
-import '../../providers/cart_provider.dart';
 import '../../providers/catalog_provider.dart';
+import '../../widgets/responsive_product_grid.dart';
 import '../details/product_details_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -141,18 +139,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            tooltip: 'Account Profile',
-            icon: CircleAvatar(
-              radius: 16,
-              backgroundColor: AppTheme.surfaceContainerLow,
-              child: const Icon(Icons.person_outline, size: 20, color: AppTheme.primary),
-            ),
-            onPressed: widget.onOpenAccount,
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: Consumer<CatalogProvider>(
         builder: (context, catalog, child) {
@@ -413,92 +399,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   ),
                 )
               else
-                // 2-Column Responsive Product Catalog Grid
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.68,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final product = products[index];
-                        return _ProductCard(
-                          product: product,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProductDetailsScreen(product: product),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      childCount: products.length,
-                    ),
-                  ),
-                ),
-
-              // Curated Philosophy Callout
-              if (products.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainerLowest,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                ResponsiveProductGrid(
+                  products: products,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                  onProductTap: (product) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductDetailsScreen(product: product),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              color: AppTheme.surfaceContainerLow,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.verified_outlined,
-                              color: AppTheme.primary,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Mindfully Selected',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'Every item in our collection is rigorously verified for durability, material honesty, and tactile design.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.secondary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
             ],
           );
@@ -519,172 +430,3 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 }
 
-class _ProductCard extends StatelessWidget {
-  final Product product;
-  final VoidCallback onTap;
-
-  const _ProductCard({
-    required this.product,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cart = context.watch<CartProvider>();
-    final inCart = cart.isInCart(product.id);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Canvas with graceful fallback
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: double.infinity,
-                  color: AppTheme.surfaceContainerLow,
-                  child: Image.network(
-                    product.image,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return const Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppTheme.primaryContainer,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          size: 28,
-                          color: AppTheme.secondary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Category tag
-            Text(
-              product.category,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.secondary,
-              ),
-            ),
-
-            const SizedBox(height: 2),
-
-            // Product Name (2-line clamp)
-            Text(
-              product.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.onSurface,
-                height: 1.2,
-              ),
-            ),
-
-            const Spacer(),
-
-            // Price and Add button / In Cart badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    CurrencyFormatter.formatPaisa(product.pricePaisa),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.onSurface,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ),
-                if (inCart)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppTheme.tertiaryFixed,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check, size: 12, color: AppTheme.tertiary),
-                        SizedBox(width: 2),
-                        Text(
-                          'In Cart',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.tertiary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  InkWell(
-                    onTap: () {
-                      cart.addItem(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Added ${product.name} to cart'),
-                          duration: const Duration(milliseconds: 900),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.add, size: 18, color: Colors.white),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

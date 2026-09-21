@@ -5,6 +5,8 @@ import '../providers/address_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/catalog_provider.dart';
+import '../providers/navigation_provider.dart';
+import '../providers/wishlist_provider.dart';
 import 'account/account_screen.dart';
 import 'cart/cart_screen.dart';
 import 'catalog/catalog_screen.dart';
@@ -19,17 +21,18 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  late int _currentIndex;
-
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
+        if (widget.initialIndex != 0) {
+          context.read<NavigationProvider>().switchTab(widget.initialIndex);
+        }
         final auth = context.read<AuthProvider>();
         context.read<CartProvider>().setUserId(auth.currentUser?.uid);
         context.read<AddressProvider>().setUserId(auth.currentUser?.uid);
+        context.read<WishlistProvider>().setUserId(auth.currentUser?.uid);
       }
     });
   }
@@ -40,7 +43,7 @@ class _MainShellState extends State<MainShell> {
       _showCategoriesSheet(context);
       return;
     }
-    setState(() => _currentIndex = index);
+    context.read<NavigationProvider>().switchTab(index);
   }
 
   void _showCategoriesSheet(BuildContext context) {
@@ -99,7 +102,7 @@ class _MainShellState extends State<MainShell> {
                       onTap: () {
                         catalog.selectCategory(cat);
                         Navigator.pop(ctx);
-                        setState(() => _currentIndex = 0); // Jump to Shop catalog
+                        context.read<NavigationProvider>().openShop();
                       },
                     ),
                   ),
@@ -127,24 +130,26 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final nav = context.watch<NavigationProvider>();
+    final currentIndex = nav.currentTabIndex;
     final cart = context.watch<CartProvider>();
     final cartCount = cart.totalItemCount;
 
     final pages = [
       CatalogScreen(
-        onOpenAccount: () => setState(() => _currentIndex = 3),
-        onOpenCart: () => setState(() => _currentIndex = 2),
+        onOpenAccount: () => nav.openAccount(),
+        onOpenCart: () => nav.openCart(),
       ),
       const SizedBox.shrink(), // Index 1 is handled via Categories Modal
       CartScreen(
-        onExplore: () => setState(() => _currentIndex = 0),
+        onExplore: () => nav.openShop(),
       ),
       const AccountScreen(),
     ];
 
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
+        index: currentIndex,
         children: pages,
       ),
       bottomNavigationBar: Container(
@@ -159,7 +164,7 @@ class _MainShellState extends State<MainShell> {
           ],
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: currentIndex,
           onTap: _onTabTapped,
           type: BottomNavigationBarType.fixed,
           backgroundColor: AppTheme.surfaceContainerLowest,

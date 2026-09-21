@@ -5,7 +5,9 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/navigation_provider.dart';
 import '../../providers/order_provider.dart';
+import '../../widgets/app_network_image.dart';
 import 'order_details_screen.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
@@ -184,18 +186,13 @@ class _OrderCard extends StatelessWidget {
                 for (int i = 0; i < order.items.length && i < 3; i++)
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: ClipRRect(
+                    child: AppNetworkImage(
+                      imageUrl: order.items[i].image,
+                      width: 42,
+                      height: 42,
+                      fit: BoxFit.cover,
                       borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        color: AppTheme.surfaceContainerLow,
-                        child: Image.network(
-                          order.items[i].image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_outlined, size: 20),
-                        ),
-                      ),
+                      iconSize: 20,
                     ),
                   ),
                 if (order.items.length > 3)
@@ -322,7 +319,10 @@ class _EmptyOrdersView extends StatelessWidget {
                 minimumSize: const Size(160, 44),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                context.read<NavigationProvider>().openShop();
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
               child: const Text('Start Shopping'),
             ),
           ],

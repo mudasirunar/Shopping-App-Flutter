@@ -8,7 +8,9 @@ import 'providers/address_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/catalog_provider.dart';
+import 'providers/navigation_provider.dart';
 import 'providers/order_provider.dart';
+import 'providers/wishlist_provider.dart';
 import 'views/main_shell.dart';
 import 'views/onboarding/onboarding_screen.dart';
 
@@ -52,6 +54,8 @@ class ShoppingApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CatalogProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
       ],
       child: MaterialApp(
         title: 'Shopping App',

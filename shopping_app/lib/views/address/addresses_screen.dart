@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/address.dart';
 import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_confirmation_dialog.dart';
 import 'add_edit_address_dialog.dart';
 
 class AddressesScreen extends StatefulWidget {
@@ -24,29 +25,16 @@ class _AddressesScreenState extends State<AddressesScreen> {
   }
 
   void _confirmDelete(BuildContext context, AddressModel address) {
-    showDialog(
+    AppConfirmationDialog.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Address'),
-        content: Text('Are you sure you want to remove "${address.recipientName} - ${address.label}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.secondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.error,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<AddressProvider>().deleteAddress(address.id);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      icon: Icons.delete_outline_rounded,
+      title: 'Delete Address?',
+      message: 'Are you sure you want to remove "${address.recipientName} - ${address.label}" from your saved addresses?',
+      confirmLabel: 'Delete',
+      isDestructive: true,
+      onConfirm: () {
+        context.read<AddressProvider>().deleteAddress(address.id);
+      },
     );
   }
 
