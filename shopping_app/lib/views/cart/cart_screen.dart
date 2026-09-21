@@ -8,6 +8,9 @@ import '../../providers/navigation_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
 import '../../widgets/app_network_image.dart';
 import '../checkout/checkout_screen.dart';
+import '../details/product_details_screen.dart';
+import '../../core/utils/app_snackbar.dart';
+import '../../models/product.dart';
 
 class CartScreen extends StatelessWidget {
   final VoidCallback? onExplore;
@@ -27,7 +30,32 @@ class CartScreen extends StatelessWidget {
       isDestructive: true,
       onConfirm: () {
         context.read<CartProvider>().clearCart();
+        AppSnackBar.show(
+          context,
+          message: 'Cart cleared',
+        );
       },
+    );
+  }
+
+  Future<bool> _confirmRemove(BuildContext context, Product product) async {
+    final confirmed = await AppConfirmationDialog.show(
+      context: context,
+      icon: Icons.delete_outline_rounded,
+      title: 'Remove Item?',
+      message: 'Are you sure you want to remove "${product.name}" from your cart?',
+      confirmLabel: 'Remove',
+      isDestructive: true,
+      onConfirm: () {},
+    );
+    return confirmed ?? false;
+  }
+
+  void _removeProduct(BuildContext context, Product product) {
+    context.read<CartProvider>().removeItem(product.id);
+    AppSnackBar.show(
+      context,
+      message: 'Removed ${product.name} from cart',
     );
   }
 
@@ -91,10 +119,11 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Free Delivery Tier Banner
-                  _DeliveryBanner(cart: cart),
-
-                  const SizedBox(height: 16),
+                  // Free Delivery Progress Banner (only shown while working towards the PKR 5,000 threshold)
+                  if (!cart.isFreeDeliveryUnlocked) ...[
+                    _DeliveryBanner(cart: cart),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Cart Items List
                   ListView.separated(
@@ -104,7 +133,16 @@ class CartScreen extends StatelessWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final item = cart.items[index];
-                      return _CartItemCard(item: item);
+                      return Dismissible(
+                        key: ValueKey('cart_item_${item.product.id}'),
+                        direction: DismissDirection.endToStart,
+                        background: const _SwipeDeleteBackground(),
+                        confirmDismiss: (_) => _confirmRemove(context, item.product),
+                        onDismissed: (_) => _removeProduct(context, item.product),
+                        child: _CartItemCard(
+                          item: item,
+                        ),
+                      );
                     },
                   ),
 
@@ -162,15 +200,17 @@ class _DeliveryBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unlocked = cart.isFreeDeliveryUnlocked;
+    if (cart.isFreeDeliveryUnlocked) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: unlocked ? AppTheme.emeraldContainer : AppTheme.surfaceContainerLow,
+        color: AppTheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: unlocked ? AppTheme.emeraldSuccess.withOpacity(0.2) : AppTheme.surfaceContainerHigh,
+          color: AppTheme.surfaceContainerHigh,
         ),
       ),
       child: Column(
@@ -181,8 +221,8 @@ class _DeliveryBanner extends StatelessWidget {
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(
-                  color: unlocked ? AppTheme.emeraldSuccess : AppTheme.primary,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -196,18 +236,16 @@ class _DeliveryBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      unlocked ? 'Free Delivery Unlocked' : 'Standard Delivery',
+                    const Text(
+                      'Free Delivery Target',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: unlocked ? AppTheme.emeraldSuccess : AppTheme.onSurface,
+                        color: AppTheme.onSurface,
                       ),
                     ),
                     Text(
-                      unlocked
-                          ? 'Applicable on orders exceeding PKR 5,000.00'
-                          : 'Add ${CurrencyFormatter.formatPaisa(cart.amountNeededForFreeDeliveryPaisa)} more for Free Delivery',
+                      'Add ${CurrencyFormatter.formatPaisa(cart.amountNeededForFreeDeliveryPaisa)} more for Free Delivery',
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppTheme.secondary,
@@ -216,26 +254,18 @@ class _DeliveryBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              if (unlocked)
-                const Icon(
-                  Icons.check_circle,
-                  color: AppTheme.emeraldSuccess,
-                  size: 20,
-                ),
             ],
           ),
-          if (!unlocked) ...[
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: cart.freeDeliveryProgress,
-                backgroundColor: AppTheme.surfaceContainerHighest,
-                color: AppTheme.primary,
-                minHeight: 5,
-              ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: cart.freeDeliveryProgress,
+              backgroundColor: AppTheme.surfaceContainerHighest,
+              color: AppTheme.primary,
+              minHeight: 5,
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -245,29 +275,41 @@ class _DeliveryBanner extends StatelessWidget {
 class _CartItemCard extends StatelessWidget {
   final CartItem item;
 
-  const _CartItemCard({required this.item});
+  const _CartItemCard({
+    required this.item,
+  });
 
   @override
   Widget build(BuildContext context) {
     final cart = context.read<CartProvider>();
     final product = item.product;
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest,
+    return Material(
+      color: AppTheme.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductDetailsScreen(
+                product: product,
+                showCartAction: false,
+              ),
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppTheme.surfaceContainerHigh.withOpacity(0.5)),
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           // Thumbnail
           AppNetworkImage(
             imageUrl: product.image,
@@ -314,11 +356,37 @@ class _CartItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 20, color: AppTheme.secondary),
-                      onPressed: () => cart.removeItem(product.id),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: AppTheme.outlineVariant.withOpacity(0.5),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.local_shipping_outlined,
+                            size: 12,
+                            color: AppTheme.secondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            product.effectiveDeliveryDays == 1
+                                ? '1 Day'
+                                : '${product.effectiveDeliveryDays} Days',
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.secondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -340,9 +408,19 @@ class _CartItemCard extends StatelessWidget {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.remove, size: 14),
-                            onPressed: () => cart.updateQuantity(product.id, item.quantity - 1),
+                            onPressed: () {
+                              final wasLastUnit = item.quantity <= 1;
+                              cart.updateQuantity(product.id, item.quantity - 1);
+                              if (wasLastUnit) {
+                                AppSnackBar.show(
+                                  context,
+                                  message: 'Removed ${product.name} from cart',
+                                );
+                              }
+                            },
                             padding: const EdgeInsets.symmetric(horizontal: 6),
                             constraints: const BoxConstraints(),
+                            color: AppTheme.onSurface,
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -377,10 +455,11 @@ class _CartItemCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${CurrencyFormatter.formatPaisa(product.pricePaisa)} / ea',
+                          '${CurrencyFormatter.formatPaisa(product.pricePaisa)} each',
                           style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             color: AppTheme.secondary,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -391,6 +470,8 @@ class _CartItemCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -403,6 +484,17 @@ class _OrderSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isFreeDelivery = cart.isFreeDeliveryUnlocked;
+    final totalProducts = cart.items.length;
+    final totalUnits = cart.totalItemCount;
+
+    final deliveryDaysList = cart.items.map((i) => i.product.effectiveDeliveryDays).toList();
+    final minDeliveryDays = deliveryDaysList.isEmpty ? 3 : deliveryDaysList.reduce((a, b) => a < b ? a : b);
+    final maxDeliveryDays = deliveryDaysList.isEmpty ? 3 : deliveryDaysList.reduce((a, b) => a > b ? a : b);
+    final deliveryEstimate = minDeliveryDays == maxDeliveryDays
+        ? '$maxDeliveryDays Days'
+        : '$minDeliveryDays-$maxDeliveryDays Days';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -419,23 +511,59 @@ class _OrderSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Order Summary',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _summaryRow('Subtotal', CurrencyFormatter.formatPaisa(cart.subtotalPaisa)),
-          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: const [
-                  Text('Delivery', style: TextStyle(fontSize: 13, color: AppTheme.secondary)),
+              const Text(
+                'Order Summary',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.onSurface,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$totalProducts ${totalProducts == 1 ? 'Product' : 'Products'} ($totalUnits ${totalUnits == 1 ? 'item' : 'items'})',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.secondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Products Count & Quantity Breakdown
+          _summaryRow(
+            'Products Count',
+            '$totalProducts ${totalProducts == 1 ? 'product' : 'products'}',
+          ),
+          const SizedBox(height: 8),
+
+          _summaryRow(
+            'Total Quantity',
+            '$totalUnits ${totalUnits == 1 ? 'unit' : 'units'}',
+          ),
+          const SizedBox(height: 8),
+
+          _summaryRow('Subtotal', CurrencyFormatter.formatPaisa(cart.subtotalPaisa)),
+          const SizedBox(height: 8),
+
+          // Delivery row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Text('Delivery Fee', style: TextStyle(fontSize: 13, color: AppTheme.secondary)),
                   SizedBox(width: 6),
                   Text(
                     'Standard',
@@ -443,7 +571,7 @@ class _OrderSummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (cart.isFreeDeliveryUnlocked)
+              if (isFreeDelivery)
                 Row(
                   children: [
                     Text(
@@ -456,11 +584,11 @@ class _OrderSummaryCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     const Text(
-                      'Free',
+                      'FREE',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.primary,
+                        color: AppTheme.emeraldSuccess,
                       ),
                     ),
                   ],
@@ -476,18 +604,74 @@ class _OrderSummaryCard extends StatelessWidget {
                 ),
             ],
           ),
+
+          // If free delivery unlocked, show savings row
+          if (isFreeDelivery) ...[
+            const SizedBox(height: 8),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Delivery Savings',
+                  style: TextStyle(fontSize: 13, color: AppTheme.emeraldSuccess, fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '-PKR 200.00',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.emeraldSuccess),
+                ),
+              ],
+            ),
+          ],
+
           const SizedBox(height: 8),
-          _summaryRow('Estimated Taxes', CurrencyFormatter.formatPaisa(0)),
+          _summaryRow('Estimated Taxes', 'PKR 0.00 (Included)'),
+
+          // Payment & Shipping Quick Info
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.payments_outlined, size: 14, color: AppTheme.secondary),
+                    SizedBox(width: 5),
+                    Text(
+                      'Cash on Delivery',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.secondary),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.local_shipping_outlined, size: 14, color: AppTheme.secondary),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Est. $deliveryEstimate',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.secondary),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
           ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Total Amount',
                     style: TextStyle(
@@ -497,7 +681,7 @@ class _OrderSummaryCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Including all duties',
+                    'Including all duties & delivery',
                     style: TextStyle(fontSize: 11, color: AppTheme.secondary),
                   ),
                 ],
@@ -513,22 +697,50 @@ class _OrderSummaryCard extends StatelessWidget {
               ),
             ],
           ),
+
+          if (isFreeDelivery) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppTheme.emeraldContainer.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.emeraldSuccess.withOpacity(0.3)),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_circle_outline, size: 14, color: AppTheme.emeraldSuccess),
+                  SizedBox(width: 6),
+                  Text(
+                    'You unlocked Free Delivery (Saved PKR 200.00)',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.emeraldSuccess,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _summaryRow(String label, String value) {
+  Widget _summaryRow(String label, String value, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.secondary)),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppTheme.onSurface,
+            color: valueColor ?? AppTheme.onSurface,
           ),
         ),
       ],
@@ -604,6 +816,41 @@ class _EmptyCartView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SwipeDeleteBackground extends StatelessWidget {
+  const _SwipeDeleteBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppTheme.error,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            'Remove',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+          SizedBox(width: 8),
+          Icon(
+            Icons.delete_outline_rounded,
+            color: Colors.white,
+            size: 22,
+          ),
+        ],
       ),
     );
   }

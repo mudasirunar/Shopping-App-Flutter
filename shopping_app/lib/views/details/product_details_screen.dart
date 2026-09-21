@@ -12,10 +12,12 @@ import '../../core/utils/app_snackbar.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
+  final bool showCartAction;
 
   const ProductDetailsScreen({
     super.key,
     required this.product,
+    this.showCartAction = true,
   });
 
   @override
@@ -89,27 +91,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               }
             },
           ),
-          IconButton(
-            icon: Badge(
-              isLabelVisible: cart.totalItemCount > 0,
-              backgroundColor: AppTheme.tertiary,
-              textColor: Colors.white,
-              label: Text(
-                '${cart.totalItemCount}',
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-              ),
-              child: const Icon(Icons.shopping_bag_outlined, color: AppTheme.primary),
-            ),
-            tooltip: 'View Cart',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const CartScreen(),
+          if (widget.showCartAction)
+            IconButton(
+              icon: Badge(
+                isLabelVisible: cart.totalItemCount > 0,
+                backgroundColor: AppTheme.tertiary,
+                textColor: Colors.white,
+                label: Text(
+                  '${cart.totalItemCount}',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                 ),
-              );
-            },
-          ),
+                child: const Icon(Icons.shopping_bag_outlined, color: AppTheme.primary),
+              ),
+              tooltip: 'View Cart',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CartScreen(),
+                  ),
+                );
+              },
+            ),
           const SizedBox(width: 8),
         ],
       ),
@@ -595,15 +598,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         AppSnackBar.show(
                           context,
                           message: 'Added $_quantity x ${product.name} to cart',
-                          actionLabel: 'View Cart',
+                          actionLabel: widget.showCartAction ? 'View Cart' : 'Back to Cart',
                           onAction: () {
                             if (!context.mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CartScreen(),
-                              ),
-                            );
+                            if (widget.showCartAction) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const CartScreen(),
+                                ),
+                              );
+                            } else {
+                              Navigator.pop(context);
+                            }
                           },
                         );
                       },
