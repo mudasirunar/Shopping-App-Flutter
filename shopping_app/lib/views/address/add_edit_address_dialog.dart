@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/phone_validator.dart';
 import '../../models/address.dart';
 import '../../providers/address_provider.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class AddEditAddressDialog extends StatefulWidget {
   final AddressModel? existingAddress;
@@ -100,11 +101,10 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
 
         if (!success) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Address limit reached (Maximum 3 addresses allowed).'),
-                backgroundColor: AppTheme.error,
-              ),
+            AppSnackBar.show(
+              context,
+              message: 'Address limit reached (Maximum 3 addresses allowed).',
+              isError: true,
             );
           }
           return;

@@ -12,6 +12,7 @@ import '../../providers/order_provider.dart';
 import '../address/add_edit_address_dialog.dart';
 import '../orders/order_history_screen.dart';
 import '../../widgets/app_network_image.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -86,8 +87,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final cart = context.read<CartProvider>();
     if (cart.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Your cart is empty!')),
+      AppSnackBar.show(
+        context,
+        message: 'Your cart is empty!',
       );
       return;
     }
@@ -141,11 +143,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       await cart.clearCart();
       _showSuccessDialog(newOrder.id, newOrder.totalPaisa);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(orderProvider.errorMessage ?? 'Failed to place order'),
-          backgroundColor: AppTheme.error,
-        ),
+      AppSnackBar.show(
+        context,
+        message: orderProvider.errorMessage ?? 'Failed to place order',
+        isError: true,
       );
     }
   }

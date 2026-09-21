@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import 'reset_password_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String email;
@@ -57,8 +58,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void _handleVerify() {
     final otp = _otpCode.trim();
     if (otp.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all 6 digits of your OTP')),
+      AppSnackBar.show(
+        context,
+        message: 'Please enter all 6 digits of your OTP',
       );
       return;
     }
@@ -82,18 +84,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     if (success && mounted) {
       _startCooldown();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('New verification code sent! Check your inbox.'),
-          backgroundColor: AppTheme.emeraldSuccess,
-        ),
+      AppSnackBar.show(
+        context,
+        message: 'New verification code sent! Check your inbox.',
+        backgroundColor: AppTheme.emeraldSuccess,
       );
     } else if (mounted && auth.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.errorMessage!),
-          backgroundColor: AppTheme.error,
-        ),
+      AppSnackBar.show(
+        context,
+        message: auth.errorMessage!,
+        isError: true,
       );
     }
   }

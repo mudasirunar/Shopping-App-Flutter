@@ -7,6 +7,7 @@ import '../../providers/cart_provider.dart';
 import '../main_shell.dart';
 import 'forgot_password_screen.dart';
 import 'sign_up_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class SignInScreen extends StatefulWidget {
   final bool showGuestOption;
@@ -57,11 +58,10 @@ class _SignInScreenState extends State<SignInScreen> {
         );
       }
     } else if (mounted && auth.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.errorMessage!),
-          backgroundColor: AppTheme.error,
-        ),
+      AppSnackBar.show(
+        context,
+        message: auth.errorMessage!,
+        isError: true,
       );
     }
   }

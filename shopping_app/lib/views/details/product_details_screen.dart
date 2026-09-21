@@ -8,6 +8,7 @@ import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
 import '../cart/cart_screen.dart';
 import '../wishlist/wishlist_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
@@ -63,26 +64,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               color: isFavorite ? Colors.red : AppTheme.secondary,
             ),
             onPressed: () {
+              final wasFavorite = isFavorite;
               wishlist.toggleFavorite(product);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(isFavorite ? 'Removed from Wishlist' : 'Saved to Wishlist'),
-                  duration: const Duration(milliseconds: 1200),
-                  behavior: SnackBarBehavior.floating,
-                  action: SnackBarAction(
-                    label: 'View Wishlist',
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const WishlistScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
+              if (wasFavorite) {
+                AppSnackBar.show(
+                  context,
+                  message: 'Removed ${product.name} from Wishlist',
+                );
+              } else {
+                AppSnackBar.show(
+                  context,
+                  message: 'Saved ${product.name} to Wishlist',
+                  actionLabel: 'View Wishlist',
+                  onAction: () {
+                    if (!context.mounted) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const WishlistScreen(),
+                      ),
+                    );
+                  },
+                );
+              }
             },
           ),
           IconButton(
@@ -588,24 +592,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ? null
                     : () {
                         cart.addItem(product, _quantity);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Added $_quantity x ${product.name} to cart'),
-                            duration: const Duration(milliseconds: 1200),
-                            behavior: SnackBarBehavior.floating,
-                            action: SnackBarAction(
-                              label: 'View Cart',
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const CartScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                        AppSnackBar.show(
+                          context,
+                          message: 'Added $_quantity x ${product.name} to cart',
+                          actionLabel: 'View Cart',
+                          onAction: () {
+                            if (!context.mounted) return;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CartScreen(),
+                              ),
+                            );
+                          },
                         );
                       },
                 child: Row(

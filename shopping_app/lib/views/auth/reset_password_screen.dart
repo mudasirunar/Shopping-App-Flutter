@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import 'sign_in_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
@@ -43,11 +44,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password reset successfully! Please sign in.'),
-          backgroundColor: AppTheme.emeraldSuccess,
-        ),
+      AppSnackBar.show(
+        context,
+        message: 'Password reset successfully! Please sign in.',
+        backgroundColor: AppTheme.emeraldSuccess,
       );
       Navigator.pushAndRemoveUntil(
         context,
@@ -55,11 +55,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         (route) => false,
       );
     } else if (mounted && auth.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.errorMessage!),
-          backgroundColor: AppTheme.error,
-        ),
+      AppSnackBar.show(
+        context,
+        message: auth.errorMessage!,
+        isError: true,
       );
     }
   }

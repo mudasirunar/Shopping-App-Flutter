@@ -5,6 +5,7 @@ import '../core/utils/currency_formatter.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import 'app_network_image.dart';
+import '../core/utils/app_snackbar.dart';
 
 /// Reusable responsive product card used across CatalogScreen and WishlistScreen.
 /// Adapts dynamically to available width: renders compact 2-column card when narrow,
@@ -455,12 +456,9 @@ class ProductCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         cart.addItem(product);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Added ${product.name} to cart'),
-            duration: const Duration(milliseconds: 900),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          context,
+          message: 'Added ${product.name} to cart',
         );
       },
       borderRadius: BorderRadius.circular(8),

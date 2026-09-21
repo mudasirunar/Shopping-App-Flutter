@@ -6,6 +6,7 @@ import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
 import 'add_edit_address_dialog.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class AddressesScreen extends StatefulWidget {
   const AddressesScreen({super.key});
@@ -127,11 +128,10 @@ class _AddressesScreenState extends State<AddressesScreen> {
               onPressed: canAdd
                   ? () => AddEditAddressDialog.show(context)
                   : () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Maximum 3 addresses reached. Delete an existing address to add a new one.'),
-                          backgroundColor: AppTheme.secondary,
-                        ),
+                      AppSnackBar.show(
+                        context,
+                        message: 'Maximum 3 addresses reached. Delete an existing address to add a new one.',
+                        backgroundColor: AppTheme.secondary,
                       );
                     },
             ),

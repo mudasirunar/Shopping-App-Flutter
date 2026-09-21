@@ -6,6 +6,7 @@ import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
 import '../../widgets/responsive_product_grid.dart';
 import '../details/product_details_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -20,12 +21,9 @@ class WishlistScreen extends StatelessWidget {
       isDestructive: true,
       onConfirm: () {
         context.read<WishlistProvider>().clearWishlist();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Wishlist cleared'),
-            duration: Duration(milliseconds: 1000),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppSnackBar.show(
+          context,
+          message: 'Wishlist cleared',
         );
       },
     );

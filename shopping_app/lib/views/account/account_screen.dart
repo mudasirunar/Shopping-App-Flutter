@@ -9,6 +9,7 @@ import '../address/addresses_screen.dart';
 import '../auth/sign_in_screen.dart';
 import '../orders/order_history_screen.dart';
 import '../wishlist/wishlist_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -26,11 +27,9 @@ class AccountScreen extends StatelessWidget {
         if (context.mounted) {
           context.read<CartProvider>().setUserId('guest');
           context.read<WishlistProvider>().setUserId('guest');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successfully signed out.'),
-              backgroundColor: AppTheme.primary,
-            ),
+          AppSnackBar.show(
+            context,
+            message: 'Successfully signed out.',
           );
         }
       },

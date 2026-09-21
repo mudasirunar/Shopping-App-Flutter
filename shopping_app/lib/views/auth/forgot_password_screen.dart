@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import 'otp_verification_screen.dart';
+import '../../core/utils/app_snackbar.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -31,11 +32,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final success = await auth.sendResetOtp(email);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('6-digit verification code sent to $email'),
-          backgroundColor: AppTheme.emeraldSuccess,
-        ),
+      AppSnackBar.show(
+        context,
+        message: '6-digit verification code sent to $email',
+        backgroundColor: AppTheme.emeraldSuccess,
       );
       Navigator.push(
         context,
@@ -44,11 +44,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       );
     } else if (mounted && auth.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.errorMessage!),
-          backgroundColor: AppTheme.error,
-        ),
+      AppSnackBar.show(
+        context,
+        message: auth.errorMessage!,
+        isError: true,
       );
     }
   }
