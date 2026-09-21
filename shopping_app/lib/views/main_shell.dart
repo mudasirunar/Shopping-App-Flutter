@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme/app_theme.dart';
+import '../providers/address_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/catalog_provider.dart';
@@ -28,6 +29,7 @@ class _MainShellState extends State<MainShell> {
       if (mounted) {
         final auth = context.read<AuthProvider>();
         context.read<CartProvider>().setUserId(auth.currentUser?.uid);
+        context.read<AddressProvider>().setUserId(auth.currentUser?.uid);
       }
     });
   }
@@ -71,32 +73,35 @@ class _MainShellState extends State<MainShell> {
                   ),
                 ),
                 for (final cat in catalog.categories)
-                  ListTile(
-                    leading: Icon(
-                      _getCategoryIcon(cat),
-                      color: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
-                          ? AppTheme.primary
-                          : AppTheme.secondary,
-                    ),
-                    title: Text(
-                      cat,
-                      style: TextStyle(
-                        fontWeight: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
-                            ? FontWeight.w700
-                            : FontWeight.w500,
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: Icon(
+                        _getCategoryIcon(cat),
                         color: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
                             ? AppTheme.primary
-                            : AppTheme.onSurface,
+                            : AppTheme.secondary,
                       ),
+                      title: Text(
+                        cat,
+                        style: TextStyle(
+                          fontWeight: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
+                              ? AppTheme.primary
+                              : AppTheme.onSurface,
+                        ),
+                      ),
+                      trailing: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
+                          ? const Icon(Icons.check, color: AppTheme.primary)
+                          : null,
+                      onTap: () {
+                        catalog.selectCategory(cat);
+                        Navigator.pop(ctx);
+                        setState(() => _currentIndex = 0); // Jump to Shop catalog
+                      },
                     ),
-                    trailing: catalog.selectedCategory.toLowerCase() == cat.toLowerCase()
-                        ? const Icon(Icons.check, color: AppTheme.primary)
-                        : null,
-                    onTap: () {
-                      catalog.selectCategory(cat);
-                      Navigator.pop(ctx);
-                      setState(() => _currentIndex = 0); // Jump to Shop catalog
-                    },
                   ),
               ],
             ),

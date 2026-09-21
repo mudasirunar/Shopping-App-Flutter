@@ -33,6 +33,7 @@ class AppTheme {
   static const Color tertiaryFixed = Color(0xFFFFDBD0);
   static const Color onTertiary = Color(0xFFFFFFFF);
   static const Color emeraldSuccess = Color(0xFF2E7D32); // Verified & Free Delivery
+  static const Color success = emeraldSuccess;
   static const Color emeraldContainer = Color(0xFFE8F5E9);
   static const Color error = Color(0xFFBA1A1A);
   static const Color errorContainer = Color(0xFFFFDAD6);

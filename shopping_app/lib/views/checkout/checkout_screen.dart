@@ -3,10 +3,13 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../core/utils/phone_validator.dart';
+import '../../models/address.dart';
 import '../../models/delivery_info.dart';
+import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
+import '../address/add_edit_address_dialog.dart';
 import '../orders/order_history_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -18,13 +21,51 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'Bilal Ahmed');
-  final _phoneController = TextEditingController(text: '03001234567');
-  final _addressController = TextEditingController(text: 'House 42, Street 5, Block 4');
-  final _cityController = TextEditingController(text: 'Karachi');
-  final _provinceController = TextEditingController(text: 'Sindh 75600');
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  String? _selectedProvince;
 
   bool _isPlacingOrder = false;
+  bool _saveAddressForFuture = true;
+
+  final List<String> _provinces = [
+    'Punjab',
+    'Sindh',
+    'Khyber Pakhtunkhwa',
+    'Balochistan',
+    'Islamabad Capital Territory',
+    'Azad Jammu & Kashmir',
+    'Gilgit-Baltistan',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().currentUser;
+      final addressProvider = context.read<AddressProvider>();
+      addressProvider.loadAddresses(user?.uid).then((_) {
+        if (mounted && addressProvider.addresses.isNotEmpty) {
+          final def = addressProvider.selectedAddress ?? addressProvider.defaultAddress;
+          if (def != null) {
+            _populateFromAddress(def);
+          }
+        }
+      });
+    });
+  }
+
+  void _populateFromAddress(AddressModel address) {
+    setState(() {
+      _nameController.text = address.recipientName;
+      _phoneController.text = address.phoneNumber;
+      _addressController.text = address.streetAddress;
+      _cityController.text = address.city;
+      _selectedProvince = _provinces.contains(address.province) ? address.province : null;
+    });
+  }
 
   @override
   void dispose() {
@@ -32,14 +73,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _cityController.dispose();
-    _provinceController.dispose();
     super.dispose();
   }
 
   bool get _isPhoneValid => PhoneValidator.isValidPakistanMobile(_phoneController.text);
 
   Future<void> _handlePlaceOrder() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() || _selectedProvince == null) {
       return;
     }
 
@@ -54,14 +94,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     setState(() => _isPlacingOrder = true);
 
     final auth = context.read<AuthProvider>();
+    final addressProvider = context.read<AddressProvider>();
     final orderProvider = context.read<OrderProvider>();
+
+    // Auto-save address if requested or if first address
+    if ((addressProvider.addresses.isEmpty || _saveAddressForFuture) && addressProvider.canAddMore) {
+      final alreadyExists = addressProvider.addresses.any(
+        (a) =>
+            a.streetAddress.trim().toLowerCase() == _addressController.text.trim().toLowerCase() &&
+            a.city.trim().toLowerCase() == _cityController.text.trim().toLowerCase(),
+      );
+      if (!alreadyExists) {
+        await addressProvider.addAddress(
+          label: 'Home',
+          recipientName: _nameController.text.trim(),
+          phoneNumber: _phoneController.text.trim(),
+          streetAddress: _addressController.text.trim(),
+          city: _cityController.text.trim(),
+          province: _selectedProvince!,
+          isDefault: addressProvider.addresses.isEmpty,
+        );
+      }
+    }
 
     final deliveryInfo = DeliveryInfo(
       fullName: _nameController.text.trim(),
       phone: _phoneController.text.trim(),
       streetAddress: _addressController.text.trim(),
       city: _cityController.text.trim(),
-      province: _provinceController.text.trim(),
+      province: _selectedProvince!,
     );
 
     final newOrder = await orderProvider.placeOrder(
@@ -411,39 +472,119 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildDeliveryForm() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
+    final addressProvider = context.watch<AddressProvider>();
+    final addresses = addressProvider.addresses;
+    final selected = addressProvider.selectedAddress;
+
+    return Material(
+      color: AppTheme.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      shadowColor: Colors.black.withOpacity(0.02),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.location_on_outlined, size: 20, color: AppTheme.primary),
-              SizedBox(width: 8),
-              Text(
-                'Delivery Information',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.onSurface),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.location_on_outlined, size: 20, color: AppTheme.primary),
+                  SizedBox(width: 8),
+                  Text(
+                    'Delivery Information',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.onSurface),
+                  ),
+                ],
               ),
+              if (addresses.isNotEmpty)
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  icon: const Icon(Icons.swap_horiz, size: 16, color: AppTheme.primary),
+                  label: Text('Addresses (${addresses.length}/3)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.primary)),
+                  onPressed: () => _showAddressPicker(context, addressProvider),
+                ),
             ],
           ),
+
+          // If addresses exist, show quick-select chips bar
+          if (addresses.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final addr in addresses)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        selected: selected?.id == addr.id,
+                        selectedColor: AppTheme.primary,
+                        backgroundColor: AppTheme.surfaceContainerLow,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              addr.label,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: selected?.id == addr.id ? FontWeight.w700 : FontWeight.w500,
+                                color: selected?.id == addr.id ? Colors.white : AppTheme.secondary,
+                              ),
+                            ),
+                            if (addr.isDefault) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.star,
+                                size: 12,
+                                color: selected?.id == addr.id ? Colors.amberAccent : AppTheme.primary,
+                              ),
+                            ],
+                          ],
+                        ),
+                        onSelected: (val) {
+                          if (val) {
+                            addressProvider.selectAddress(addr);
+                            _populateFromAddress(addr);
+                          }
+                        },
+                      ),
+                    ),
+                  if (addressProvider.canAddMore)
+                    ActionChip(
+                      backgroundColor: AppTheme.surfaceContainerLowest,
+                      side: const BorderSide(color: AppTheme.primary, width: 1),
+                      avatar: const Icon(Icons.add, size: 14, color: AppTheme.primary),
+                      label: const Text('+ New', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primary)),
+                      onPressed: () async {
+                        final newAddr = await AddEditAddressDialog.show(context);
+                        if (newAddr != null) {
+                          _populateFromAddress(newAddr);
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 14),
 
           // Full Name
           TextFormField(
             controller: _nameController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
-              labelText: 'Full Name',
+              labelText: 'Recipient Full Name',
+              hintText: 'Enter recipient name',
               prefixIcon: Icon(Icons.person_outline, size: 20, color: AppTheme.secondary),
             ),
             validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter recipient name' : null,
@@ -451,15 +592,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
           const SizedBox(height: 12),
 
-          // Mobile Number with live validation
+          // Mobile Number with live Pakistan validation
           TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.next,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
               labelText: 'Mobile Contact',
               hintText: '03001234567',
-              helperText: 'Enter 11-digit Pakistan mobile (e.g. 03001234567)',
+              helperText: '11-digit Pakistan mobile starting with 03',
               helperStyle: const TextStyle(fontSize: 11, color: AppTheme.secondary),
               prefixIcon: const Icon(Icons.phone_outlined, size: 20, color: AppTheme.secondary),
               suffixIcon: _isPhoneValid
@@ -474,9 +616,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           // Street Address
           TextFormField(
             controller: _addressController,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'Street Address',
-              hintText: 'House/flat, street, area',
+              hintText: 'House / Flat, Street, Area',
               prefixIcon: Icon(Icons.home_outlined, size: 20, color: AppTheme.secondary),
             ),
             validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter address' : null,
@@ -484,34 +627,160 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
           const SizedBox(height: 12),
 
-          // City and Province Row
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _cityController,
-                  decoration: const InputDecoration(
-                    labelText: 'City',
-                    prefixIcon: Icon(Icons.location_city_outlined, size: 20, color: AppTheme.secondary),
-                  ),
-                  validator: (val) => (val == null || val.trim().isEmpty) ? 'Enter city' : null,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  controller: _provinceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Province / Postal',
-                    prefixIcon: Icon(Icons.map_outlined, size: 20, color: AppTheme.secondary),
-                  ),
-                  validator: (val) => (val == null || val.trim().isEmpty) ? 'Enter province' : null,
-                ),
-              ),
-            ],
+          // City
+          TextFormField(
+            controller: _cityController,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              labelText: 'City',
+              hintText: 'e.g. Lahore, Karachi, Islamabad',
+              prefixIcon: Icon(Icons.location_city_outlined, size: 20, color: AppTheme.secondary),
+            ),
+            validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter city' : null,
           ),
+
+          const SizedBox(height: 12),
+
+          // Province Dropdown (Full width, isExpanded to prevent any overflow)
+          DropdownButtonFormField<String>(
+            value: _selectedProvince,
+            isExpanded: true,
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.primary, size: 22),
+            dropdownColor: AppTheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(16),
+            elevation: 3,
+            hint: const Text(
+              'Select Province',
+              style: TextStyle(fontSize: 14, color: AppTheme.secondary),
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Province',
+              prefixIcon: Icon(Icons.map_outlined, size: 20, color: AppTheme.secondary),
+            ),
+            items: _provinces.map((prov) {
+              return DropdownMenuItem<String>(
+                value: prov,
+                child: Text(
+                  prov,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.primary),
+                ),
+              );
+            }).toList(),
+            onChanged: (val) {
+              setState(() => _selectedProvince = val);
+            },
+            validator: (val) => (val == null || val.isEmpty) ? 'Please select a province' : null,
+          ),
+
+          // Save address checkbox if user can add more
+          if (addressProvider.canAddMore) ...[
+            const SizedBox(height: 8),
+            Material(
+              color: Colors.transparent,
+              child: CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                activeColor: AppTheme.primary,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: const Text('Save this delivery address for future orders', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                value: _saveAddressForFuture,
+                onChanged: (val) => setState(() => _saveAddressForFuture = val ?? true),
+              ),
+            ),
+          ],
         ],
       ),
+      ),
+    );
+  }
+
+  void _showAddressPicker(BuildContext context, AddressProvider addressProvider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surfaceContainerLowest,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Material(
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Select Delivery Address',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                        ),
+                        Text('${addressProvider.count} / 3 Saved', style: const TextStyle(fontSize: 12, color: AppTheme.secondary)),
+                      ],
+                    ),
+                  ),
+                  for (final addr in addressProvider.addresses)
+                    Material(
+                      color: Colors.transparent,
+                      child: ListTile(
+                        leading: Icon(
+                          addr.isDefault ? Icons.star : Icons.location_on_outlined,
+                          color: addr.isDefault ? Colors.amber[700] : AppTheme.primary,
+                        ),
+                        title: Row(
+                          children: [
+                            Text(addr.label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                            if (addr.isDefault) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE8F5E9),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text('Default', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.success)),
+                              ),
+                            ],
+                          ],
+                        ),
+                        subtitle: Text('${addr.recipientName} • ${addr.streetAddress}, ${addr.city}', maxLines: 1, overflow: TextOverflow.ellipsis),
+                        trailing: addressProvider.selectedAddress?.id == addr.id
+                            ? const Icon(Icons.check, color: AppTheme.primary)
+                            : null,
+                        onTap: () {
+                          addressProvider.selectAddress(addr);
+                          _populateFromAddress(addr);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                  if (addressProvider.canAddMore) ...[
+                    const Divider(),
+                    Material(
+                      color: Colors.transparent,
+                      child: ListTile(
+                        leading: const Icon(Icons.add_circle_outline, color: AppTheme.primary),
+                        title: const Text('Add New Address', style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primary)),
+                        onTap: () async {
+                          Navigator.pop(ctx);
+                          final newAddr = await AddEditAddressDialog.show(context);
+                          if (newAddr != null) {
+                            _populateFromAddress(newAddr);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -59,38 +59,47 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       ),
                     ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.star_outline, color: AppTheme.primary),
-                    title: const Text('Featured'),
-                    trailing: catalog.sortOption == ProductSortOption.featured
-                        ? const Icon(Icons.check, color: AppTheme.primary)
-                        : null,
-                    onTap: () {
-                      catalog.setSortOption(ProductSortOption.featured);
-                      Navigator.pop(ctx);
-                    },
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: const Icon(Icons.star_outline, color: AppTheme.primary),
+                      title: const Text('Featured'),
+                      trailing: catalog.sortOption == ProductSortOption.featured
+                          ? const Icon(Icons.check, color: AppTheme.primary)
+                          : null,
+                      onTap: () {
+                        catalog.setSortOption(ProductSortOption.featured);
+                        Navigator.pop(ctx);
+                      },
+                    ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.arrow_upward, color: AppTheme.primary),
-                    title: const Text('Price: Low to High'),
-                    trailing: catalog.sortOption == ProductSortOption.priceLowToHigh
-                        ? const Icon(Icons.check, color: AppTheme.primary)
-                        : null,
-                    onTap: () {
-                      catalog.setSortOption(ProductSortOption.priceLowToHigh);
-                      Navigator.pop(ctx);
-                    },
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: const Icon(Icons.arrow_upward, color: AppTheme.primary),
+                      title: const Text('Price: Low to High'),
+                      trailing: catalog.sortOption == ProductSortOption.priceLowToHigh
+                          ? const Icon(Icons.check, color: AppTheme.primary)
+                          : null,
+                      onTap: () {
+                        catalog.setSortOption(ProductSortOption.priceLowToHigh);
+                        Navigator.pop(ctx);
+                      },
+                    ),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.arrow_downward, color: AppTheme.primary),
-                    title: const Text('Price: High to Low'),
-                    trailing: catalog.sortOption == ProductSortOption.priceHighToLow
-                        ? const Icon(Icons.check, color: AppTheme.primary)
-                        : null,
-                    onTap: () {
-                      catalog.setSortOption(ProductSortOption.priceHighToLow);
-                      Navigator.pop(ctx);
-                    },
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: const Icon(Icons.arrow_downward, color: AppTheme.primary),
+                      title: const Text('Price: High to Low'),
+                      trailing: catalog.sortOption == ProductSortOption.priceHighToLow
+                          ? const Icon(Icons.check, color: AppTheme.primary)
+                          : null,
+                      onTap: () {
+                        catalog.setSortOption(ProductSortOption.priceHighToLow);
+                        Navigator.pop(ctx);
+                      },
+                    ),
                   ),
                 ],
               ),
