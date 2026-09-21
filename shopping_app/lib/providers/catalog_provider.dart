@@ -1,0 +1,98 @@
+import 'package:flutter/foundation.dart';
+import '../models/product.dart';
+import '../services/catalog_service.dart';
+
+enum ProductSortOption {
+  featured,
+  priceLowToHigh,
+  priceHighToLow,
+}
+
+class CatalogProvider extends ChangeNotifier {
+  final CatalogService _service;
+
+  List<Product> _products = [];
+  bool _isLoading = true;
+  String _selectedCategory = 'All';
+  String _searchQuery = '';
+  ProductSortOption _sortOption = ProductSortOption.featured;
+
+  CatalogProvider({CatalogService? service}) : _service = service ?? CatalogService() {
+    loadProducts();
+  }
+
+  List<Product> get allProducts => _products;
+  bool get isLoading => _isLoading;
+  String get selectedCategory => _selectedCategory;
+  String get searchQuery => _searchQuery;
+  ProductSortOption get sortOption => _sortOption;
+
+  List<String> get categories => const ['All', 'Electronics', 'Fashion', 'Home & Living'];
+
+  Future<void> loadProducts() async {
+    _isLoading = true;
+    notifyListeners();
+
+    _products = await _service.loadCatalog();
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void selectCategory(String category) {
+    if (_selectedCategory == category) return;
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query.trim().toLowerCase();
+    notifyListeners();
+  }
+
+  void setSortOption(ProductSortOption option) {
+    _sortOption = option;
+    notifyListeners();
+  }
+
+  void resetFilters() {
+    _selectedCategory = 'All';
+    _searchQuery = '';
+    _sortOption = ProductSortOption.featured;
+    notifyListeners();
+  }
+
+  /// Returns the reactive filtered and sorted list of products.
+  List<Product> get filteredProducts {
+    List<Product> results = List.from(_products);
+
+    // 1. Category Filter
+    if (_selectedCategory != 'All') {
+      results = results.where((p) => p.category.toLowerCase() == _selectedCategory.toLowerCase()).toList();
+    }
+
+    // 2. Search Query Filter
+    if (_searchQuery.isNotEmpty) {
+      results = results.where((p) {
+        final nameMatch = p.name.toLowerCase().contains(_searchQuery);
+        final descMatch = p.description.toLowerCase().contains(_searchQuery);
+        final catMatch = p.category.toLowerCase().contains(_searchQuery);
+        return nameMatch || descMatch || catMatch;
+      }).toList();
+    }
+
+    // 3. Sorting
+    switch (_sortOption) {
+      case ProductSortOption.priceLowToHigh:
+        results.sort((a, b) => a.pricePaisa.compareTo(b.pricePaisa));
+        break;
+      case ProductSortOption.priceHighToLow:
+        results.sort((a, b) => b.pricePaisa.compareTo(a.pricePaisa));
+        break;
+      case ProductSortOption.featured:
+        // Keep catalog default order
+        break;
+    }
+
+    return results;
+  }
+}

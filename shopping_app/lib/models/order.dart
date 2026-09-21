@@ -61,6 +61,7 @@ class OrderSnapshotItem {
 @immutable
 class OrderModel {
   final String orderId;
+  final String userId;
   final List<OrderSnapshotItem> items;
   final DeliveryInfo deliveryInfo;
   final int subtotalPaisa;
@@ -69,8 +70,12 @@ class OrderModel {
   final String status;
   final DateTime createdAt;
 
+  /// Alias for orderId
+  String get id => orderId;
+
   const OrderModel({
     required this.orderId,
+    this.userId = '',
     required this.items,
     required this.deliveryInfo,
     required this.subtotalPaisa,
@@ -85,6 +90,7 @@ class OrderModel {
   Map<String, dynamic> toFirestoreMap({bool useServerTimestamp = true}) {
     return {
       'orderId': orderId,
+      'userId': userId,
       'items': items.map((e) => e.toJson()).toList(),
       'deliveryInfo': deliveryInfo.toJson(),
       'subtotalPaisa': subtotalPaisa,
@@ -116,6 +122,7 @@ class OrderModel {
 
     return OrderModel(
       orderId: data['orderId'] as String? ?? doc.id,
+      userId: data['userId'] as String? ?? '',
       items: itemsList,
       deliveryInfo: DeliveryInfo.fromJson(
         Map<String, dynamic>.from(data['deliveryInfo'] as Map? ?? {}),

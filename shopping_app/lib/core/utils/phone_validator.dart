@@ -42,6 +42,9 @@ class PhoneValidator {
     return validate(input) == null;
   }
 
+  /// Alias for Pakistani phone validation.
+  static bool isValidPakistanMobile(String? input) => isValid(input);
+
   /// Formats raw digits into a readable format: `0300-1234567`.
   static String formatForDisplay(String phone) {
     final clean = phone.replaceAll(RegExp(r'\D'), '');

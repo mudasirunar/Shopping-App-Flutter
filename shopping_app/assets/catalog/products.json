@@ -1,0 +1,114 @@
+[
+  {
+    "id": "prod-001",
+    "name": "Aura Wireless ANC Headphones",
+    "description": "Crafted with custom 40mm bio-cellulose drivers, hybrid active noise cancellation, and 38-hour battery longevity. Memory foam ear cushions finished in vegan leather for all-day listening comfort.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2499900
+  },
+  {
+    "id": "prod-002",
+    "name": "Precision Gooseneck Kettle",
+    "description": "Temperature-controlled 1.0L pour-over electric kettle with matte stainless finish, ergonomic wooden handle, and precision spout designed for consistent brew extraction.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1450000
+  },
+  {
+    "id": "prod-003",
+    "name": "Tailored Linen Overshirt",
+    "description": "100% breathable European flax linen overshirt featuring tailored French seams, natural horn buttons, and twin utilitarian chest pockets for timeless layering.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 825000
+  },
+  {
+    "id": "prod-004",
+    "name": "Ceramic Pour-Over & Carafe",
+    "description": "Handcrafted minimalist ceramic dripper paired with heat-resistant 600ml borosilicate glass carafe for the ultimate artisanal morning brew ritual.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 680000
+  },
+  {
+    "id": "prod-005",
+    "name": "Minimalist Leather Cardholder",
+    "description": "Slim bifold card wallet handcrafted from vegetable-tanned full-grain leather with RFID shielding and 6 quick-access card slots plus cash slip.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 345000
+  },
+  {
+    "id": "prod-006",
+    "name": "Studio Mechanical Keyboard",
+    "description": "75% compact wireless mechanical keyboard with hot-swappable tactile switches, sound-dampening silicone gasket mount, and CNC machined aluminum chassis.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1890000
+  },
+  {
+    "id": "prod-007",
+    "name": "Ergonomic Aluminum Laptop Stand",
+    "description": "Precision anodized aluminum riser promoting airflow and comfortable posture. Folds flat with anti-slip silicone pads and cable routing cutouts.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 560000
+  },
+  {
+    "id": "prod-008",
+    "name": "Japanese Raw Denim Jacket",
+    "description": "14oz selvedge raw indigo denim jacket woven on vintage shuttle looms. Features durable copper hardware and develops unique fading over years of wear.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1299900
+  },
+  {
+    "id": "prod-009",
+    "name": "Cast Iron Skillet 10-Inch",
+    "description": "Pre-seasoned heavy-gauge cast iron frying pan engineered with smooth cooking surface, dual pour spouts, and heat-resistant silicone handle grip.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 740000
+  },
+  {
+    "id": "prod-010",
+    "name": "Magnetic Wireless Power Bank",
+    "description": "10,000mAh ultra-compact power bank with 15W MagSafe wireless charging, 20W USB-C Power Delivery fast charging, and built-in kickstand.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1609592426868-80fbebe3e858?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 920000
+  },
+  {
+    "id": "prod-011",
+    "name": "Hand-Poured Soy Wax Candle",
+    "description": "Natural amber glass scented candle made with botanical soy wax, lead-free cotton wick, and notes of cedarwood, amber, and crisp bergamot. 50-hour burn.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 280000
+  },
+  {
+    "id": "prod-012",
+    "name": "Oxford Cotton Button-Down Shirt",
+    "description": "Classic tailored oxford shirt made with 100% two-ply combed cotton, pre-shrunk wash, mother-of-pearl buttons, and rounded barrel cuffs.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 495000
+  },
+  {
+    "id": "prod-013",
+    "name": "Smart Ambient Desk Lamp",
+    "description": "Sleek architectural LED task lamp featuring stepless touch dimming, adjustable 2700K-6500K color temperature, and integrated USB-C device charging port.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1150000
+  },
+  {
+    "id": "prod-014",
+    "name": "Wool Blend Minimalist Overcoat",
+    "description": "Refined single-breasted wool overcoat with structured shoulders, satin inner lining, deep welt pockets, and notched lapels for cold-weather elegance.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1539533018447-63fcce667823?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2200000
+  }
+]
