@@ -229,10 +229,10 @@ class ProductCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left Image Canvas (Width: 124, Height: 136)
+            // Left Image Canvas (Width: 120, Height: 134)
             SizedBox(
-              width: 124,
-              height: 136,
+              width: 120,
+              height: 134,
               child: Stack(
                 children: [
                   Positioned.fill(
@@ -261,25 +261,30 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Row 1: Category, Transit Duration, Quality Tag
+                  // Row 1: Category, Transit Duration, Quality Tag (Defensively flexed)
                   Row(
                     children: [
-                      Text(
-                        product.category.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary,
-                          letterSpacing: 0.7,
+                      Flexible(
+                        child: Text(
+                          product.category.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.secondary,
+                            letterSpacing: 0.7,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       Text('•', style: TextStyle(color: AppTheme.secondary.withOpacity(0.4), fontSize: 10)),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 4),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.bolt_rounded, size: 11, color: Color(0xFFF59E0B)),
+                          const SizedBox(width: 1),
                           Text(
                             '${product.effectiveDeliveryDays}d transit',
                             style: const TextStyle(
@@ -290,23 +295,28 @@ class ProductCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      if (product.qualityTag != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceContainerLow,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            product.qualityTag!,
-                            style: const TextStyle(
-                              fontSize: 8.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.primary,
+                      if (product.qualityTag != null) ...[
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceContainerLow,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              product.qualityTag!,
+                              style: const TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.primary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
+                      ],
                     ],
                   ),
 
@@ -328,7 +338,7 @@ class ProductCard extends StatelessWidget {
 
                   const SizedBox(height: 4),
 
-                  // Row 3: Rating + Review Count
+                  // Row 3: Rating + Review Count (Flexed to avoid overflow)
                   Row(
                     children: [
                       ...List.generate(5, (starIdx) {
@@ -350,11 +360,15 @@ class ProductCard extends StatelessWidget {
                       ),
                       if (product.reviews != null && product.reviews!.isNotEmpty) ...[
                         const SizedBox(width: 4),
-                        Text(
-                          '• ${product.reviews!.length} reviews',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppTheme.secondary,
+                        Flexible(
+                          child: Text(
+                            '• ${product.reviews!.length} reviews',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: AppTheme.secondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -378,20 +392,25 @@ class ProductCard extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // Row 5: Price and Action Button
+                  // Row 5: Price and Action Button (Expanded price to avoid overflow)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        CurrencyFormatter.formatPaisa(product.pricePaisa),
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.primary,
-                          letterSpacing: -0.3,
+                      Expanded(
+                        child: Text(
+                          CurrencyFormatter.formatPaisa(product.pricePaisa),
+                          style: const TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.primary,
+                            letterSpacing: -0.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      const SizedBox(width: 8),
                       _buildCartActionButton(context, cart, inCart, isWide: true),
                     ],
                   ),

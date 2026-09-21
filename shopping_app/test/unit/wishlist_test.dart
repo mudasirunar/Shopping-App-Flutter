@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopping_app/models/product.dart';
+import 'package:shopping_app/providers/cart_provider.dart';
 import 'package:shopping_app/providers/wishlist_provider.dart';
+import 'package:shopping_app/widgets/responsive_product_grid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -136,6 +140,50 @@ void main() {
       await Future.delayed(Duration.zero);
       expect(provider.itemCount, 1);
       expect(provider.isFavorite('prod-001'), isTrue);
+    });
+
+    testWidgets('Renders 3 products with wide card without overflow on narrow screens', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      const testProduct3 = Product(
+        id: 'prod-003',
+        name: 'Flagship Ultra Smart Watch Pro with Titanium Case',
+        description: 'Premium titanium case smartwatch with cellular connectivity',
+        category: 'Smartwatches & Accessories',
+        image: 'https://images.unsplash.com/test3',
+        pricePaisa: 7500000,
+        qualityTag: 'Flagship Quality',
+        deliveryDays: 4,
+      );
+
+      final cartProvider = CartProvider();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ChangeNotifierProvider.value(
+            value: cartProvider,
+            child: Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  ResponsiveProductGrid(
+                    products: const [testProduct1, testProduct2, testProduct3],
+                    onProductTap: (_) {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text(testProduct1.name), findsOneWidget);
+      expect(find.text(testProduct2.name), findsOneWidget);
+      expect(find.text(testProduct3.name), findsOneWidget);
     });
   });
 }
