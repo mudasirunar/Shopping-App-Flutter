@@ -6,9 +6,8 @@ import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
-import '../cart/cart_screen.dart';
-import '../wishlist/wishlist_screen.dart';
 import '../../core/utils/app_snackbar.dart';
+import '../../core/navigation/app_navigator.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
@@ -78,15 +77,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   context,
                   message: 'Saved ${product.name} to Wishlist',
                   actionLabel: 'View Wishlist',
-                  onAction: () {
-                    if (!context.mounted) return;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const WishlistScreen(),
-                      ),
-                    );
-                  },
+                  onAction: () => AppNavigator.openWishlist(),
                 );
               }
             },
@@ -104,14 +95,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 child: const Icon(Icons.shopping_bag_outlined, color: AppTheme.primary),
               ),
               tooltip: 'View Cart',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CartScreen(),
-                  ),
-                );
-              },
+              onPressed: () => AppNavigator.openCart(),
             ),
           const SizedBox(width: 8),
         ],
@@ -600,17 +584,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           message: 'Added $_quantity x ${product.name} to cart',
                           actionLabel: widget.showCartAction ? 'View Cart' : 'Back to Cart',
                           onAction: () {
-                            if (!context.mounted) return;
-                            if (widget.showCartAction) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const CartScreen(),
-                                ),
-                              );
-                            } else {
+                            if (!widget.showCartAction && context.mounted) {
                               Navigator.pop(context);
+                              return;
                             }
+                            AppNavigator.openCart();
                           },
                         );
                       },

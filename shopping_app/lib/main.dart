@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/navigation/app_navigator.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/address_provider.dart';
 import 'providers/auth_provider.dart';
@@ -58,6 +59,7 @@ class ShoppingApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: AppNavigator.navigatorKey,
         title: 'Shopping App',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,

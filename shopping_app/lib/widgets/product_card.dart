@@ -6,6 +6,7 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import 'app_network_image.dart';
 import '../core/utils/app_snackbar.dart';
+import '../core/navigation/app_navigator.dart';
 
 /// Reusable responsive product card used across CatalogScreen and WishlistScreen.
 /// Adapts dynamically to available width: renders compact 2-column card when narrow,
@@ -478,6 +479,8 @@ class ProductCard extends StatelessWidget {
         AppSnackBar.show(
           context,
           message: 'Added ${product.name} to cart',
+          actionLabel: 'View Cart',
+          onAction: () => AppNavigator.openCart(),
         );
       },
       borderRadius: BorderRadius.circular(8),
