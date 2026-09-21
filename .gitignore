@@ -66,7 +66,12 @@ shopping_app/.flutter-plugins-dependencies
 # ------------------------------------------------------------------------------
 # iOS Build Files & Generated Configurations
 # ------------------------------------------------------------------------------
-**/ios/Flutter/Generated.xcconfig
+**Flutter Shopping App (Task 04)
+Internship Assignment: Anas Technologies / Flutter Internship
+Bundle Identifier: com.mudasir.shopping_app
+Platforms: Android & iOS only
+Architecture: Clean Layered Architecture with Provider State Management
+Cloud & Backend Services: Firebase Auth, Cloud Firestore, Vercel Serverless (Node.js + Brevo API for Password Reset)Flutter/Generated.xcconfig
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/Flutter/Generated.h
 **/ios/Flutter/Generated.m

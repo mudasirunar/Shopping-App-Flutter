@@ -1,12 +1,4 @@
-# Flutter Shopping App (Task 04)
-
-> **Internship Assignment:** Anas Technologies / Flutter Internship  
-> **Bundle Identifier:** `com.mudasir.shopping_app`  
-> **Platforms:** Android & iOS only  
-> **Architecture:** Clean Layered Architecture with Provider State Management  
-> **Cloud & Backend Services:** Firebase Auth, Cloud Firestore, Vercel Serverless (Node.js + Brevo API for Password Reset)
-
----
+# Shopping App
 
 ## 📌 Project Overview
 A production-grade mobile shopping application featuring:
@@ -24,12 +16,6 @@ A production-grade mobile shopping application featuring:
 
 ```
 .
-├── docs/                               # Project Documentation (Committed to Git)
-│   ├── PRD.md                          # Product Requirements Document
-│   ├── ARCHITECTURE.md                 # System & Data Architecture
-│   ├── DESIGN.md                       # UI/UX Specifications & Design System
-│   ├── AGENTS.md                       # AI Agent Guidelines & Operations Policy
-│   └── TASK_TRACKER.md                 # Phased Execution Roadmap
 ├── shopping_app/                       # Flutter Mobile Application
 │   ├── android/                        # Android project (com.mudasir.shopping_app)
 │   ├── ios/                            # iOS project (com.mudasir.shopping_app)
@@ -44,7 +30,7 @@ A production-grade mobile shopping application featuring:
 │   ├── .env.example                    # Backend environment variable template
 │   └── vercel.json                     # Vercel serverless configuration
 ├── firestore.rules                     # Cloud Firestore Security Rules
-├── .gitignore                          # Global gitignore (Safeguarding docs/)
+├── .gitignore                          # Global gitignore
 └── README.md                           # Main Project README
 ```
 
@@ -72,5 +58,4 @@ npm start
 
 ## 🔒 Security & Secrets Policy
 - **Never commit `.env` or service account keys.**
-- The `docs/` directory is permanently tracked in version control.
 - Client writes strictly enforce data schema and ownership in `firestore.rules`.
