@@ -1,14 +1,7 @@
 # ==============================================================================
 # Root .gitignore for Shopping App Monorepo
 # Contains Flutter App (Android & iOS) + Vercel Serverless Backend
-# NOTE: docs/ folder is explicitly tracked and NEVER ignored.
 # ==============================================================================
-
-# ------------------------------------------------------------------------------
-# Documentation Exemption (docs/ is ALWAYS tracked in Git)
-# ------------------------------------------------------------------------------
-!docs/
-!docs/**
 
 # ------------------------------------------------------------------------------
 # Operating System & IDE Files
