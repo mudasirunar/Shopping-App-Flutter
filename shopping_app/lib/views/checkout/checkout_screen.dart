@@ -11,6 +11,7 @@ import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
 import '../address/add_edit_address_dialog.dart';
 import '../orders/order_history_screen.dart';
+import '../../widgets/app_network_image.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -949,17 +950,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 children: [
-                  ClipRRect(
+                  AppNetworkImage(
+                    imageUrl: item.product.image,
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(6),
-                    child: SizedBox(
-                      width: 36,
-                      height: 36,
-                      child: Image.network(
-                        item.product.image,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 16),
-                      ),
-                    ),
+                    category: item.product.category,
+                    iconSize: 16,
                   ),
                   const SizedBox(width: 10),
                   Expanded(

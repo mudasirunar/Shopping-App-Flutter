@@ -5,7 +5,37 @@
     "description": "Crafted with custom 40mm bio-cellulose drivers, hybrid active noise cancellation, and 38-hour battery longevity. Memory foam ear cushions finished in vegan leather for all-day listening comfort.",
     "category": "Electronics",
     "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 2499900
+    "pricePaisa": 2499900,
+    "rating": 4.4,
+    "reviewCount": 12,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Hamza Tariq",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Exceptional build quality. Pairs seamlessly with my phone and laptop, and battery life easily exceeds 30 hours."
+      },
+      {
+        "reviewerName": "Ayesha Khan",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      }
+    ],
+    "badgeTag": "EDITION 01",
+    "qualityTag": "Verified Quality"
   },
   {
     "id": "prod-002",
@@ -13,7 +43,42 @@
     "description": "Temperature-controlled 1.0L pour-over electric kettle with matte stainless finish, ergonomic wooden handle, and precision spout designed for consistent brew extraction.",
     "category": "Home & Living",
     "image": "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 1450000
+    "pricePaisa": 1450000,
+    "rating": 4.5,
+    "reviewCount": 25,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bilal Siddiqui",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      },
+      {
+        "reviewerName": "Zainab Malik",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "Works wonderfully. Minimalist design matches my room perfectly and performance is flawless."
+      },
+      {
+        "reviewerName": "Usman Farooq",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      }
+    ],
+    "qualityTag": "Verified Quality"
   },
   {
     "id": "prod-003",
@@ -21,7 +86,37 @@
     "description": "100% breathable European flax linen overshirt featuring tailored French seams, natural horn buttons, and twin utilitarian chest pockets for timeless layering.",
     "category": "Fashion",
     "image": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 825000
+    "pricePaisa": 825000,
+    "rating": 4.6,
+    "reviewCount": 38,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Maryam Javed",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Great cut and drape. Survived multiple washes without shrinkage or fading. Worth every rupee."
+      },
+      {
+        "reviewerName": "Omar Farooq",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      }
+    ],
+    "badgeTag": "SIGNATURE",
+    "qualityTag": "Best Seller"
   },
   {
     "id": "prod-004",
@@ -29,7 +124,42 @@
     "description": "Handcrafted minimalist ceramic dripper paired with heat-resistant 600ml borosilicate glass carafe for the ultimate artisanal morning brew ritual.",
     "category": "Home & Living",
     "image": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 680000
+    "pricePaisa": 680000,
+    "rating": 4.7,
+    "reviewCount": 51,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Fatima Noor",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      },
+      {
+        "reviewerName": "Mustafa Ali",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Sana Ahmed",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ],
+    "qualityTag": "Verified Quality"
   },
   {
     "id": "prod-005",
@@ -37,7 +167,37 @@
     "description": "Slim bifold card wallet handcrafted from vegetable-tanned full-grain leather with RFID shielding and 6 quick-access card slots plus cash slip.",
     "category": "Fashion",
     "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 345000
+    "pricePaisa": 345000,
+    "rating": 4.8,
+    "reviewCount": 64,
+    "stockStatus": "lowStock",
+    "deliveryDays": 2,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Daniyal Raza",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Hira Sheikh",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ],
+    "stockCount": 2,
+    "qualityTag": "Handcrafted"
   },
   {
     "id": "prod-006",
@@ -45,7 +205,43 @@
     "description": "75% compact wireless mechanical keyboard with hot-swappable tactile switches, sound-dampening silicone gasket mount, and CNC machined aluminum chassis.",
     "category": "Electronics",
     "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 1890000
+    "pricePaisa": 1890000,
+    "rating": 4.9,
+    "reviewCount": 77,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Saad Qureshi",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      },
+      {
+        "reviewerName": "Mahnoor Tariq",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Works exactly as described. Clean finish with responsive controls. Very satisfied with this purchase."
+      },
+      {
+        "reviewerName": "Shahzaib Khan",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      }
+    ],
+    "badgeTag": "EDITION 01",
+    "qualityTag": "Best Seller"
   },
   {
     "id": "prod-007",
@@ -53,7 +249,36 @@
     "description": "Precision anodized aluminum riser promoting airflow and comfortable posture. Folds flat with anti-slip silicone pads and cable routing cutouts.",
     "category": "Electronics",
     "image": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 560000
+    "pricePaisa": 560000,
+    "rating": 4.4,
+    "reviewCount": 90,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Rabia Aslam",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Works exactly as described. Clean finish with responsive controls. Very satisfied with this purchase."
+      },
+      {
+        "reviewerName": "Fahad Mehmood",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      }
+    ],
+    "qualityTag": "Customer Favorite"
   },
   {
     "id": "prod-008",
@@ -61,7 +286,43 @@
     "description": "14oz selvedge raw indigo denim jacket woven on vintage shuttle looms. Features durable copper hardware and develops unique fading over years of wear.",
     "category": "Fashion",
     "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 1299900
+    "pricePaisa": 1299900,
+    "rating": 4.5,
+    "reviewCount": 18,
+    "stockStatus": "outOfStock",
+    "deliveryDays": 5,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Khadija Baig",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      },
+      {
+        "reviewerName": "Zubair Hashmi",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Anum Riaz",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ],
+    "stockCount": 0,
+    "badgeTag": "LIMITED RUN"
   },
   {
     "id": "prod-009",
@@ -69,15 +330,79 @@
     "description": "Pre-seasoned heavy-gauge cast iron frying pan engineered with smooth cooking surface, dual pour spouts, and heat-resistant silicone handle grip.",
     "category": "Home & Living",
     "image": "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 740000
+    "pricePaisa": 740000,
+    "rating": 4.6,
+    "reviewCount": 31,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Taimoor Shah",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Amna Bashir",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ],
+    "qualityTag": "Verified Quality"
   },
   {
     "id": "prod-010",
     "name": "Magnetic Wireless Power Bank",
     "description": "10,000mAh ultra-compact power bank with 15W MagSafe wireless charging, 20W USB-C Power Delivery fast charging, and built-in kickstand.",
     "category": "Electronics",
-    "image": "https://images.unsplash.com/photo-1609592426868-80fbebe3e858?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 920000
+    "image": "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 920000,
+    "rating": 4.7,
+    "reviewCount": 44,
+    "stockStatus": "lowStock",
+    "deliveryDays": 3,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Waleed Akhtar",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      },
+      {
+        "reviewerName": "Saba Qadir",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Works exactly as described. Clean finish with responsive controls. Very satisfied with this purchase."
+      },
+      {
+        "reviewerName": "Haris Nadeem",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      }
+    ],
+    "stockCount": 3
   },
   {
     "id": "prod-011",
@@ -85,7 +410,36 @@
     "description": "Natural amber glass scented candle made with botanical soy wax, lead-free cotton wick, and notes of cedarwood, amber, and crisp bergamot. 50-hour burn.",
     "category": "Home & Living",
     "image": "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 280000
+    "pricePaisa": 280000,
+    "rating": 4.8,
+    "reviewCount": 57,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bushra Gillani",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "Works wonderfully. Minimalist design matches my room perfectly and performance is flawless."
+      },
+      {
+        "reviewerName": "Arsalan Bukhari",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      }
+    ],
+    "qualityTag": "Best Seller"
   },
   {
     "id": "prod-012",
@@ -93,7 +447,42 @@
     "description": "Classic tailored oxford shirt made with 100% two-ply combed cotton, pre-shrunk wash, mother-of-pearl buttons, and rounded barrel cuffs.",
     "category": "Fashion",
     "image": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 495000
+    "pricePaisa": 495000,
+    "rating": 4.9,
+    "reviewCount": 70,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Mehwish Naz",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      },
+      {
+        "reviewerName": "Nabeel Sarwar",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Iqra Rasheed",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ],
+    "badgeTag": "ESSENTIAL"
   },
   {
     "id": "prod-013",
@@ -101,14 +490,1504 @@
     "description": "Sleek architectural LED task lamp featuring stepless touch dimming, adjustable 2700K-6500K color temperature, and integrated USB-C device charging port.",
     "category": "Home & Living",
     "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 1150000
+    "pricePaisa": 1150000,
+    "rating": 4.4,
+    "reviewCount": 83,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Hamza Tariq",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Ayesha Khan",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ],
+    "qualityTag": "Customer Favorite"
   },
   {
     "id": "prod-014",
     "name": "Wool Blend Minimalist Overcoat",
     "description": "Refined single-breasted wool overcoat with structured shoulders, satin inner lining, deep welt pockets, and notched lapels for cold-weather elegance.",
     "category": "Fashion",
-    "image": "https://images.unsplash.com/photo-1539533018447-63fcce667823?w=800&auto=format&fit=crop&q=80",
-    "pricePaisa": 2200000
+    "image": "https://images.unsplash.com/photo-1544923246-77307dd654cb?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2200000,
+    "rating": 4.5,
+    "reviewCount": 96,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bilal Siddiqui",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      },
+      {
+        "reviewerName": "Zainab Malik",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Great cut and drape. Survived multiple washes without shrinkage or fading. Worth every rupee."
+      },
+      {
+        "reviewerName": "Usman Farooq",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      }
+    ],
+    "badgeTag": "SIGNATURE"
+  },
+  {
+    "id": "prod-015",
+    "name": "Hi-Fi Studio Monitor Speaker",
+    "description": "Compact desktop reference speaker delivering flat frequency response, Kevlar woofers, and silk dome tweeters for pristine acoustic clarity.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1780000,
+    "rating": 4.6,
+    "reviewCount": 24,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Maryam Javed",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Works exactly as described. Clean finish with responsive controls. Very satisfied with this purchase."
+      },
+      {
+        "reviewerName": "Omar Farooq",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      }
+    ],
+    "qualityTag": "Verified Quality"
+  },
+  {
+    "id": "prod-016",
+    "name": "Titanium Smartwatch Pro",
+    "description": "Aerospace-grade titanium casing, always-on AMOLED sapphire crystal display, dual-band GPS, and continuous biometric health monitoring with 7-day battery.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 3150000,
+    "rating": 4.7,
+    "reviewCount": 37,
+    "stockStatus": "outOfStock",
+    "deliveryDays": 5,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Fatima Noor",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      },
+      {
+        "reviewerName": "Mustafa Ali",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Exceptional build quality. Pairs seamlessly with my phone and laptop, and battery life easily exceeds 30 hours."
+      },
+      {
+        "reviewerName": "Sana Ahmed",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      }
+    ],
+    "stockCount": 0,
+    "badgeTag": "LIMITED RUN"
+  },
+  {
+    "id": "prod-017",
+    "name": "Merino Wool Ribbed Beanie",
+    "description": "Spun from 100% ultrafine Australian Merino wool. Temperature-regulating, itch-free, and ribbed for an adaptable snug fit in cooler weather.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 240000,
+    "rating": 4.8,
+    "reviewCount": 50,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Daniyal Raza",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Hira Sheikh",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ]
+  },
+  {
+    "id": "prod-018",
+    "name": "Italian Full-Grain Leather Belt",
+    "description": "Handcrafted vegetable-tanned bridle leather finished with beveled edges and a brushed solid brass roller buckle designed for lifelong durability.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 390000,
+    "rating": 4.9,
+    "reviewCount": 63,
+    "stockStatus": "lowStock",
+    "deliveryDays": 3,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Saad Qureshi",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      },
+      {
+        "reviewerName": "Mahnoor Tariq",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Great cut and drape. Survived multiple washes without shrinkage or fading. Worth every rupee."
+      },
+      {
+        "reviewerName": "Shahzaib Khan",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      }
+    ],
+    "stockCount": 3
+  },
+  {
+    "id": "prod-019",
+    "name": "Ceramic Ultrasonic Aroma Diffuser",
+    "description": "Textured porcelain stone diffuser utilizing high-frequency ultrasonic vibrations to gently scent spaces up to 500 sq ft with whisper-quiet operation.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 580000,
+    "rating": 4.4,
+    "reviewCount": 76,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Rabia Aslam",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "Works wonderfully. Minimalist design matches my room perfectly and performance is flawless."
+      },
+      {
+        "reviewerName": "Fahad Mehmood",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      }
+    ],
+    "qualityTag": "Handcrafted"
+  },
+  {
+    "id": "prod-020",
+    "name": "Artisanal Stoneware Dinnerware Set",
+    "description": "12-piece kiln-fired stoneware ceramic dinner set featuring organic speckled glaze, scratch-resistant surface, and dishwasher-safe resilience.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1614735241165-6756e1df61ab?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1650000,
+    "rating": 4.5,
+    "reviewCount": 89,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Khadija Baig",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      },
+      {
+        "reviewerName": "Zubair Hashmi",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Anum Riaz",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ],
+    "qualityTag": "Best Seller"
+  },
+  {
+    "id": "prod-021",
+    "name": "Court Classic Leather Sneakers",
+    "description": "Hand-stitched full-grain calfskin leather low-tops with cushioned OrthoLite insoles, Italian Margom rubber cupsole, and breathable leather lining.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1490000,
+    "rating": 4.6,
+    "reviewCount": 17,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Taimoor Shah",
+        "rating": 5.0,
+        "date": "5 days ago",
+        "comment": "Incredibly comfortable footbed. Wore them all day across the city without any heel pain or fatigue."
+      },
+      {
+        "reviewerName": "Amna Bashir",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sizing is accurate and leather finish is supple. Sturdy sole with great grip on all surfaces."
+      }
+    ],
+    "badgeTag": "EDITION 01"
+  },
+  {
+    "id": "prod-022",
+    "name": "Summit Waterproof Hiking Boots",
+    "description": "Rugged all-weather trail boots engineered with Gore-Tex waterproof membrane, Vibram Megagrip traction lugs, and reinforced rubber toe cap.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2250000,
+    "rating": 4.7,
+    "reviewCount": 30,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Waleed Akhtar",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sizing is accurate and leather finish is supple. Sturdy sole with great grip on all surfaces."
+      },
+      {
+        "reviewerName": "Saba Qadir",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stylish and versatile. Pairs easily with both casual trousers and denim. Excellent craftsmanship."
+      },
+      {
+        "reviewerName": "Haris Nadeem",
+        "rating": 4.5,
+        "date": "3 weeks ago",
+        "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
+      }
+    ],
+    "qualityTag": "Verified Quality"
+  },
+  {
+    "id": "prod-023",
+    "name": "Suede Chelsea Boots",
+    "description": "Handcrafted from water-repellent Italian calf suede with elasticated side gussets, Goodyear welted construction, and studded rubber sole.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1950000,
+    "rating": 4.8,
+    "reviewCount": 43,
+    "stockStatus": "outOfStock",
+    "deliveryDays": 4,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bushra Gillani",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stylish and versatile. Pairs easily with both casual trousers and denim. Excellent craftsmanship."
+      },
+      {
+        "reviewerName": "Arsalan Bukhari",
+        "rating": 4.5,
+        "date": "3 weeks ago",
+        "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
+      }
+    ],
+    "stockCount": 0
+  },
+  {
+    "id": "prod-024",
+    "name": "AeroFlow Lightweight Runners",
+    "description": "Engineered knit upper with responsive nitrogen-infused foam midsole providing exceptional energy return and ultra-light featherweight stride.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1120000,
+    "rating": 4.9,
+    "reviewCount": 56,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Mehwish Naz",
+        "rating": 4.5,
+        "date": "3 weeks ago",
+        "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
+      },
+      {
+        "reviewerName": "Nabeel Sarwar",
+        "rating": 5.0,
+        "date": "5 days ago",
+        "comment": "Incredibly comfortable footbed. Wore them all day across the city without any heel pain or fatigue."
+      },
+      {
+        "reviewerName": "Iqra Rasheed",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sizing is accurate and leather finish is supple. Sturdy sole with great grip on all surfaces."
+      }
+    ]
+  },
+  {
+    "id": "prod-025",
+    "name": "Aero Minimalist Chronograph Watch",
+    "description": "Japanese quartz chronograph movement encased in 316L surgical stainless steel with domed sapphire crystal, date aperture, and quick-release strap.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2100000,
+    "rating": 4.4,
+    "reviewCount": 69,
+    "stockStatus": "lowStock",
+    "deliveryDays": 2,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Hamza Tariq",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Compact, elegant, and utilitarian. Fits smoothly into my everyday carry without adding unnecessary bulk."
+      },
+      {
+        "reviewerName": "Ayesha Khan",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      }
+    ],
+    "stockCount": 2,
+    "badgeTag": "LIMITED RUN"
+  },
+  {
+    "id": "prod-026",
+    "name": "Waterproof Commuter Backpack",
+    "description": "22L weatherproof ballistic nylon rolltop backpack with padded 16-inch laptop compartment, magnetic quick-release buckle, and luggage pass-through.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1250000,
+    "rating": 4.5,
+    "reviewCount": 82,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bilal Siddiqui",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      },
+      {
+        "reviewerName": "Zainab Malik",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stitching and materials are premium. Delivered promptly in immaculate condition."
+      },
+      {
+        "reviewerName": "Usman Farooq",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Looks very sleek and functional. Great attention to subtle details. Exceeded my expectations."
+      }
+    ],
+    "qualityTag": "Verified Quality"
+  },
+  {
+    "id": "prod-027",
+    "name": "Polarized Acetate Sunglasses",
+    "description": "Hand-polished cellulose acetate frame fitted with polarized scratch-resistant mineral glass lenses offering 100% UVA/UVB eye protection.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 760000,
+    "rating": 4.6,
+    "reviewCount": 95,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Maryam Javed",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stitching and materials are premium. Delivered promptly in immaculate condition."
+      },
+      {
+        "reviewerName": "Omar Farooq",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Looks very sleek and functional. Great attention to subtle details. Exceeded my expectations."
+      }
+    ],
+    "qualityTag": "Best Seller"
+  },
+  {
+    "id": "prod-028",
+    "name": "Heritage Leather Weekend Duffle",
+    "description": "Full-grain vegetable-tanned bovine leather duffle with YKK brass zippers, reinforced carry handles, and detachable padded shoulder strap.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1547949003-9792a18a2601?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 2680000,
+    "rating": 4.7,
+    "reviewCount": 23,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Fatima Noor",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Looks very sleek and functional. Great attention to subtle details. Exceeded my expectations."
+      },
+      {
+        "reviewerName": "Mustafa Ali",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Compact, elegant, and utilitarian. Fits smoothly into my everyday carry without adding unnecessary bulk."
+      },
+      {
+        "reviewerName": "Sana Ahmed",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      }
+    ],
+    "badgeTag": "SIGNATURE"
+  },
+  {
+    "id": "prod-029",
+    "name": "Organic Botanical Face Elixir",
+    "description": "Cold-pressed rosehip, squalane, and jojoba seed oil elixir infused with vitamin C & E to restore radiant skin barrier hydration and glow.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 460000,
+    "rating": 4.8,
+    "reviewCount": 36,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Daniyal Raza",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Noticeably improved my routine. Gentle on sensitive skin, subtle natural scent, and absorbs smoothly."
+      },
+      {
+        "reviewerName": "Hira Sheikh",
+        "rating": 5.0,
+        "date": "1 week ago",
+        "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
+      }
+    ],
+    "qualityTag": "Handcrafted"
+  },
+  {
+    "id": "prod-030",
+    "name": "Double-Edge Safety Razor Set",
+    "description": "Precision weighted closed-comb safety razor finished in matte gunmetal with matching stand, synthetic badger hair brush, and 10 Swedish steel blades.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 620000,
+    "rating": 4.9,
+    "reviewCount": 49,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Saad Qureshi",
+        "rating": 5.0,
+        "date": "1 week ago",
+        "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
+      },
+      {
+        "reviewerName": "Mahnoor Tariq",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "High quality formulation. A little goes a long way and packaging feels luxurious."
+      },
+      {
+        "reviewerName": "Shahzaib Khan",
+        "rating": 5.0,
+        "date": "1 month ago",
+        "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
+      }
+    ],
+    "badgeTag": "ESSENTIAL"
+  },
+  {
+    "id": "prod-031",
+    "name": "Atlas Cedar & Vetiver Eau De Parfum",
+    "description": "Artisanal small-batch fragrance with top notes of bergamot and pink pepper, heart of cedarwood and cardamom, and a warm dry-down of smoky vetiver.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 1390000,
+    "rating": 4.4,
+    "reviewCount": 62,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Rabia Aslam",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "High quality formulation. A little goes a long way and packaging feels luxurious."
+      },
+      {
+        "reviewerName": "Fahad Mehmood",
+        "rating": 5.0,
+        "date": "1 month ago",
+        "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
+      }
+    ]
+  },
+  {
+    "id": "prod-032",
+    "name": "Braided USB-C Fast Cable",
+    "description": "Durable nylon braided 2-meter USB-C to USB-C cable supporting 100W Power Delivery and high-speed 480Mbps data transfer. Reinforced strain relief joints.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 65000,
+    "rating": 4.5,
+    "reviewCount": 75,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Khadija Baig",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      },
+      {
+        "reviewerName": "Zubair Hashmi",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Exceptional build quality. Pairs seamlessly with my phone and laptop, and battery life easily exceeds 30 hours."
+      },
+      {
+        "reviewerName": "Anum Riaz",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      }
+    ]
+  },
+  {
+    "id": "prod-033",
+    "name": "Portable Mini Bluetooth Speaker",
+    "description": "Pocket-sized wireless speaker with IPX7 waterproof rating, 360-degree sound dispersion, and 10 hours of continuous battery playback on a single charge.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1543512214-318c7553f230?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 385000,
+    "rating": 4.6,
+    "reviewCount": 88,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Taimoor Shah",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Exceptional build quality. Pairs seamlessly with my phone and laptop, and battery life easily exceeds 30 hours."
+      },
+      {
+        "reviewerName": "Amna Bashir",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      }
+    ],
+    "qualityTag": "Best Seller"
+  },
+  {
+    "id": "prod-034",
+    "name": "Fast Wireless Charging Pad",
+    "description": "Ultra-slim aluminum charging pad supporting up to 15W Qi wireless output with foreign object detection, thermal management, and non-slip rubber base.",
+    "category": "Electronics",
+    "image": "https://images.unsplash.com/photo-1622445262464-84b1456045b6?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 240000,
+    "rating": 4.7,
+    "reviewCount": 16,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "1-Year Brand Warranty",
+    "warrantyDetail": "Official replacement & repair coverage against internal defects.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Connectivity": "Wireless / USB-C Fast Interface",
+      "Battery / Power": "Energy-efficient low-heat architecture",
+      "Compatibility": "iOS, Android, macOS & Windows",
+      "Warranty": "1-Year Official Manufacturer Warranty",
+      "Transit": "Express Insured Air (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Waleed Akhtar",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
+      },
+      {
+        "reviewerName": "Saba Qadir",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Works exactly as described. Clean finish with responsive controls. Very satisfied with this purchase."
+      },
+      {
+        "reviewerName": "Haris Nadeem",
+        "rating": 4.0,
+        "date": "1 month ago",
+        "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
+      }
+    ],
+    "qualityTag": "Customer Favorite"
+  },
+  {
+    "id": "prod-035",
+    "name": "Pure Cotton Everyday Crew Tee",
+    "description": "Pre-washed 180gsm combed cotton jersey t-shirt with classic crew neck, tailored drape, and double-needle hems designed for enduring shape retention.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 125000,
+    "rating": 4.8,
+    "reviewCount": 29,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bushra Gillani",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Great cut and drape. Survived multiple washes without shrinkage or fading. Worth every rupee."
+      },
+      {
+        "reviewerName": "Arsalan Bukhari",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      }
+    ]
+  },
+  {
+    "id": "prod-036",
+    "name": "Combed Cotton Ribbed Crew Socks 3-Pack",
+    "description": "Pack of three pairs of breathable ribbed crew socks with reinforced heel and toe cushioning, seamless toe closure, and stay-up elasticated cuffs.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 75000,
+    "rating": 4.9,
+    "reviewCount": 42,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Mehwish Naz",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
+      },
+      {
+        "reviewerName": "Nabeel Sarwar",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Iqra Rasheed",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ]
+  },
+  {
+    "id": "prod-037",
+    "name": "Heavyweight Heavy-Canvas Tote Bag",
+    "description": "16oz durable washed cotton canvas tote bag with reinforced dual shoulder straps, inner zip pocket for essentials, and spacious 20-liter capacity.",
+    "category": "Fashion",
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 145000,
+    "rating": 4.4,
+    "reviewCount": 55,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "7-Day Easy Exchange",
+    "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Material": "100% Pure Combed Textile / Flax Linen",
+      "Fit Type": "Modern Tailored Regular Fit",
+      "Care Instructions": "Machine wash cold, air dry naturally",
+      "Origin": "Ethically Woven & Finished",
+      "Transit": "Standard Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Hamza Tariq",
+        "rating": 5.0,
+        "date": "4 days ago",
+        "comment": "Fabric quality is top notch. Fits true to size with neat stitching and comfortable breathability all day."
+      },
+      {
+        "reviewerName": "Ayesha Khan",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
+      }
+    ]
+  },
+  {
+    "id": "prod-038",
+    "name": "Stoneware Ceramic Coffee Mug",
+    "description": "Hand-dipped 350ml ceramic coffee mug with ergonomic comfort handle, matte exterior glaze, and smooth gloss interior. Microwave and dishwasher safe.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 85000,
+    "rating": 4.5,
+    "reviewCount": 68,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bilal Siddiqui",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      },
+      {
+        "reviewerName": "Zainab Malik",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "Works wonderfully. Minimalist design matches my room perfectly and performance is flawless."
+      },
+      {
+        "reviewerName": "Usman Farooq",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      }
+    ]
+  },
+  {
+    "id": "prod-039",
+    "name": "Insulated Stainless Steel Tumbler",
+    "description": "Double-wall vacuum insulated 500ml stainless steel travel tumbler. Keeps cold beverages chilled for 24 hours and hot coffee hot for 12 hours.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 185000,
+    "rating": 4.6,
+    "reviewCount": 81,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Maryam Javed",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "Works wonderfully. Minimalist design matches my room perfectly and performance is flawless."
+      },
+      {
+        "reviewerName": "Omar Farooq",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      }
+    ]
+  },
+  {
+    "id": "prod-040",
+    "name": "Natural Bamboo Desk Organizer Tray",
+    "description": "Eco-friendly natural bamboo catchall desk tray with four divided compartments designed to neatly arrange keys, stationery, watches, and daily essentials.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1584992236310-6edddc08acff?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 120000,
+    "rating": 4.7,
+    "reviewCount": 94,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Fatima Noor",
+        "rating": 5.0,
+        "date": "3 weeks ago",
+        "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
+      },
+      {
+        "reviewerName": "Mustafa Ali",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Sana Ahmed",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ],
+    "badgeTag": "ESSENTIAL"
+  },
+  {
+    "id": "prod-041",
+    "name": "Linen Table Runner & Placemats",
+    "description": "Pure washed natural flax linen table runner paired with four matching placemats. Features mitered corners and understated hemstitch border detailing.",
+    "category": "Home & Living",
+    "image": "https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 210000,
+    "rating": 4.8,
+    "reviewCount": 22,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Damage-Free Guarantee",
+    "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Composition": "High-Grade Stoneware / Food-Safe Stainless",
+      "Finish": "Matte Artisan Glaze / Brushed Metal",
+      "Maintenance": "Dishwasher Safe & Heat Resistant",
+      "Capacity": "Engineered for Everyday Living",
+      "Transit": "Insured Ground Courier (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Daniyal Raza",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Added such an elegant aesthetic to my living space. Super functional and easy to maintain daily."
+      },
+      {
+        "reviewerName": "Hira Sheikh",
+        "rating": 5.0,
+        "date": "10 days ago",
+        "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
+      }
+    ]
+  },
+  {
+    "id": "prod-042",
+    "name": "Classic Canvas Slip-On Shoes",
+    "description": "Low-profile slip-on casual sneakers constructed from durable 10oz canvas with elastic side accents, padded collar, and vulcanized waffle rubber sole.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 265000,
+    "rating": 4.9,
+    "reviewCount": 35,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Saad Qureshi",
+        "rating": 4.5,
+        "date": "1 week ago",
+        "comment": "Sizing is accurate and leather finish is supple. Sturdy sole with great grip on all surfaces."
+      },
+      {
+        "reviewerName": "Mahnoor Tariq",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stylish and versatile. Pairs easily with both casual trousers and denim. Excellent craftsmanship."
+      },
+      {
+        "reviewerName": "Shahzaib Khan",
+        "rating": 4.5,
+        "date": "3 weeks ago",
+        "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
+      }
+    ]
+  },
+  {
+    "id": "prod-043",
+    "name": "Leather Strap Slide Sandals",
+    "description": "Comfort slide sandals featuring dual adjustable oiled leather foot straps, contoured cork-latex footbed, and shock-absorbing EVA traction outsole.",
+    "category": "Footwear",
+    "image": "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 195000,
+    "rating": 4.4,
+    "reviewCount": 48,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "14-Day Size Replacement",
+    "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Upper Material": "Calfskin Leather / Heavyweight Canvas",
+      "Insole": "Ergonomic Cushioning with Arch Support",
+      "Outsole": "Vulcanized Anti-Slip Traction Rubber",
+      "Fit": "True to Standard European Size",
+      "Transit": "Express Footwear Courier (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Rabia Aslam",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stylish and versatile. Pairs easily with both casual trousers and denim. Excellent craftsmanship."
+      },
+      {
+        "reviewerName": "Fahad Mehmood",
+        "rating": 4.5,
+        "date": "3 weeks ago",
+        "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
+      }
+    ]
+  },
+  {
+    "id": "prod-044",
+    "name": "Tactical Stainless Keychain Multitool",
+    "description": "Precision laser-cut 420 stainless steel pocket multitool combining bottle opener, hex wrenches, pry bar, and flathead screwdriver in a 40g key-sized frame.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 55000,
+    "rating": 4.5,
+    "reviewCount": 61,
+    "stockStatus": "lowStock",
+    "deliveryDays": 5,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Khadija Baig",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Looks very sleek and functional. Great attention to subtle details. Exceeded my expectations."
+      },
+      {
+        "reviewerName": "Zubair Hashmi",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Compact, elegant, and utilitarian. Fits smoothly into my everyday carry without adding unnecessary bulk."
+      },
+      {
+        "reviewerName": "Anum Riaz",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      }
+    ],
+    "stockCount": 3
+  },
+  {
+    "id": "prod-045",
+    "name": "Premium Microfiber Lens & Screen Cloths",
+    "description": "Pack of 4 ultra-dense microfiber cleaning cloths designed for streak-free, scratch-safe cleaning of eyewear, camera optics, smartphones, and displays.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 35000,
+    "rating": 4.6,
+    "reviewCount": 74,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Taimoor Shah",
+        "rating": 5.0,
+        "date": "2 days ago",
+        "comment": "Compact, elegant, and utilitarian. Fits smoothly into my everyday carry without adding unnecessary bulk."
+      },
+      {
+        "reviewerName": "Amna Bashir",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      }
+    ],
+    "qualityTag": "Customer Favorite"
+  },
+  {
+    "id": "prod-046",
+    "name": "Compact Hard-Shell Tech Pouch",
+    "description": "Weather-resistant zippered accessory pouch with elastic cable loops, mesh zip compartment, and structured padding to protect chargers and dongles.",
+    "category": "Accessories",
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 165000,
+    "rating": 4.7,
+    "reviewCount": 87,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Lifetime Hardware Warranty",
+    "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
+      "Lining": "Reinforced Weatherproof Ripstop",
+      "Design": "Minimalist Everyday Carry Ergonomics",
+      "Shielding": "Engineered for Lifetime Durability",
+      "Transit": "Standard Insured Transit (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Waleed Akhtar",
+        "rating": 4.5,
+        "date": "8 days ago",
+        "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
+      },
+      {
+        "reviewerName": "Saba Qadir",
+        "rating": 5.0,
+        "date": "2 weeks ago",
+        "comment": "Stitching and materials are premium. Delivered promptly in immaculate condition."
+      },
+      {
+        "reviewerName": "Haris Nadeem",
+        "rating": 4.5,
+        "date": "1 month ago",
+        "comment": "Looks very sleek and functional. Great attention to subtle details. Exceeded my expectations."
+      }
+    ]
+  },
+  {
+    "id": "prod-047",
+    "name": "Organic Beeswax & Mint Lip Balm Duo",
+    "description": "Pair of all-natural moisturizing lip balms formulated with organic yellow beeswax, virgin coconut oil, shea butter, and refreshing wild peppermint extract.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 45000,
+    "rating": 4.8,
+    "reviewCount": 15,
+    "stockStatus": "inStock",
+    "deliveryDays": 4,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Grade-A Sustainable Material",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (4 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bushra Gillani",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "High quality formulation. A little goes a long way and packaging feels luxurious."
+      },
+      {
+        "reviewerName": "Arsalan Bukhari",
+        "rating": 5.0,
+        "date": "1 month ago",
+        "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
+      }
+    ]
+  },
+  {
+    "id": "prod-048",
+    "name": "Natural Bristle Grooming Brush",
+    "description": "Solid pearwood grooming brush set with medium-firm natural bristles designed to evenly distribute natural hair oils, detangle, and stimulate scalp health.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 72000,
+    "rating": 4.9,
+    "reviewCount": 28,
+    "stockStatus": "inStock",
+    "deliveryDays": 5,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (5 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Mehwish Naz",
+        "rating": 5.0,
+        "date": "1 month ago",
+        "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
+      },
+      {
+        "reviewerName": "Nabeel Sarwar",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Noticeably improved my routine. Gentle on sensitive skin, subtle natural scent, and absorbs smoothly."
+      },
+      {
+        "reviewerName": "Iqra Rasheed",
+        "rating": 5.0,
+        "date": "1 week ago",
+        "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
+      }
+    ],
+    "qualityTag": "Handcrafted"
+  },
+  {
+    "id": "prod-049",
+    "name": "Nourishing Botanical Beard Oil",
+    "description": "Fast-absorbing grooming oil blend combining cold-pressed argan, golden jojoba, and sweet almond oils with subtle notes of sandalwood and fresh pine.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 115000,
+    "rating": 4.4,
+    "reviewCount": 41,
+    "stockStatus": "inStock",
+    "deliveryDays": 2,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Brand New · 100% Authentic",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (2 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Hamza Tariq",
+        "rating": 5.0,
+        "date": "3 days ago",
+        "comment": "Noticeably improved my routine. Gentle on sensitive skin, subtle natural scent, and absorbs smoothly."
+      },
+      {
+        "reviewerName": "Ayesha Khan",
+        "rating": 5.0,
+        "date": "1 week ago",
+        "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
+      }
+    ]
+  },
+  {
+    "id": "prod-050",
+    "name": "Exfoliating Clay & Charcoal Soap Bar",
+    "description": "Cold-process artisan body bar crafted with activated coconut charcoal, French green clay, olive oil, and therapeutic tea tree essential oil.",
+    "category": "Beauty & Grooming",
+    "image": "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=800&auto=format&fit=crop&q=80",
+    "pricePaisa": 49000,
+    "rating": 4.5,
+    "reviewCount": 54,
+    "stockStatus": "inStock",
+    "deliveryDays": 3,
+    "warranty": "Hygienic Seal Protected",
+    "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
+    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "specifications": {
+      "Ingredients": "100% Natural Botanical Oils & Extracts",
+      "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
+      "Skin Type": "Suitable for All Skin Types including Sensitive",
+      "Safety": "Batch-Tested Tamper-Evident Seal",
+      "Transit": "Temperature-Controlled Transit (3 Business Days)"
+    },
+    "reviews": [
+      {
+        "reviewerName": "Bilal Siddiqui",
+        "rating": 5.0,
+        "date": "1 week ago",
+        "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
+      },
+      {
+        "reviewerName": "Zainab Malik",
+        "rating": 4.5,
+        "date": "2 weeks ago",
+        "comment": "High quality formulation. A little goes a long way and packaging feels luxurious."
+      },
+      {
+        "reviewerName": "Usman Farooq",
+        "rating": 5.0,
+        "date": "1 month ago",
+        "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
+      }
+    ]
   }
 ]

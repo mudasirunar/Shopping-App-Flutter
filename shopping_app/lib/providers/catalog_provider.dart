@@ -27,7 +27,16 @@ class CatalogProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   ProductSortOption get sortOption => _sortOption;
 
-  List<String> get categories => const ['All', 'Electronics', 'Fashion', 'Home & Living'];
+  List<String> get categories {
+    final set = <String>{};
+    for (final p in _products) {
+      if (p.category.trim().isNotEmpty) {
+        set.add(p.category.trim());
+      }
+    }
+    final sorted = set.toList()..sort();
+    return ['All', ...sorted];
+  }
 
   Future<void> loadProducts() async {
     _isLoading = true;

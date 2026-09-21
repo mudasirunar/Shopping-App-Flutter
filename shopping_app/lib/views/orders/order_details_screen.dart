@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../models/order.dart';
+import '../../widgets/app_network_image.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final OrderModel order;
@@ -252,17 +253,13 @@ class OrderDetailsScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         children: [
-                          ClipRRect(
+                          AppNetworkImage(
+                            imageUrl: item.image,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
                             borderRadius: BorderRadius.circular(8),
-                            child: SizedBox(
-                              width: 48,
-                              height: 48,
-                              child: Image.network(
-                                item.image,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_outlined),
-                              ),
-                            ),
+                            iconSize: 20,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
