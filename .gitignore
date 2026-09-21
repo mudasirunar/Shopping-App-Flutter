@@ -1,0 +1,95 @@
+# ==============================================================================
+# Root .gitignore for Shopping App Monorepo
+# Contains Flutter App (Android & iOS) + Vercel Serverless Backend
+# NOTE: docs/ folder is explicitly tracked and NEVER ignored.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Documentation Exemption (docs/ is ALWAYS tracked in Git)
+# ------------------------------------------------------------------------------
+!docs/
+!docs/**
+
+# ------------------------------------------------------------------------------
+# Operating System & IDE Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# Backend & Secrets (CRITICAL: Do NOT commit secrets or service keys)
+# ------------------------------------------------------------------------------
+backend/node_modules/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+*.pem
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+backend/.vercel/
+
+# ------------------------------------------------------------------------------
+# Flutter & Dart Build Artifacts
+# ------------------------------------------------------------------------------
+**/build/
+**/.dart_tool/
+**/.packages
+**/.pub/
+**/.pub-cache/
+shopping_app/.flutter-plugins
+shopping_app/.flutter-plugins-dependencies
+
+# ------------------------------------------------------------------------------
+# Android, Kotlin & Gradle Build Files, Binaries & Logs
+# ------------------------------------------------------------------------------
+**/.gradle/
+**/android/.gradle/
+**/android/local.properties
+**/android/app/build/
+**/android/captures/
+**/android/.cxx/
+**/android/gradle/wrapper/gradle-wrapper.jar
+**/kotlin/
+**/.kotlin/
+*.class
+*.dex
+*.apk
+*.ap_
+*.aab
+*.hprof
+*.keystore
+*.jks
+
+# ------------------------------------------------------------------------------
+# iOS Build Files & Generated Configurations
+# ------------------------------------------------------------------------------
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/Generated.h
+**/ios/Flutter/Generated.m
+**/ios/Flutter/flutter_assets/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/DerivedData/
+**/ios/*.xcworkspace/xcuserdata/
+**/ios/*.xcodeproj/xcuserdata/
+*.ipa
+
+# ------------------------------------------------------------------------------
+# Logs & Temporary Files
+# ------------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

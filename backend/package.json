@@ -1,0 +1,19 @@
+{
+  "name": "shopping-app-backend",
+  "version": "1.0.0",
+  "description": "Serverless backend for Flutter Shopping App (Password Reset via Brevo & Firebase Admin)",
+  "main": "api/send-reset-otp.js",
+  "scripts": {
+    "start": "node api/send-reset-otp.js",
+    "dev": "vercel dev"
+  },
+  "keywords": ["flutter", "shopping-app", "brevo", "firebase-admin", "serverless"],
+  "author": "Mudasir",
+  "license": "ISC",
+  "dependencies": {
+    "@getbrevo/brevo": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^12.0.0"
+  }
+}

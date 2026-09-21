@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Orders Collection: Each user's orders are isolated under users/{userId}/orders/{orderId}
+    match /users/{userId}/orders/{orderId} {
+      // Allow create only if the authenticated user is the owner of this document path
+      allow create: if request.auth != null 
+                    && request.auth.uid == userId
+                    && request.resource.data.orderId is string
+                    && request.resource.data.subtotalPaisa is int
+                    && request.resource.data.deliveryPaisa is int
+                    && request.resource.data.totalPaisa is int
+                    && request.resource.data.status == 'placed';
+
+      // Allow read only if the authenticated user is the owner
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Strictly deny client updates and deletions of existing orders
+      allow update, delete: if false;
+    }
+
+    // Backend Auth Resets: Serverless/Admin SDK access only. Client direct access denied.
+    match /_auth_resets/{email} {
+      allow read, write: if false;
+    }
+  }
+}

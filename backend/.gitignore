@@ -1,0 +1,9 @@
+# Backend specific gitignore
+node_modules/
+.env
+.env.local
+.env.*.local
+*.json
+!package.json
+!vercel.json
+.vercel/
