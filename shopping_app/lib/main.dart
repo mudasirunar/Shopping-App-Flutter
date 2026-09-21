@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/address_provider.dart';
 import 'providers/auth_provider.dart';
@@ -8,9 +10,20 @@ import 'providers/cart_provider.dart';
 import 'providers/catalog_provider.dart';
 import 'providers/order_provider.dart';
 import 'views/main_shell.dart';
+import 'views/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // Android: dark status bar icons
+      statusBarBrightness: Brightness.light, // iOS: dark status bar text & icons
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   // Initialize Firebase purely from native config files (google-services.json & GoogleService-Info.plist)
   try {
@@ -19,11 +32,16 @@ void main() async {
     debugPrint('Firebase initialization note: $e');
   }
 
-  runApp(const ShoppingApp());
+  final prefs = await SharedPreferences.getInstance();
+  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
+  runApp(ShoppingApp(hasSeenOnboarding: hasSeenOnboarding));
 }
 
 class ShoppingApp extends StatelessWidget {
-  const ShoppingApp({super.key});
+  final bool hasSeenOnboarding;
+
+  const ShoppingApp({super.key, this.hasSeenOnboarding = false});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +57,7 @@ class ShoppingApp extends StatelessWidget {
         title: 'Shopping App',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const MainShell(),
+        home: hasSeenOnboarding ? const MainShell() : const OnboardingScreen(),
       ),
     );
   }

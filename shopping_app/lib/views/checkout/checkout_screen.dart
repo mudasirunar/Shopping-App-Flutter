@@ -263,7 +263,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         backgroundColor: AppTheme.surfaceContainerLowest,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.primary),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(

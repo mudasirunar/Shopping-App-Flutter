@@ -143,7 +143,9 @@ class AccountScreen extends StatelessWidget {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const SignInScreen()),
+                                MaterialPageRoute(
+                                  builder: (_) => const SignInScreen(showGuestOption: false),
+                                ),
                               );
                             },
                             child: const Text(
@@ -251,7 +253,9 @@ class AccountScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SignInScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const SignInScreen(showGuestOption: false),
+                            ),
                           );
                         },
                       ),

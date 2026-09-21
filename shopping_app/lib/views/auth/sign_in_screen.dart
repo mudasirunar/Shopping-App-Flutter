@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
@@ -8,7 +9,16 @@ import 'forgot_password_screen.dart';
 import 'sign_up_screen.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  final bool showGuestOption;
+  final String? title;
+  final String? subtitle;
+
+  const SignInScreen({
+    super.key,
+    this.showGuestOption = true,
+    this.title,
+    this.subtitle,
+  });
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -38,10 +48,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (success && mounted) {
       context.read<CartProvider>().setUserId(auth.currentUser?.uid);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainShell()),
-      );
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainShell()),
+        );
+      }
     } else if (mounted && auth.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -61,18 +75,31 @@ class _SignInScreenState extends State<SignInScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primary, size: 20),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         actions: [
-          TextButton(
-            onPressed: () {
-              context.read<CartProvider>().setUserId('guest');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MainShell()),
-              );
-            },
-            child: const Text('Skip / Guest'),
-          ),
-          const SizedBox(width: 8),
+          if (widget.showGuestOption) ...[
+            TextButton(
+              onPressed: () {
+                context.read<CartProvider>().setUserId('guest');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MainShell()),
+                );
+              },
+              child: const Text('Skip / Guest'),
+            ),
+            const SizedBox(width: 8),
+          ],
         ],
       ),
       body: SafeArea(
@@ -111,10 +138,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
                   const SizedBox(height: 18),
 
-                  const Text(
-                    'Welcome back',
+                  Text(
+                    widget.title ??
+                        (widget.showGuestOption
+                            ? 'Welcome back'
+                            : 'Sign In to Your Account'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary,
@@ -122,10 +152,13 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Sign in to access your orders and saved cart.',
+                  Text(
+                    widget.subtitle ??
+                        (widget.showGuestOption
+                            ? 'Sign in to access your orders and saved cart.'
+                            : 'Log in to sync your cart, save addresses, and track orders across devices.'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: AppTheme.secondary),
+                    style: const TextStyle(fontSize: 13, color: AppTheme.secondary),
                   ),
 
                   const SizedBox(height: 28),
