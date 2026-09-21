@@ -26,11 +26,11 @@
   - [x] `docs/DESIGN.md`
   - [x] `docs/AGENTS.md`
   - [x] `docs/TASK_TRACKER.md`
-- [ ] Create repository `.gitignore` (safeguarding docs, ignoring flutter build artifacts, APKs, `.env`, credentials).
-- [ ] Initialize clean Flutter project (`shopping_app/`) for Android & iOS only with bundle ID `com.mudasir.shopping_app`.
-- [ ] Configure Flutter application display names and verify build settings.
-- [ ] Initialize `backend/` skeleton with Vercel serverless function structure and `.env.example`.
-- [ ] Review initial git status and request user permission to commit and push initial baseline.
+- [x] Create repository `.gitignore` (safeguarding docs, ignoring flutter build artifacts, APKs, `.env`, credentials).
+- [x] Initialize clean Flutter project (`shopping_app/`) for Android & iOS only with bundle ID `com.mudasir.shopping_app`.
+- [x] Configure Flutter application display names and verify build settings.
+- [x] Initialize `backend/` skeleton with Vercel serverless function structure and `.env.example`.
+- [x] Create initial baseline commit on branch `main` with tracked `docs/`.
 
 ### Phase 2: Core Domain Models, Paisa Math, Phone Validator & Unit Tests
 - [ ] Define immutable models:
