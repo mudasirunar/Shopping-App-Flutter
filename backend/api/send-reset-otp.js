@@ -1,5 +1,6 @@
 const { initFirebaseAdmin } = require('../lib/firebaseAdmin');
 const { sendEmail } = require('../lib/brevoClient');
+const { validateAppToken, OTP_COOLDOWN_MS } = require('../lib/security');
 require('dotenv').config();
 
 // In-memory fallback if Firestore isn't connected yet during local verification
@@ -12,7 +13,7 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-app-security-token'
   );
 
   if (req.method === 'OPTIONS') {
@@ -23,7 +24,17 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  const { email } = req.body || {};
+  // 1. Validate App Security Handshake Token
+  const tokenCheck = validateAppToken(req);
+  if (!tokenCheck.valid) {
+    return res.status(401).json({ error: tokenCheck.error });
+  }
+
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (e) {}
+  }
+  const { email } = body || {};
   if (!email || !email.includes('@')) {
     return res.status(400).json({ error: 'A valid email address is required.' });
   }
@@ -45,9 +56,40 @@ module.exports = async (req, res) => {
       }
     }
 
-    // Generate 6-digit OTP
+    // 2. Anti-Spam Rate Limiting: 60-second cooldown per email
+    const now = Date.now();
+    let existingRecord = null;
+
+    if (admin.apps.length > 0) {
+      try {
+        const db = admin.firestore();
+        const doc = await db.collection('_auth_resets').doc(trimmedEmail).get();
+        if (doc.exists) {
+          existingRecord = doc.data();
+        }
+      } catch (e) {
+        console.warn('[send-reset-otp] Check rate limit warning:', e.message);
+      }
+    } else {
+      existingRecord = memoryOtpStore.get(trimmedEmail);
+    }
+
+    if (existingRecord && existingRecord.lastRequestedAt) {
+      const lastRequested = existingRecord.lastRequestedAt.toMillis
+        ? existingRecord.lastRequestedAt.toMillis()
+        : existingRecord.lastRequestedAt;
+      const diff = now - lastRequested;
+      if (diff < OTP_COOLDOWN_MS) {
+        const waitSec = Math.ceil((OTP_COOLDOWN_MS - diff) / 1000);
+        return res.status(429).json({
+          error: `Please wait ${waitSec} seconds before requesting a new code.`,
+        });
+      }
+    }
+
+    // 3. Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const expiresAt = now + 10 * 60 * 1000; // 10 minutes
 
     // Store in Firestore if available, otherwise memory
     let savedToFirestore = false;
@@ -56,7 +98,9 @@ module.exports = async (req, res) => {
         const db = admin.firestore();
         await db.collection('_auth_resets').doc(trimmedEmail).set({
           otp,
+          attempts: 0,
           expiresAt: admin.firestore.Timestamp.fromMillis(expiresAt),
+          lastRequestedAt: admin.firestore.Timestamp.fromMillis(now),
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           uid: userRecord ? userRecord.uid : null,
         });
@@ -67,10 +111,15 @@ module.exports = async (req, res) => {
     }
 
     if (!savedToFirestore) {
-      memoryOtpStore.set(trimmedEmail, { otp, expiresAt });
+      memoryOtpStore.set(trimmedEmail, {
+        otp,
+        attempts: 0,
+        expiresAt,
+        lastRequestedAt: now,
+      });
     }
 
-    // Send email via Brevo
+    // 4. Send email via Brevo
     const emailSubject = 'Your Shopping App Password Reset Code';
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px;">
@@ -88,7 +137,7 @@ module.exports = async (req, res) => {
         </p>
         <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
         <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-          Shopping App • Anas Technologies Flutter Internship Task 04
+          Shopping App • Secure Account Recovery
         </p>
       </div>
     `;

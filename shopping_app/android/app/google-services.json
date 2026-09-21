@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "511474787611",
+    "project_id": "shopping-app-flutter-1b711",
+    "storage_bucket": "shopping-app-flutter-1b711.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511474787611:android:72880e1629edb0032b1fbe",
+        "android_client_info": {
+          "package_name": "com.mudasir.shopping_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBP5xEPOarlKYqmTYkU4OKynJNqFohz0aU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
