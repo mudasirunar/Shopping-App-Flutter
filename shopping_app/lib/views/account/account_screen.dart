@@ -12,7 +12,12 @@ import '../wishlist/wishlist_screen.dart';
 import '../../core/utils/app_snackbar.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final ScrollController? scrollController;
+
+  const AccountScreen({
+    super.key,
+    this.scrollController,
+  });
 
   void _confirmSignOut(BuildContext context) {
     AppConfirmationDialog.show(
@@ -62,6 +67,7 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
+        controller: scrollController,
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 110),
         child: Column(
           children: [

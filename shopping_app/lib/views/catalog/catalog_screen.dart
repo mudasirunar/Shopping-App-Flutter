@@ -8,11 +8,13 @@ import '../details/product_details_screen.dart';
 class CatalogScreen extends StatefulWidget {
   final VoidCallback? onOpenAccount;
   final VoidCallback? onOpenCart;
+  final ScrollController? scrollController;
 
   const CatalogScreen({
     super.key,
     this.onOpenAccount,
     this.onOpenCart,
+    this.scrollController,
   });
 
   @override
@@ -151,6 +153,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           final products = catalog.filteredProducts;
 
           return CustomScrollView(
+            controller: widget.scrollController,
             slivers: [
               // Header Title & Subtitle Block
               SliverToBoxAdapter(

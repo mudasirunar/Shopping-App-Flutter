@@ -14,10 +14,12 @@ import '../../models/product.dart';
 
 class CartScreen extends StatelessWidget {
   final VoidCallback? onExplore;
+  final ScrollController? scrollController;
 
   const CartScreen({
     super.key,
     this.onExplore,
+    this.scrollController,
   });
 
   void _confirmClearCart(BuildContext context) {
@@ -115,6 +117,7 @@ class CartScreen extends StatelessWidget {
       body: cart.isEmpty
           ? _EmptyCartView(onExplore: onExplore)
           : SingleChildScrollView(
+              controller: scrollController,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

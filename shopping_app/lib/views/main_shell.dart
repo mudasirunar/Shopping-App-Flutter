@@ -22,6 +22,18 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  final ScrollController _catalogScrollController = ScrollController();
+  final ScrollController _cartScrollController = ScrollController();
+  final ScrollController _accountScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _catalogScrollController.dispose();
+    _cartScrollController.dispose();
+    _accountScrollController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,13 +50,34 @@ class _MainShellState extends State<MainShell> {
     });
   }
 
+  void _scrollToTop(int index) {
+    ScrollController? controller;
+    if (index == 0) controller = _catalogScrollController;
+    if (index == 2) controller = _cartScrollController;
+    if (index == 3) controller = _accountScrollController;
+
+    if (controller != null && controller.hasClients) {
+      controller.animateTo(
+        0,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
   void _onTabTapped(int index) {
     if (index == 1) {
       // Categories tab -> open category quick selector bottom sheet
       _showCategoriesSheet(context);
       return;
     }
-    context.read<NavigationProvider>().switchTab(index);
+    final nav = context.read<NavigationProvider>();
+    if (nav.currentTabIndex == index) {
+      // Re-click same selected tab -> smoothly scroll to top
+      _scrollToTop(index);
+      return;
+    }
+    nav.switchTab(index);
   }
 
   void _showCategoriesSheet(BuildContext context) {
@@ -139,14 +172,18 @@ class _MainShellState extends State<MainShell> {
 
     final pages = [
       CatalogScreen(
+        scrollController: _catalogScrollController,
         onOpenAccount: () => nav.openAccount(),
         onOpenCart: () => nav.openCart(),
       ),
       const SizedBox.shrink(), // Index 1 is handled via Categories Modal
       CartScreen(
+        scrollController: _cartScrollController,
         onExplore: () => nav.openShop(),
       ),
-      const AccountScreen(),
+      AccountScreen(
+        scrollController: _accountScrollController,
+      ),
     ];
 
     return Scaffold(
