@@ -131,27 +131,22 @@ class CartScreen extends StatelessWidget {
                   ],
 
                   // Cart Items List
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: cart.items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final item = cart.items[index];
-                      return Dismissible(
-                        key: ValueKey('cart_item_${item.product.id}'),
-                        direction: DismissDirection.endToStart,
-                        background: const _SwipeDeleteBackground(),
-                        confirmDismiss: (_) => _confirmRemove(context, item.product),
-                        onDismissed: (_) => _removeProduct(context, item.product),
-                        child: _CartItemCard(
-                          item: item,
-                        ),
-                      );
-                    },
-                  ),
+                  for (int i = 0; i < cart.items.length; i++) ...[
+                    Dismissible(
+                      key: ValueKey('cart_item_${cart.items[i].product.id}'),
+                      direction: DismissDirection.endToStart,
+                      background: const _SwipeDeleteBackground(),
+                      confirmDismiss: (_) => _confirmRemove(context, cart.items[i].product),
+                      onDismissed: (_) => _removeProduct(context, cart.items[i].product),
+                      child: _CartItemCard(
+                        item: cart.items[i],
+                      ),
+                    ),
+                    if (i < cart.items.length - 1)
+                      const SizedBox(height: 12),
+                  ],
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // Order Summary Card
                   _OrderSummaryCard(cart: cart),
@@ -774,7 +769,7 @@ class _EmptyCartView extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.shopping_bag_outlined,
+                Icons.shopping_cart_outlined,
                 size: 36,
                 color: AppTheme.secondary,
               ),

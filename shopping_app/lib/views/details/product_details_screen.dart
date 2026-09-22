@@ -86,7 +86,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             IconButton(
               icon: Badge(
                 isLabelVisible: cart.totalItemCount > 0,
-                backgroundColor: AppTheme.tertiary,
+                backgroundColor: const Color(0xFFFF3B30),
                 textColor: Colors.white,
                 label: Text(
                   '${cart.totalItemCount}',
