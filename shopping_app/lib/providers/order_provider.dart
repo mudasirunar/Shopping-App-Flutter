@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,8 @@ class OrderProvider extends ChangeNotifier {
   List<OrderModel> _userOrders = [];
   bool _isLoading = false;
   String? _errorMessage;
+  String _currentUserId = 'guest';
+  StreamSubscription<QuerySnapshot>? _ordersSubscription;
 
   OrderProvider({FirebaseFirestore? firestore}) {
     try {
@@ -60,9 +63,20 @@ class OrderProvider extends ChangeNotifier {
     } catch (_) {}
   }
 
-  /// Loads orders for the given user from Firestore or local storage.
+  /// Sets the active user and triggers real-time order sync.
+  void setUserId(String? userId) {
+    final effectiveUserId = (userId == null || userId.isEmpty) ? 'guest' : userId;
+    if (_currentUserId == effectiveUserId) return;
+    fetchOrders(effectiveUserId);
+  }
+
+  /// Loads orders for the given user from Firestore or local storage with real-time sync.
   Future<void> fetchOrders(String? userId) async {
     final effectiveUserId = (userId == null || userId.isEmpty) ? 'guest' : userId;
+    _currentUserId = effectiveUserId;
+
+    await _ordersSubscription?.cancel();
+    _ordersSubscription = null;
 
     if (effectiveUserId == 'guest') {
       await _loadLocalOrders('guest');
@@ -73,29 +87,89 @@ class OrderProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    // 1. Immediately show local cache if available
+    await _loadLocalOrders(effectiveUserId);
+
+    // 2. Migrate guest orders if any exist
+    await _migrateGuestOrdersToCloud(effectiveUserId);
+
+    // 3. Set up real-time listener for live sync across devices
     try {
       final firestore = _safeFirestore;
-      if (firestore == null) {
-        _errorMessage = 'Cloud storage is currently offline.';
-        return;
+      if (firestore != null) {
+        _ordersSubscription = firestore
+            .collection('users')
+            .doc(effectiveUserId)
+            .collection('orders')
+            .snapshots()
+            .listen((snapshot) {
+              final orders = snapshot.docs
+                  .map((doc) => OrderModel.fromFirestore(doc))
+                  .toList();
+              orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+              _userOrders = orders;
+              _saveLocalOrders(effectiveUserId);
+              _isLoading = false;
+              _errorMessage = null;
+              notifyListeners();
+            }, onError: (e) {
+              debugPrint('Firestore orders stream error: $e');
+              _isLoading = false;
+              notifyListeners();
+            });
+      } else {
+        _isLoading = false;
+        notifyListeners();
       }
-
-      final snapshot = await firestore
-          .collection('orders')
-          .where('userId', isEqualTo: effectiveUserId)
-          .orderBy('createdAt', descending: true)
-          .get();
-
-      _userOrders = snapshot.docs
-          .map((doc) => OrderModel.fromFirestore(doc))
-          .toList();
-      await _saveLocalOrders(effectiveUserId);
     } catch (e) {
-      // If Firestore is offline or query index pending, fall back to local saved orders
       await _loadLocalOrders(effectiveUserId);
-    } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Migrates local guest orders to the authenticated user in Cloud Firestore.
+  Future<void> _migrateGuestOrdersToCloud(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const guestKey = 'local_orders_guest';
+      final raw = prefs.getString(guestKey);
+      if (raw == null || raw.isEmpty) return;
+
+      final List<dynamic> decoded = json.decode(raw) as List<dynamic>;
+      final guestOrders = decoded
+          .map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
+
+      if (guestOrders.isEmpty) return;
+
+      final firestore = _safeFirestore;
+      if (firestore != null) {
+        final batch = firestore.batch();
+        for (final order in guestOrders) {
+          final migrated = OrderModel(
+            orderId: order.orderId,
+            userId: userId,
+            items: order.items,
+            deliveryInfo: order.deliveryInfo,
+            subtotalPaisa: order.subtotalPaisa,
+            deliveryPaisa: order.deliveryPaisa,
+            totalPaisa: order.totalPaisa,
+            status: order.status,
+            createdAt: order.createdAt,
+          );
+          batch.set(
+            firestore.collection('users').doc(userId).collection('orders').doc(order.orderId),
+            migrated.toFirestoreMap(useServerTimestamp: false),
+          );
+        }
+        await batch.commit();
+      }
+
+      await prefs.remove(guestKey);
+      debugPrint('[OrderProvider] Migrated ${guestOrders.length} guest orders to user $userId');
+    } catch (e) {
+      debugPrint('[OrderProvider] Error migrating guest orders: $e');
     }
   }
 
@@ -127,20 +201,25 @@ class OrderProvider extends ChangeNotifier {
         subtotalPaisa: subtotalPaisa,
         deliveryPaisa: deliveryFeePaisa,
         totalPaisa: totalPaisa,
-        status: 'Confirmed (COD)',
+        status: 'placed',
         createdAt: DateTime.now(),
       );
 
-      // Save to Cloud Firestore if connected
-      final firestore = _safeFirestore;
-      if (firestore != null) {
-        try {
-          await firestore
-              .collection('orders')
-              .doc(orderShortId)
-              .set(newOrder.toFirestoreMap(useServerTimestamp: false));
-        } catch (firestoreError) {
-          // In case Firebase is offline, order is still recorded in local memory
+      // Save to Cloud Firestore if connected and registered
+      if (effectiveUserId != 'guest') {
+        final firestore = _safeFirestore;
+        if (firestore != null) {
+          try {
+            await firestore
+                .collection('users')
+                .doc(effectiveUserId)
+                .collection('orders')
+                .doc(orderShortId)
+                .set(newOrder.toFirestoreMap(useServerTimestamp: false));
+          } catch (firestoreError) {
+            // In case Firebase is offline, order is still recorded in local memory
+            debugPrint('Firestore order save error: $firestoreError');
+          }
         }
       }
 
@@ -155,5 +234,11 @@ class OrderProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _ordersSubscription?.cancel();
+    super.dispose();
   }
 }

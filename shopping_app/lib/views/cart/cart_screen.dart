@@ -75,7 +75,9 @@ class CartScreen extends StatelessWidget {
               )
             : null,
         titleSpacing: Navigator.canPop(context) ? 0 : 16,
-        backgroundColor: AppTheme.surfaceContainerLowest,
+        backgroundColor: AppTheme.surface,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Row(
           children: [

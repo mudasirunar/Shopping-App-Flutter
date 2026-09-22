@@ -116,7 +116,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: AppTheme.surfaceContainerLowest,
+        backgroundColor: AppTheme.surface,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Row(
           children: [

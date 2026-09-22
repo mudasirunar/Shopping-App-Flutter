@@ -12,10 +12,19 @@ import 'cart/cart_screen.dart';
 import 'catalog/catalog_screen.dart';
 import '../widgets/bottom_nav_bar.dart';
 
+import '../widgets/top_welcome_banner.dart';
+
 class MainShell extends StatefulWidget {
   final int initialIndex;
+  final String? welcomeUserName;
+  final bool isNewUser;
 
-  const MainShell({super.key, this.initialIndex = 0});
+  const MainShell({
+    super.key,
+    this.initialIndex = 0,
+    this.welcomeUserName,
+    this.isNewUser = false,
+  });
 
   @override
   State<MainShell> createState() => _MainShellState();
@@ -39,13 +48,19 @@ class _MainShellState extends State<MainShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        if (widget.initialIndex != 0) {
-          context.read<NavigationProvider>().switchTab(widget.initialIndex);
-        }
+        context.read<NavigationProvider>().switchTab(widget.initialIndex);
         final auth = context.read<AuthProvider>();
         context.read<CartProvider>().setUserId(auth.currentUser?.uid);
         context.read<AddressProvider>().setUserId(auth.currentUser?.uid);
         context.read<WishlistProvider>().setUserId(auth.currentUser?.uid);
+
+        if (widget.welcomeUserName != null && widget.welcomeUserName!.trim().isNotEmpty) {
+          TopWelcomeBanner.show(
+            context,
+            name: widget.welcomeUserName!,
+            isNewUser: widget.isNewUser,
+          );
+        }
       }
     });
   }
@@ -169,7 +184,6 @@ class _MainShellState extends State<MainShell> {
     final cart = context.watch<CartProvider>();
     final cartCount = cart.totalItemCount;
 
-
     final pages = [
       CatalogScreen(
         scrollController: _catalogScrollController,
@@ -188,6 +202,7 @@ class _MainShellState extends State<MainShell> {
 
     return Scaffold(
       extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: currentIndex,
         children: pages,

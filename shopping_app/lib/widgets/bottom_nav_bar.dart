@@ -90,7 +90,10 @@ class _IOSNativeTabBarState extends State<_IOSNativeTabBar> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final mediaQuery = MediaQuery.of(context);
+    final bottomInset = mediaQuery.viewPadding.bottom > 0
+        ? mediaQuery.viewPadding.bottom
+        : mediaQuery.padding.bottom;
     final totalHeight = 49.0 + bottomInset;
 
     return SizedBox(

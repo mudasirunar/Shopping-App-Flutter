@@ -40,6 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _handleSignIn() async {
     if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
 
     final auth = context.read<AuthProvider>();
     final success = await auth.signIn(
@@ -48,15 +49,22 @@ class _SignInScreenState extends State<SignInScreen> {
     );
 
     if (success && mounted) {
-      context.read<CartProvider>().setUserId(auth.currentUser?.uid);
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainShell()),
-        );
-      }
+      FocusScope.of(context).unfocus();
+      final user = auth.currentUser;
+      final rawName = user?.displayName;
+      final emailPrefix = user?.email?.split('@').first ?? '';
+      final name = (rawName != null && rawName.trim().isNotEmpty) ? rawName.trim() : emailPrefix;
+
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => MainShell(
+            initialIndex: 0,
+            welcomeUserName: name,
+            isNewUser: false,
+          ),
+        ),
+        (route) => false,
+      );
     } else if (mounted && auth.errorMessage != null) {
       AppSnackBar.show(
         context,
@@ -91,9 +99,9 @@ class _SignInScreenState extends State<SignInScreen> {
             TextButton(
               onPressed: () {
                 context.read<CartProvider>().setUserId('guest');
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MainShell()),
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)),
+                  (route) => false,
                 );
               },
               child: const Text('Skip / Guest'),
@@ -167,6 +175,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: 'Email Address',
                       hintText: 'name@example.com',
@@ -185,6 +194,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outline, size: 20, color: AppTheme.secondary),

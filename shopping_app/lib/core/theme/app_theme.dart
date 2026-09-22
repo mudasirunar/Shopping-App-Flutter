@@ -64,10 +64,11 @@ class AppTheme {
         outlineVariant: outlineVariant,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: surfaceContainerLowest,
+        backgroundColor: surface,
         foregroundColor: onSurface,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -55,53 +56,123 @@ class AddressProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  StreamSubscription<QuerySnapshot>? _addressSubscription;
+
   /// Sets the active user context and syncs saved addresses.
   void setUserId(String? userId) {
     final effectiveId = (userId == null || userId.isEmpty) ? 'guest' : userId;
     if (_currentUserId == effectiveId) return;
     _currentUserId = effectiveId;
-    loadAddresses(effectiveId);
+    _setupUserSync(effectiveId);
+  }
+
+  Future<void> _setupUserSync(String effectiveId) async {
+    await _addressSubscription?.cancel();
+    _addressSubscription = null;
+
+    _isLoading = true;
+    notifyListeners();
+
+    // 1. Load local cache
+    await _loadFromLocal(effectiveId);
+
+    // 2. If authenticated, migrate any guest addresses and start real-time listener
+    if (effectiveId != 'guest') {
+      await _migrateGuestAddressesToCloud(effectiveId);
+
+      final firestore = _safeFirestore;
+      if (firestore != null) {
+        _addressSubscription = firestore
+            .collection('users')
+            .doc(effectiveId)
+            .collection('addresses')
+            .snapshots()
+            .listen((snapshot) {
+              _addresses = snapshot.docs
+                  .map((doc) => AddressModel.fromFirestore(doc))
+                  .take(maxAddresses)
+                  .toList();
+              _ensureDefaultDesignation();
+              _saveToLocal(effectiveId);
+              _isLoading = false;
+              notifyListeners();
+            }, onError: (err) {
+              debugPrint('Firestore address stream error: $err');
+              _isLoading = false;
+              notifyListeners();
+            });
+      } else {
+        _isLoading = false;
+        notifyListeners();
+      }
+    } else {
+      _ensureDefaultDesignation();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Migrates local guest addresses to the authenticated user's Firestore collection.
+  Future<void> _migrateGuestAddressesToCloud(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const guestKey = 'user_addresses_guest';
+      final guestData = prefs.getString(guestKey);
+      if (guestData == null || guestData.isEmpty) return;
+
+      final List<dynamic> decoded = json.decode(guestData) as List<dynamic>;
+      final guestAddresses = decoded
+          .map((item) => AddressModel.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+
+      if (guestAddresses.isEmpty) return;
+
+      final firestore = _safeFirestore;
+      if (firestore != null) {
+        final existingDocs = await firestore
+            .collection('users')
+            .doc(userId)
+            .collection('addresses')
+            .get();
+
+        final existingIds = existingDocs.docs.map((d) => d.id).toSet();
+        var currentCount = existingDocs.docs.length;
+
+        final batch = firestore.batch();
+        bool anyAdded = false;
+
+        for (final address in guestAddresses) {
+          if (currentCount >= maxAddresses) break;
+          if (!existingIds.contains(address.id)) {
+            final docRef = firestore
+                .collection('users')
+                .doc(userId)
+                .collection('addresses')
+                .doc(address.id);
+            batch.set(docRef, address.toFirestoreMap());
+            currentCount++;
+            anyAdded = true;
+          }
+        }
+
+        if (anyAdded) {
+          await batch.commit();
+        }
+      }
+
+      // Clear guest addresses once migrated
+      await prefs.remove(guestKey);
+      debugPrint('[AddressProvider] Successfully migrated guest addresses to user $userId');
+    } catch (e) {
+      debugPrint('[AddressProvider] Error migrating guest addresses: $e');
+    }
   }
 
   /// Loads addresses from local SharedPreferences and Firestore (for registered users).
   Future<void> loadAddresses([String? userId]) async {
     final effectiveId = (userId == null || userId.isEmpty) ? _currentUserId : userId;
     _currentUserId = effectiveId;
-    _isLoading = true;
-    notifyListeners();
-
-    // 1. Load from local SharedPreferences cache
-    await _loadFromLocal(effectiveId);
-
-    // 2. If authenticated, fetch from Cloud Firestore and sync
-    if (effectiveId != 'guest') {
-      try {
-        final firestore = _safeFirestore;
-        if (firestore != null) {
-          final snapshot = await firestore
-              .collection('users')
-              .doc(effectiveId)
-              .collection('addresses')
-              .get();
-
-          if (snapshot.docs.isNotEmpty) {
-            _addresses = snapshot.docs
-                .map((doc) => AddressModel.fromFirestore(doc))
-                .take(maxAddresses)
-                .toList();
-
-            _ensureDefaultDesignation();
-            await _saveToLocal(effectiveId);
-          }
-        }
-      } catch (e) {
-        debugPrint('Firestore address sync notice: $e');
-      }
-    }
-
-    _ensureDefaultDesignation();
-    _isLoading = false;
-    notifyListeners();
+    await _setupUserSync(effectiveId);
   }
 
   /// Adds a new address with strict enforcement of [maxAddresses] limit.
@@ -276,5 +347,11 @@ class AddressProvider extends ChangeNotifier {
         debugPrint('Firestore address batch commit notice: $e');
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _addressSubscription?.cancel();
+    super.dispose();
   }
 }

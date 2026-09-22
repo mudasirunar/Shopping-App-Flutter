@@ -12,6 +12,7 @@ import 'providers/catalog_provider.dart';
 import 'providers/navigation_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/wishlist_provider.dart';
+import 'services/user_data_sync_service.dart';
 import 'views/main_shell.dart';
 import 'views/onboarding/onboarding_screen.dart';
 
@@ -57,6 +58,16 @@ class ShoppingApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
+        Provider<UserDataSyncService>(
+          create: (ctx) => UserDataSyncService(
+            cartProvider: ctx.read<CartProvider>(),
+            wishlistProvider: ctx.read<WishlistProvider>(),
+            addressProvider: ctx.read<AddressProvider>(),
+            orderProvider: ctx.read<OrderProvider>(),
+          ),
+          dispose: (_, service) => service.dispose(),
+          lazy: false,
+        ),
       ],
       child: MaterialApp(
         navigatorKey: AppNavigator.navigatorKey,

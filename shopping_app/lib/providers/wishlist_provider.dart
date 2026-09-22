@@ -1,17 +1,19 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/product.dart';
 
-/// Provider managing favorited / bookmarked products with
-/// guest SharedPreferences persistence and authenticated Cloud Firestore synchronization.
+/// Provider managing favorited products with real-time multi-device
+/// Cloud Firestore synchronization and seamless guest migration.
 class WishlistProvider extends ChangeNotifier {
   FirebaseFirestore? _firestore;
   List<Product> _items = [];
   Set<String> _favoriteIds = {};
   String _currentUserId = 'guest';
   bool _isLoading = false;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _wishlistSubscription;
 
   WishlistProvider({FirebaseFirestore? firestore}) {
     try {
@@ -45,57 +47,145 @@ class WishlistProvider extends ChangeNotifier {
   void setUserId(String? userId) {
     final effectiveId = (userId == null || userId.isEmpty) ? 'guest' : userId;
     if (_currentUserId == effectiveId) return;
+
+    final previousId = _currentUserId;
     _currentUserId = effectiveId;
-    loadWishlist(effectiveId);
+
+    if (previousId == 'guest' && effectiveId != 'guest') {
+      _migrateGuestWishlistToCloud(effectiveId);
+    } else if (effectiveId == 'guest') {
+      _cancelCloudSubscription();
+      loadWishlist('guest');
+    } else {
+      _cancelCloudSubscription();
+      _connectCloudSubscription(effectiveId);
+    }
   }
 
-  /// Loads wishlist items from local cache and Firestore for registered accounts.
+  // --- Real-Time Firestore Synchronization ---
+
+  void _connectCloudSubscription(String userId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    // 1. Immediately display local cached favorites
+    await _loadFromLocal(userId);
+
+    final firestore = _safeFirestore;
+    if (firestore == null) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    try {
+      _wishlistSubscription = firestore
+          .collection('users')
+          .doc(userId)
+          .collection('wishlist')
+          .snapshots()
+          .listen((snapshot) {
+        final cloudItems = <Product>[];
+        for (final doc in snapshot.docs) {
+          try {
+            cloudItems.add(Product.fromJson(doc.data()));
+          } catch (e) {
+            debugPrint('Error parsing cloud wishlist item ${doc.id}: $e');
+          }
+        }
+
+        _items = cloudItems;
+        _favoriteIds = cloudItems.map((p) => p.id).toSet();
+        _saveToLocal(userId);
+        _isLoading = false;
+        notifyListeners();
+      }, onError: (e) {
+        debugPrint('Firestore wishlist stream error: $e');
+        _isLoading = false;
+        notifyListeners();
+      });
+    } catch (e) {
+      debugPrint('Failed to connect Firestore wishlist stream: $e');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void _cancelCloudSubscription() {
+    _wishlistSubscription?.cancel();
+    _wishlistSubscription = null;
+  }
+
+  // --- Guest to Cloud Migration ---
+
+  Future<void> _migrateGuestWishlistToCloud(String targetUserId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final guestKey = _storageKey('guest');
+      final guestRaw = prefs.getString(guestKey);
+      final guestItems = <Product>[];
+
+      if (guestRaw != null && guestRaw.isNotEmpty) {
+        final decoded = jsonDecode(guestRaw);
+        if (decoded is List) {
+          guestItems.addAll(decoded
+              .whereType<Map<String, dynamic>>()
+              .map((map) => Product.fromJson(map)));
+        }
+      }
+
+      final firestore = _safeFirestore;
+      if (firestore != null && guestItems.isNotEmpty) {
+        // Fetch existing cloud wishlist
+        final existingSnapshot = await firestore
+            .collection('users')
+            .doc(targetUserId)
+            .collection('wishlist')
+            .get();
+
+        final existingIds = existingSnapshot.docs.map((d) => d.id).toSet();
+        final batch = firestore.batch();
+
+        for (final item in guestItems) {
+          if (!existingIds.contains(item.id)) {
+            final docRef = firestore
+                .collection('users')
+                .doc(targetUserId)
+                .collection('wishlist')
+                .doc(item.id);
+            batch.set(docRef, item.toJson());
+          }
+        }
+        await batch.commit();
+
+        // Clear local guest wishlist
+        await prefs.remove(guestKey);
+      }
+    } catch (e) {
+      debugPrint('Error during guest wishlist migration: $e');
+    }
+
+    _connectCloudSubscription(targetUserId);
+  }
+
+  /// Loads wishlist items from local cache for guest accounts.
   Future<void> loadWishlist([String? userId]) async {
     final effectiveId = (userId == null || userId.isEmpty) ? _currentUserId : userId;
     _currentUserId = effectiveId;
     _isLoading = true;
     notifyListeners();
 
-    // 1. Load from local SharedPreferences cache
     await _loadFromLocal(effectiveId);
 
-    // 2. If authenticated, sync with Cloud Firestore
     if (effectiveId != 'guest') {
-      try {
-        final firestore = _safeFirestore;
-        if (firestore != null) {
-          final snapshot = await firestore
-              .collection('users')
-              .doc(effectiveId)
-              .collection('wishlist')
-              .get();
-
-          if (snapshot.docs.isNotEmpty) {
-            final remoteItems = <Product>[];
-            for (final doc in snapshot.docs) {
-              final data = doc.data();
-              remoteItems.add(Product.fromJson(data));
-            }
-            // Merge remote items with local items, avoiding duplicates
-            final Map<String, Product> merged = {};
-            for (final item in _items) {
-              merged[item.id] = item;
-            }
-            for (final item in remoteItems) {
-              merged[item.id] = item;
-            }
-            _items = merged.values.toList();
-            _favoriteIds = _items.map((p) => p.id).toSet();
-            await _saveToLocal(effectiveId);
-          }
-        }
-      } catch (e) {
-        debugPrint('Firestore wishlist sync notice: $e');
-      }
+      _connectCloudSubscription(effectiveId);
+    } else {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   /// Toggles favorite status for the given product. Returns true if now favorite, false if removed.
@@ -230,5 +320,11 @@ class WishlistProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Firestore wishlist background sync notice: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _cancelCloudSubscription();
+    super.dispose();
   }
 }

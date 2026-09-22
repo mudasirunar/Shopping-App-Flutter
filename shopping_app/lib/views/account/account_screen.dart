@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
 import '../address/addresses_screen.dart';
 import '../auth/sign_in_screen.dart';
+import '../main_shell.dart';
 import '../orders/order_history_screen.dart';
 import '../wishlist/wishlist_screen.dart';
-import '../../core/utils/app_snackbar.dart';
 
 class AccountScreen extends StatelessWidget {
   final ScrollController? scrollController;
@@ -32,9 +34,12 @@ class AccountScreen extends StatelessWidget {
         if (context.mounted) {
           context.read<CartProvider>().setUserId('guest');
           context.read<WishlistProvider>().setUserId('guest');
-          AppSnackBar.show(
-            context,
-            message: 'Successfully signed out.',
+          context.read<AddressProvider>().setUserId('guest');
+          context.read<OrderProvider>().setUserId('guest');
+
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)),
+            (route) => false,
           );
         }
       },
@@ -55,7 +60,9 @@ class AccountScreen extends StatelessWidget {
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: AppTheme.surfaceContainerLowest,
+        backgroundColor: AppTheme.surface,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: const Text(
           'My Account',

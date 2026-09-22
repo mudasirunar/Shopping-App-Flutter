@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/cart_provider.dart';
 import '../main_shell.dart';
 import '../../core/utils/app_snackbar.dart';
 
@@ -33,19 +32,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _handleSignUp() async {
     if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
 
+    final name = _nameController.text.trim();
     final auth = context.read<AuthProvider>();
     final success = await auth.signUp(
-      name: _nameController.text.trim(),
+      name: name,
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
 
     if (success && mounted) {
-      context.read<CartProvider>().setUserId(auth.currentUser?.uid);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const MainShell()),
+      FocusScope.of(context).unfocus();
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => MainShell(
+            initialIndex: 0,
+            welcomeUserName: name,
+            isNewUser: true,
+          ),
+        ),
         (route) => false,
       );
     } else if (mounted && auth.errorMessage != null) {
@@ -133,6 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // Name
                   TextFormField(
                     controller: _nameController,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: 'Full Name',
                       hintText: 'Enter your full name',
@@ -147,6 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: 'Email Address',
                       hintText: 'name@example.com',
@@ -165,6 +173,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       helperText: 'Must be at least 8 characters long',
@@ -192,6 +201,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscurePassword,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
                       labelText: 'Confirm Password',
                       prefixIcon: Icon(Icons.lock_reset_outlined, size: 20, color: AppTheme.secondary),
