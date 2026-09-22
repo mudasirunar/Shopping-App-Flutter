@@ -168,11 +168,6 @@ class _AndroidBottomBarState extends State<_AndroidBottomBar>
     stiffness: 380,
     ratio: 0.68,
   );
-  static final _followSpring = SpringDescription.withDampingRatio(
-    mass: 1,
-    stiffness: 240,
-    ratio: 0.82,
-  );
   static final _pressSpring = SpringDescription.withDampingRatio(
     mass: 1,
     stiffness: 300,
@@ -222,11 +217,6 @@ class _AndroidBottomBarState extends State<_AndroidBottomBar>
     );
   }
 
-  /// While dragging, the pill chases the finger on a spring (fluid, not stiff).
-  void _followTo(double pos) {
-    _c.animateWith(SpringSimulation(_followSpring, _c.value, pos, _c.velocity));
-  }
-
   void _setPressed(bool v) {
     if (_pressed == v) return;
     _pressed = v;
@@ -268,15 +258,16 @@ class _AndroidBottomBarState extends State<_AndroidBottomBar>
 
   void _onDragStart(DragStartDetails d) {
     _dragging = true;
+    _c.stop(); // stop any running spring animation
     _dragPos = _posFromDx(d.localPosition.dx);
     _lastHapticIndex = _c.value.round();
     _setPressed(true);
-    _followTo(_dragPos);
+    _c.value = _dragPos; // direct set, no spring
   }
 
   void _onDragUpdate(DragUpdateDetails d) {
     _dragPos = _posFromDx(d.localPosition.dx);
-    _followTo(_dragPos);
+    _c.value = _dragPos; // direct 1:1 tracking — zero lag
     final nearest = _dragPos.round();
     if (nearest != _lastHapticIndex) {
       _lastHapticIndex = nearest;
@@ -292,7 +283,7 @@ class _AndroidBottomBarState extends State<_AndroidBottomBar>
         .toInt();
     _dragging = false;
     _setPressed(false);
-    _animateTo(target, velocity: _c.velocity);
+    _animateTo(target, velocity: vel);
     if (target != widget.currentIndex) widget.onTap(target);
   }
 
