@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/catalog_provider.dart';
 import '../../providers/navigation_provider.dart';
+import '../../widgets/app_search_bar.dart';
 import '../../widgets/responsive_product_grid.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
@@ -205,13 +206,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
             letterSpacing: -0.4,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded, color: AppTheme.primary, size: 24),
-            onPressed: () => _openSearchScreen(context),
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: Consumer<CatalogProvider>(
         builder: (context, catalog, child) {
@@ -230,35 +224,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: InkWell(
+                  child: AppSearchBar.trigger(
                     onTap: () => _openSearchScreen(context),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      height: 46,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainerLowest,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
-                            blurRadius: 6,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.search_rounded, color: AppTheme.secondary, size: 20),
-                          SizedBox(width: 10),
-                          Text(
-                            'Search in full catalog...',
-                            style: TextStyle(color: AppTheme.secondary, fontSize: 13.5),
-                          ),
-                        ],
-                      ),
-                    ),
+                    hintText: 'Search in full catalog...',
                   ),
                 ),
               ),

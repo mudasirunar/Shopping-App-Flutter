@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/product.dart';
 import '../../providers/catalog_provider.dart';
+import '../../widgets/app_search_bar.dart';
 import '../../widgets/product_card.dart';
 import '../details/product_details_screen.dart';
 
@@ -240,51 +241,31 @@ class _SearchScreenState extends State<SearchScreen> {
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
         titleSpacing: 0,
-        backgroundColor: AppTheme.surfaceContainerLowest,
+        backgroundColor: AppTheme.surface,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppTheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Container(
-          height: 42,
+        title: AppSearchBar.field(
+          controller: _controller,
+          focusNode: _focusNode,
+          autofocus: widget.initialQuery == null || widget.initialQuery!.isEmpty,
+          hintText: 'Search products, tags, categories...',
           margin: const EdgeInsets.only(right: 16),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: TextField(
-            controller: _controller,
-            focusNode: _focusNode,
-            autofocus: widget.initialQuery == null || widget.initialQuery!.isEmpty,
-            textInputAction: TextInputAction.search,
-            onChanged: (val) {
-              setState(() {
-                _currentQuery = val;
-              });
-            },
-            onSubmitted: _onSearchSubmitted,
-            style: const TextStyle(fontSize: 14, color: AppTheme.onSurface),
-            decoration: InputDecoration(
-              hintText: 'Search products, tags, categories...',
-              hintStyle: const TextStyle(fontSize: 13.5, color: AppTheme.secondary),
-              prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppTheme.secondary),
-              suffixIcon: _currentQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 18, color: AppTheme.secondary),
-                      onPressed: () {
-                        _controller.clear();
-                        setState(() {
-                          _currentQuery = '';
-                        });
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
-            ),
-          ),
+          onChanged: (val) {
+            setState(() {
+              _currentQuery = val;
+            });
+          },
+          onSubmitted: _onSearchSubmitted,
+          onClear: () {
+            setState(() {
+              _currentQuery = '';
+            });
+          },
         ),
       ),
       body: _currentQuery.trim().isEmpty

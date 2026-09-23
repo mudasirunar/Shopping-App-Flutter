@@ -208,7 +208,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     height: 48,
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.03),
@@ -233,7 +233,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 },
                               )
                             : null,
-                        border: InputBorder.none,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 13),
                         fillColor: Colors.transparent,
                       ),

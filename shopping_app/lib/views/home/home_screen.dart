@@ -12,6 +12,7 @@ import '../../providers/catalog_provider.dart';
 import '../../providers/navigation_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
+import '../../widgets/app_search_bar.dart';
 import '../../widgets/hero_promotional_carousel.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
@@ -187,42 +188,9 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
-              child: InkWell(
+              child: AppSearchBar.trigger(
                 onTap: () => _openSearch(context),
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  height: 48,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLowest,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.6)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.025),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search_rounded, color: AppTheme.primary, size: 22),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Text(
-                          'Search 50+ products, electronics, deals...',
-                          style: TextStyle(
-                            color: AppTheme.secondary,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                hintText: 'Search products, electronics, deals...',
               ),
             ),
           ),
