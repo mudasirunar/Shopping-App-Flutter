@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
 
-/// A floating top welcome banner card featuring an animated waving hand,
-/// solid brand border, subtle translucent body, and customized greeting copy.
+/// A floating top notification banner overlay featuring animations,
+/// solid border, subtle shadow, and customized messaging for login,
+/// registration, and logout states.
 class TopWelcomeBanner extends StatefulWidget {
-  final String name;
+  final String? name;
   final bool isNewUser;
+  final bool isLogout;
+  final String? customTitle;
+  final String? customSubtitle;
   final VoidCallback onDismissed;
 
   const TopWelcomeBanner({
     super.key,
-    required this.name,
-    required this.isNewUser,
+    this.name,
+    this.isNewUser = false,
+    this.isLogout = false,
+    this.customTitle,
+    this.customSubtitle,
     required this.onDismissed,
   });
 
@@ -29,6 +36,32 @@ class TopWelcomeBanner extends StatefulWidget {
       builder: (ctx) => TopWelcomeBanner(
         name: name,
         isNewUser: isNewUser,
+        isLogout: false,
+        onDismissed: () {
+          if (entry.mounted) {
+            entry.remove();
+          }
+        },
+      ),
+    );
+
+    overlay.insert(entry);
+  }
+
+  /// Displays the top logout banner overlay when a user logs out.
+  static void showLogout(
+    BuildContext context, {
+    String title = 'Signed Out Successfully',
+    String subtitle = 'You are now browsing in guest mode.',
+  }) {
+    final overlay = Overlay.of(context, rootOverlay: true);
+
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (ctx) => TopWelcomeBanner(
+        isLogout: true,
+        customTitle: title,
+        customSubtitle: subtitle,
         onDismissed: () {
           if (entry.mounted) {
             entry.remove();
@@ -90,7 +123,9 @@ class _TopWelcomeBannerState extends State<TopWelcomeBanner>
 
     // Start entrance and wave loop
     _slideController.forward();
-    _waveController.repeat(reverse: true);
+    if (!widget.isLogout) {
+      _waveController.repeat(reverse: true);
+    }
 
     // Auto-dismiss after 3.6 seconds
     Future.delayed(const Duration(milliseconds: 3600), () {
@@ -130,18 +165,34 @@ class _TopWelcomeBannerState extends State<TopWelcomeBanner>
 
   @override
   Widget build(BuildContext context) {
-    final firstName = _getFirstName(widget.name);
-    final displayName = firstName.isNotEmpty
-        ? firstName
-        : (widget.isNewUser ? 'Friend' : 'Member');
+    final String title;
+    final String subtitle;
 
-    final title = widget.isNewUser
-        ? 'Welcome to Shopping App, $displayName!'
-        : 'Welcome back, $displayName!';
+    if (widget.isLogout) {
+      title = widget.customTitle ?? 'Signed Out Successfully';
+      subtitle = widget.customSubtitle ?? 'You are now browsing in guest mode.';
+    } else {
+      final firstName = _getFirstName(widget.name ?? '');
+      final displayName = firstName.isNotEmpty
+          ? firstName
+          : (widget.isNewUser ? 'Friend' : 'Member');
 
-    final subtitle = widget.isNewUser
-        ? 'Your journey starts here. Happy shopping! 🎉'
-        : "Great to see you again. Explore today's picks! ✨";
+      title = widget.isNewUser
+          ? 'Welcome to Shopping App, $displayName!'
+          : 'Welcome back, $displayName!';
+
+      subtitle = widget.isNewUser
+          ? 'Your journey starts here. Happy shopping! 🎉'
+          : "Great to see you again. Explore today's picks! ✨";
+    }
+
+    final borderColor = widget.isLogout
+        ? const Color(0xFF64748B)
+        : AppTheme.primary;
+
+    final shadowColor = widget.isLogout
+        ? const Color(0xFF475569).withOpacity(0.14)
+        : AppTheme.primary.withOpacity(0.12);
 
     return Positioned(
       top: 0,
@@ -170,12 +221,12 @@ class _TopWelcomeBannerState extends State<TopWelcomeBanner>
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppTheme.primary,
+                          color: borderColor,
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.12),
+                            color: shadowColor,
                             blurRadius: 24,
                             offset: const Offset(0, 8),
                           ),
@@ -186,88 +237,106 @@ class _TopWelcomeBannerState extends State<TopWelcomeBanner>
                           ),
                         ],
                       ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Waving hand icon with oscillating animation
-                              AnimatedBuilder(
-                                animation: _waveAnimation,
-                                builder: (context, child) {
-                                  return Transform.rotate(
-                                    angle: _waveAnimation.value,
-                                    origin: const Offset(14, 20),
-                                    child: Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.primary.withOpacity(
-                                          0.08,
-                                        ),
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppTheme.primary.withOpacity(
-                                            0.20,
-                                          ),
-                                          width: 1.0,
-                                        ),
-                                      ),
-                                      child: const Center(
-                                        child: Text(
-                                          '👋',
-                                          style: TextStyle(fontSize: 22),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: 14),
-
-                              // Text Message Block
-                              Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      title,
-                                      style: const TextStyle(
-                                        color: AppTheme.primary,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: -0.2,
-                                        height: 1.25,
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      subtitle,
-                                      style: const TextStyle(
-                                        color: AppTheme.secondary,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: -0.1,
-                                        height: 1.3,
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ],
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (widget.isLogout)
+                            // Logout icon badge
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFFCBD5E1),
+                                  width: 1.0,
                                 ),
                               ),
-
-                              // Dismiss icon
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8),
+                              child: const Center(
                                 child: Icon(
-                                  Icons.close_rounded,
-                                  size: 18,
-                                  color: AppTheme.secondary.withOpacity(0.6),
+                                  Icons.logout_rounded,
+                                  color: Color(0xFF475569),
+                                  size: 22,
                                 ),
                               ),
-                            ],
+                            )
+                          else
+                            // Waving hand icon with oscillating animation
+                            AnimatedBuilder(
+                              animation: _waveAnimation,
+                              builder: (context, child) {
+                                return Transform.rotate(
+                                  angle: _waveAnimation.value,
+                                  origin: const Offset(14, 20),
+                                  child: Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primary.withOpacity(0.08),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppTheme.primary.withOpacity(0.20),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        '👋',
+                                        style: TextStyle(fontSize: 22),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          const SizedBox(width: 14),
+
+                          // Text Message Block
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: widget.isLogout
+                                        ? const Color(0xFF1E293B)
+                                        : AppTheme.primary,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
+                                    height: 1.25,
+                                  ),
+                                  softWrap: true,
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  subtitle,
+                                  style: const TextStyle(
+                                    color: AppTheme.secondary,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: -0.1,
+                                    height: 1.3,
+                                  ),
+                                  softWrap: true,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+
+                          // Dismiss icon
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: AppTheme.secondary.withOpacity(0.6),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -275,6 +344,8 @@ class _TopWelcomeBannerState extends State<TopWelcomeBanner>
               ),
             ),
           ),
-        );
+        ),
+      ),
+    );
   }
 }

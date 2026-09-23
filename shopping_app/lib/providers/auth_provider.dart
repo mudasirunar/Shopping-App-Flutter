@@ -39,12 +39,26 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  int _activeOperationId = 0;
+
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
+  /// Cancels any active in-flight authentication operation, immediately
+  /// resetting loading state and discarding subsequent results.
+  void cancelCurrentOperation() {
+    _activeOperationId++;
+    if (_isLoading) {
+      _isLoading = false;
+      _errorMessage = null;
+      notifyListeners();
+    }
+  }
+
   Future<bool> signIn(String email, String password) async {
+    final opId = ++_activeOperationId;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -52,7 +66,9 @@ class AuthProvider extends ChangeNotifier {
     try {
       final auth = _safeAuth;
       if (auth == null) {
-        _errorMessage = 'Authentication service is currently unavailable.';
+        if (opId == _activeOperationId) {
+          _errorMessage = 'Authentication service is currently unavailable.';
+        }
         return false;
       }
 
@@ -60,17 +76,30 @@ class AuthProvider extends ChangeNotifier {
         email: email.trim(),
         password: password,
       );
+
+      if (opId != _activeOperationId) {
+        // Cancelled while awaiting network response
+        await auth.signOut();
+        return false;
+      }
+
       _currentUser = credential.user;
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = _mapAuthError(e.code);
+      if (opId == _activeOperationId) {
+        _errorMessage = _mapAuthError(e.code);
+      }
       return false;
     } catch (e) {
-      _errorMessage = 'An unexpected error occurred. Please try again.';
+      if (opId == _activeOperationId) {
+        _errorMessage = 'An unexpected error occurred. Please try again.';
+      }
       return false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (opId == _activeOperationId) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -85,6 +114,7 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
+    final opId = ++_activeOperationId;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -92,7 +122,9 @@ class AuthProvider extends ChangeNotifier {
     try {
       final auth = _safeAuth;
       if (auth == null) {
-        _errorMessage = 'Authentication service is currently unavailable.';
+        if (opId == _activeOperationId) {
+          _errorMessage = 'Authentication service is currently unavailable.';
+        }
         return false;
       }
 
@@ -100,18 +132,35 @@ class AuthProvider extends ChangeNotifier {
         email: email.trim(),
         password: password,
       );
+
+      if (opId != _activeOperationId) {
+        await auth.signOut();
+        return false;
+      }
+
       await credential.user?.updateDisplayName(name.trim());
+      if (opId != _activeOperationId) {
+        await auth.signOut();
+        return false;
+      }
+
       _currentUser = auth.currentUser;
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = _mapAuthError(e.code);
+      if (opId == _activeOperationId) {
+        _errorMessage = _mapAuthError(e.code);
+      }
       return false;
     } catch (e) {
-      _errorMessage = 'Failed to create account. Please try again.';
+      if (opId == _activeOperationId) {
+        _errorMessage = 'Failed to create account. Please try again.';
+      }
       return false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (opId == _activeOperationId) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 

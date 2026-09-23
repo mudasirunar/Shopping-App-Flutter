@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import 'otp_verification_screen.dart';
@@ -14,21 +15,52 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  String? _emailError;
+  String _lastEmailText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _lastEmailText = _emailController.text;
+    _emailController.addListener(_onEmailChanged);
+  }
+
+  void _onEmailChanged() {
+    if (_emailController.text != _lastEmailText) {
+      _lastEmailText = _emailController.text;
+      if (_emailError != null) {
+        setState(() => _emailError = null);
+      }
+    }
+  }
 
   @override
   void dispose() {
+    _emailController.removeListener(_onEmailChanged);
     _emailController.dispose();
     super.dispose();
   }
 
   Future<void> _handleSendOtp() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final auth = context.read<AuthProvider>();
     final email = _emailController.text.trim();
 
+    String? emailErr;
+    if (email.isEmpty) {
+      emailErr = 'Enter your email address';
+    } else if (!email.contains('@') || !email.contains('.')) {
+      emailErr = 'Enter a valid email address';
+    }
+
+    if (emailErr != null) {
+      _lastEmailText = _emailController.text;
+      setState(() => _emailError = emailErr);
+      return;
+    }
+
+    setState(() => _emailError = null);
+
+    final auth = context.read<AuthProvider>();
     final success = await auth.sendResetOtp(email);
 
     if (success && mounted) {
@@ -39,16 +71,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => OtpVerificationScreen(email: email),
-        ),
+        MaterialPageRoute(builder: (_) => OtpVerificationScreen(email: email)),
       );
     } else if (mounted && auth.errorMessage != null) {
-      AppSnackBar.show(
-        context,
-        message: auth.errorMessage!,
-        isError: true,
-      );
+      AppSnackBar.show(context, message: auth.errorMessage!, isError: true);
     }
   }
 
@@ -56,27 +82,39 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
-    return Scaffold(
-      backgroundColor: AppTheme.surface,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          context.read<AuthProvider>().cancelCurrentOperation();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.surface,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppTheme.primary,
+              size: 20,
+            ),
+            onPressed: () {
+              context.read<AuthProvider>().cancelCurrentOperation();
+              Navigator.pop(context);
+            },
+          ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Form(
-              key: _formKey,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -128,16 +166,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
+                    onChanged: (val) {
+                      _lastEmailText = val;
+                      if (_emailError != null) {
+                        setState(() => _emailError = null);
+                      }
+                    },
+                    decoration: InputDecoration(
                       labelText: 'Registered Email',
                       hintText: 'name@example.com',
-                      prefixIcon: Icon(Icons.mail_outline, size: 20, color: AppTheme.secondary),
+                      errorText: _emailError,
+                      prefixIcon: const Icon(
+                        Icons.mail_outline,
+                        size: 20,
+                        color: AppTheme.secondary,
+                      ),
                     ),
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty) return 'Enter your email';
-                      if (!val.contains('@') || !val.contains('.')) return 'Enter a valid email';
-                      return null;
-                    },
                   ),
 
                   const SizedBox(height: 20),
@@ -147,18 +191,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryContainer,
                       minimumSize: const Size.fromHeight(50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: auth.isLoading ? null : _handleSendOtp,
                     child: auth.isLoading
                         ? const SizedBox(
                             width: 22,
                             height: 22,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
                         : const Text(
                             'Send Verification Code',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                   ),
                 ],
