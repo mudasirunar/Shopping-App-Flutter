@@ -101,6 +101,7 @@ class _MainShellState extends State<MainShell> {
     final pages = [
       HomeScreen(
         scrollController: _homeScrollController,
+        onOpenCart: () => nav.openCart(),
       ),
       ExploreScreen(
         scrollController: _exploreScrollController,

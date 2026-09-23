@@ -1,9 +1,20 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../core/navigation/app_navigator.dart';
 import '../../core/theme/app_theme.dart';
+import '../../providers/cart_provider.dart';
 import '../../providers/catalog_provider.dart';
 import '../../providers/navigation_provider.dart';
+import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_search_bar.dart';
+import '../../widgets/catalog_interlude_strip.dart';
+import '../../widgets/explore_category_banner.dart';
+import '../../widgets/explore_spotlight_card.dart';
+import '../../widgets/explore_story_rail.dart';
+import '../../widgets/product_card.dart';
 import '../../widgets/responsive_product_grid.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
@@ -12,19 +23,13 @@ class ExploreScreen extends StatefulWidget {
   final ScrollController? scrollController;
   final VoidCallback? onOpenCart;
 
-  const ExploreScreen({
-    super.key,
-    this.scrollController,
-    this.onOpenCart,
-  });
+  const ExploreScreen({super.key, this.scrollController, this.onOpenCart});
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  final ScrollController _categoryScrollController = ScrollController();
-  final Map<String, GlobalKey> _categoryKeys = {};
   bool _isGridView = true;
 
   @override
@@ -35,28 +40,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _categoryScrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollToCategory(String cat) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final key = _categoryKeys[cat];
-      final ctx = key?.currentContext;
-      if (ctx != null) {
-        Scrollable.ensureVisible(
-          ctx,
-          alignment: 0.5, // Centers the selected chip horizontally in the viewport
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
-  }
-
   void _checkTargetCategory() {
     final nav = context.read<NavigationProvider>();
     final targetCat = nav.targetExploreCategory;
@@ -64,12 +47,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       final catalog = context.read<CatalogProvider>();
       catalog.selectCategory(targetCat);
       nav.clearTargetExploreCategory();
-      _scrollToCategory(targetCat);
-    } else {
-      final catalog = context.read<CatalogProvider>();
-      if (catalog.selectedCategory.toLowerCase() != 'all') {
-        _scrollToCategory(catalog.selectedCategory);
-      }
     }
   }
 
@@ -103,7 +80,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.star_outline, color: AppTheme.primary),
+                    leading: const Icon(
+                      Icons.star_outline,
+                      color: AppTheme.primary,
+                    ),
                     title: const Text('Featured'),
                     trailing: catalog.sortOption == ProductSortOption.featured
                         ? const Icon(Icons.check, color: AppTheme.primary)
@@ -114,9 +94,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.arrow_upward, color: AppTheme.primary),
+                    leading: const Icon(
+                      Icons.arrow_upward,
+                      color: AppTheme.primary,
+                    ),
                     title: const Text('Price: Low to High'),
-                    trailing: catalog.sortOption == ProductSortOption.priceLowToHigh
+                    trailing:
+                        catalog.sortOption == ProductSortOption.priceLowToHigh
                         ? const Icon(Icons.check, color: AppTheme.primary)
                         : null,
                     onTap: () {
@@ -125,9 +109,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.arrow_downward, color: AppTheme.primary),
+                    leading: const Icon(
+                      Icons.arrow_downward,
+                      color: AppTheme.primary,
+                    ),
                     title: const Text('Price: High to Low'),
-                    trailing: catalog.sortOption == ProductSortOption.priceHighToLow
+                    trailing:
+                        catalog.sortOption == ProductSortOption.priceHighToLow
                         ? const Icon(Icons.check, color: AppTheme.primary)
                         : null,
                     onTap: () {
@@ -136,7 +124,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.sort_by_alpha_rounded, color: AppTheme.primary),
+                    leading: const Icon(
+                      Icons.sort_by_alpha_rounded,
+                      color: AppTheme.primary,
+                    ),
                     title: const Text('Name: A to Z'),
                     trailing: catalog.sortOption == ProductSortOption.nameAToZ
                         ? const Icon(Icons.check, color: AppTheme.primary)
@@ -169,10 +160,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   void _openSearchScreen(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const SearchScreen()));
+  }
+
+  void _openProduct(BuildContext context, product) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const SearchScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => ProductDetailsScreen(product: product)),
     );
   }
 
@@ -180,24 +174,32 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     // Listen for any new target category arriving from navigation
     final nav = context.watch<NavigationProvider>();
+    final cart = context.watch<CartProvider>();
+    final wishlist = context.watch<WishlistProvider>();
     final target = nav.targetExploreCategory;
     if (target != null && target.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         context.read<CatalogProvider>().selectCategory(target);
         context.read<NavigationProvider>().clearTargetExploreCategory();
-        _scrollToCategory(target);
       });
     }
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: AppTheme.surface,
+        backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(color: AppTheme.surface.withOpacity(0.65)),
+          ),
+        ),
         title: const Text(
           'Explore Catalog',
           style: TextStyle(
@@ -205,6 +207,49 @@ class _ExploreScreenState extends State<ExploreScreen> {
             fontWeight: FontWeight.w800,
             fontSize: 20,
             letterSpacing: -0.4,
+          ),
+        ),
+        actions: [
+          // Wishlist Shortcut
+          IconButton(
+            icon: Badge(
+              isLabelVisible: wishlist.itemCount > 0,
+              backgroundColor: AppTheme.primary,
+              label: Text('${wishlist.itemCount}'),
+              child: const Icon(
+                Icons.favorite_outline_rounded,
+                color: AppTheme.onSurface,
+                size: 22,
+              ),
+            ),
+            onPressed: () => AppNavigator.openWishlist(),
+          ),
+          // Cart Shortcut
+          IconButton(
+            icon: Badge(
+              isLabelVisible: cart.totalItemCount > 0,
+              backgroundColor: const Color(0xFFFF3B30),
+              label: Text('${cart.totalItemCount}'),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                color: AppTheme.onSurface,
+                size: 22,
+              ),
+            ),
+            onPressed: () => widget.onOpenCart != null
+                ? widget.onOpenCart!()
+                : AppNavigator.openCart(),
+          ),
+          const SizedBox(width: 4),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: AppSearchBar.trigger(
+              onTap: () => _openSearchScreen(context),
+              hintText: 'Search in full catalog...',
+            ),
           ),
         ),
       ),
@@ -217,162 +262,137 @@ class _ExploreScreenState extends State<ExploreScreen> {
           }
 
           final products = catalog.filteredProducts;
+          final showCategory =
+              catalog.selectedCategory.trim().toLowerCase() == 'all';
+
+          // Split products: spotlight (first), first batch (next 4), remaining
+          final spotlightProduct = products.isNotEmpty ? products.first : null;
+          final afterSpotlight = products.length > 1
+              ? products.sublist(1)
+              : <dynamic>[];
+          final firstBatch = afterSpotlight.length > 4
+              ? afterSpotlight.sublist(0, 4)
+              : afterSpotlight;
+          final remainingProducts = afterSpotlight.length > 4
+              ? afterSpotlight.sublist(4)
+              : <dynamic>[];
+
+          final topPadding = MediaQuery.of(context).padding.top;
+          final double appBarBottom = topPadding > (kToolbarHeight + 52)
+              ? topPadding
+              : topPadding + kToolbarHeight + 52;
 
           return CustomScrollView(
             controller: widget.scrollController,
             slivers: [
-              // Search Launch Bar
+              // Top spacer for frosted glass AppBar + search bar
+              SliverToBoxAdapter(child: SizedBox(height: appBarBottom + 6)),
+
+              // 1. Story-Style Category Rail
+              SliverToBoxAdapter(
+                child: ExploreStoryRail(
+                  categories: catalog.categories,
+                  selectedCategory: catalog.selectedCategory,
+                  onCategorySelected: (cat) {
+                    catalog.selectCategory(cat);
+                  },
+                ),
+              ),
+
+              // 2. Dynamic Category Editorial Hero Banner
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: AppSearchBar.trigger(
-                    onTap: () => _openSearchScreen(context),
-                    hintText: 'Search in full catalog...',
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
+                  child: ExploreCategoryBanner(
+                    selectedCategory: catalog.selectedCategory,
+                    productCount: products.length,
                   ),
                 ),
               ),
 
-              // Horizontal Category Chips Row
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 38,
-                  child: ListView.separated(
-                    controller: _categoryScrollController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: catalog.categories.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final cat = catalog.categories[index];
-                      final isSelected =
-                          catalog.selectedCategory.toLowerCase() == cat.toLowerCase();
-
-                      final chipKey = _categoryKeys.putIfAbsent(cat, () => GlobalKey());
-
-                      return InkWell(
-                        key: chipKey,
-                        onTap: () {
-                          catalog.selectCategory(cat);
-                          _scrollToCategory(cat);
-                        },
-                        borderRadius: BorderRadius.circular(10),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppTheme.primaryContainer
-                                : AppTheme.surfaceContainerLowest,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: isSelected
-                                  ? AppTheme.primaryContainer
-                                  : AppTheme.outlineVariant.withOpacity(0.5),
-                            ),
-                          ),
-                          child: Text(
-                            cat,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected ? Colors.white : AppTheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Count & Sort Row
+              // 3. Toolbar Row (Sort + Shape Changer)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        '${products.length} Products Available',
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.secondary,
+                      InkWell(
+                        onTap: () => _showSortModal(context),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceContainerLowest,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppTheme.outlineVariant.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Sort: ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.secondary,
+                                ),
+                              ),
+                              Text(
+                                _getSortLabel(catalog.sortOption),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 16,
+                                color: AppTheme.secondary,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            onTap: () => _showSortModal(context),
+                      const SizedBox(width: 8),
+                      // Shape Changing View Toggle Button
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _isGridView = !_isGridView;
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceContainerLowest,
                             borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppTheme.surfaceContainerLowest,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Sort: ',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppTheme.secondary,
-                                    ),
-                                  ),
-                                  Text(
-                                    _getSortLabel(catalog.sortOption),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 16,
-                                    color: AppTheme.secondary,
-                                  ),
-                                ],
-                              ),
+                            border: Border.all(
+                              color: AppTheme.outlineVariant.withOpacity(0.4),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          // Shape Changing View Toggle Button
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _isGridView = !_isGridView;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: AppTheme.surfaceContainerLowest,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
-                              ),
-                              child: Icon(
-                                _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
-                                size: 18,
-                                color: AppTheme.onSurface,
-                              ),
-                            ),
+                          child: Icon(
+                            _isGridView
+                                ? Icons.view_list_rounded
+                                : Icons.grid_view_rounded,
+                            size: 18,
+                            color: AppTheme.onSurface,
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
 
-              // Products Grid or Empty State
+              // Empty State
               if (products.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
@@ -382,7 +402,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.inbox_outlined, size: 48, color: AppTheme.secondary),
+                          const Icon(
+                            Icons.inbox_outlined,
+                            size: 48,
+                            color: AppTheme.secondary,
+                          ),
                           const SizedBox(height: 12),
                           const Text(
                             'No products found in this category',
@@ -401,22 +425,124 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                   ),
-                )
-              else
+                ),
+
+              // 4. Editor's Spotlight Pick (Hero Card for #1 product)
+              if (spotlightProduct != null) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ExploreSpotlightCard(
+                      product: spotlightProduct,
+                      onTap: () => _openProduct(context, spotlightProduct),
+                    ),
+                  ),
+                ),
+              ],
+
+              // 5. First batch of products (up to 4)
+              if (firstBatch.isNotEmpty)
+                _buildProductBatch(firstBatch, showCategory),
+
+              // 6. Ambient Catalog Interlude / Promo Break
+              if (remainingProducts.isNotEmpty)
+                const SliverToBoxAdapter(child: CatalogInterludeStrip()),
+
+              // 7. Remaining products
+              if (remainingProducts.isNotEmpty)
                 ResponsiveProductGrid(
-                  products: products,
+                  products: List.from(remainingProducts),
                   isWideView: !_isGridView,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-                  showCategory: catalog.selectedCategory.trim().toLowerCase() == 'all',
-                  onProductTap: (product) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProductDetailsScreen(product: product),
-                      ),
-                    );
-                  },
+                  showCategory: showCategory,
+                  onProductTap: (product) => _openProduct(context, product),
                 ),
+
+              // Bottom padding if no remaining products
+              if (remainingProducts.isEmpty && firstBatch.isNotEmpty)
+                const SliverToBoxAdapter(child: SizedBox(height: 110)),
             ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Builds a small batch of product cards (used for the first 4 items).
+  Widget _buildProductBatch(List products, bool showCategory) {
+    if (!_isGridView) {
+      // Wide view: each card takes full width
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverList.builder(
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final p = products[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ProductCard(
+                product: p,
+                onTap: () => _openProduct(context, p),
+                isWide: true,
+                showCategory: showCategory,
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    // Grid view: 2 columns with smart last-row expansion
+    final rowCount = (products.length / 2).ceil();
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverList.builder(
+        itemCount: rowCount,
+        itemBuilder: (context, rowIndex) {
+          final firstIndex = rowIndex * 2;
+          final secondIndex = firstIndex + 1;
+          final hasSecond = secondIndex < products.length;
+
+          final p1 = products[firstIndex];
+
+          if (!hasSecond) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ProductCard(
+                product: p1,
+                onTap: () => _openProduct(context, p1),
+                isWide: true,
+                showCategory: showCategory,
+              ),
+            );
+          }
+
+          final p2 = products[secondIndex];
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ProductCard(
+                    product: p1,
+                    onTap: () => _openProduct(context, p1),
+                    isWide: false,
+                    showCategory: showCategory,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ProductCard(
+                    product: p2,
+                    onTap: () => _openProduct(context, p2),
+                    isWide: false,
+                    showCategory: showCategory,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
