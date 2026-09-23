@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/navigation/app_navigator.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/app_snackbar.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
@@ -14,6 +12,7 @@ import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/app_search_bar.dart';
 import '../../widgets/hero_promotional_carousel.dart';
+import '../../widgets/voucher_wallet_strip.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
 
@@ -63,14 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return '$hours:$minutes:$seconds';
   }
 
-  void _copyVoucher(String code) {
-    Clipboard.setData(ClipboardData(text: code));
-    HapticFeedback.lightImpact();
-    AppSnackBar.show(
-      context,
-      message: 'Voucher code "$code" copied to clipboard!',
-    );
-  }
+
 
   void _openSearch(BuildContext context) {
     Navigator.of(context).push(
@@ -201,8 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // 3. Voucher Codes Wallet Strip
-          SliverToBoxAdapter(
-            child: _buildVoucherStrip(),
+          const SliverToBoxAdapter(
+            child: VoucherWalletStrip(),
           ),
 
           // 4. Category Quick Rail
@@ -249,110 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-  // ---------------------------------------------------------------------------
-  // Voucher Strip
-  // ---------------------------------------------------------------------------
-  Widget _buildVoucherStrip() {
-    final vouchers = [
-      {'code': 'FESTIVAL20', 'label': '20% OFF Orders over Rs. 5,000', 'color': const Color(0xFF047857)},
-      {'code': 'FREESHIP', 'label': 'Free Insured Air Courier', 'color': const Color(0xFF1D4ED8)},
-      {'code': 'SAVE15', 'label': 'Flat 15% OFF Audio & Tech', 'color': const Color(0xFFB45309)},
-    ];
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Icon(Icons.confirmation_number_outlined, size: 18, color: AppTheme.primary),
-                SizedBox(width: 6),
-                Text(
-                  'Exclusive Promo Codes',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 56,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: vouchers.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                final v = vouchers[index];
-                final code = v['code'] as String;
-                final label = v['label'] as String;
-                final col = v['color'] as Color;
-
-                return InkWell(
-                  onTap: () => _copyVoucher(code),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: col.withOpacity(0.35)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: col.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            code,
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: col,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          label,
-                          style: const TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(Icons.copy_rounded, size: 14, color: col),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ---------------------------------------------------------------------------
   // Category Quick Rail
