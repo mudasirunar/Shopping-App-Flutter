@@ -68,10 +68,15 @@ class OrderModel {
   final int deliveryPaisa;
   final int totalPaisa;
   final String status;
+  final String? cancellationReason;
   final DateTime createdAt;
 
   /// Alias for orderId
   String get id => orderId;
+
+  /// Returns true if order is cancelled (handles both spellings)
+  bool get isCancelled =>
+      status.toLowerCase() == 'cancelled' || status.toLowerCase() == 'canceled';
 
   const OrderModel({
     required this.orderId,
@@ -82,8 +87,35 @@ class OrderModel {
     required this.deliveryPaisa,
     required this.totalPaisa,
     this.status = 'placed',
+    this.cancellationReason,
     required this.createdAt,
   });
+
+  OrderModel copyWith({
+    String? orderId,
+    String? userId,
+    List<OrderSnapshotItem>? items,
+    DeliveryInfo? deliveryInfo,
+    int? subtotalPaisa,
+    int? deliveryPaisa,
+    int? totalPaisa,
+    String? status,
+    String? cancellationReason,
+    DateTime? createdAt,
+  }) {
+    return OrderModel(
+      orderId: orderId ?? this.orderId,
+      userId: userId ?? this.userId,
+      items: items ?? this.items,
+      deliveryInfo: deliveryInfo ?? this.deliveryInfo,
+      subtotalPaisa: subtotalPaisa ?? this.subtotalPaisa,
+      deliveryPaisa: deliveryPaisa ?? this.deliveryPaisa,
+      totalPaisa: totalPaisa ?? this.totalPaisa,
+      status: status ?? this.status,
+      cancellationReason: cancellationReason ?? this.cancellationReason,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 
   /// Map representation for writing to Firestore.
   /// Uses [FieldValue.serverTimestamp()] when writing directly to Firestore.
@@ -97,6 +129,7 @@ class OrderModel {
       'deliveryPaisa': deliveryPaisa,
       'totalPaisa': totalPaisa,
       'status': status,
+      if (cancellationReason != null) 'cancellationReason': cancellationReason,
       'createdAt': useServerTimestamp
           ? FieldValue.serverTimestamp()
           : Timestamp.fromDate(createdAt),
@@ -114,6 +147,7 @@ class OrderModel {
       'deliveryPaisa': deliveryPaisa,
       'totalPaisa': totalPaisa,
       'status': status,
+      if (cancellationReason != null) 'cancellationReason': cancellationReason,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -143,6 +177,7 @@ class OrderModel {
       deliveryPaisa: (json['deliveryPaisa'] as num?)?.toInt() ?? 0,
       totalPaisa: (json['totalPaisa'] as num?)?.toInt() ?? 0,
       status: json['status'] as String? ?? 'placed',
+      cancellationReason: json['cancellationReason'] as String?,
       createdAt: parsedDate,
     );
   }
@@ -175,6 +210,7 @@ class OrderModel {
       deliveryPaisa: (data['deliveryPaisa'] as num?)?.toInt() ?? 0,
       totalPaisa: (data['totalPaisa'] as num?)?.toInt() ?? 0,
       status: data['status'] as String? ?? 'placed',
+      cancellationReason: data['cancellationReason'] as String?,
       createdAt: parsedDate,
     );
   }

@@ -39,11 +39,19 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.orders.isEmpty) return const SizedBox.shrink();
+    // Strictly filter out any cancelled orders
+    final eligibleOrders = widget.orders.where((o) {
+      final s = o.status.toLowerCase();
+      return !o.isCancelled && s != 'cancelled' && s != 'canceled';
+    }).toList();
 
-    if (widget.orders.length == 1) {
-      return _buildTrackerCard(context, widget.orders.first);
+    if (eligibleOrders.isEmpty) return const SizedBox.shrink();
+
+    if (eligibleOrders.length == 1) {
+      return _buildTrackerCard(context, eligibleOrders.first);
     }
+
+    final safeIndex = _currentIndex.clamp(0, eligibleOrders.length - 1);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -66,7 +74,7 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'ACTIVE SHIPMENTS (${widget.orders.length})',
+                    'ACTIVE SHIPMENTS (${eligibleOrders.length})',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -87,7 +95,7 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
                   ),
                 ),
                 child: Text(
-                  '${_currentIndex + 1} of ${widget.orders.length}',
+                  '${safeIndex + 1} of ${eligibleOrders.length}',
                   style: const TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
@@ -102,7 +110,7 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
           height: 174,
           child: PageView.builder(
             controller: _pageController,
-            itemCount: widget.orders.length,
+            itemCount: eligibleOrders.length,
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;
@@ -111,7 +119,7 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: _buildTrackerCard(context, widget.orders[index]),
+                child: _buildTrackerCard(context, eligibleOrders[index]),
               );
             },
           ),
@@ -120,8 +128,8 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
         Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: List.generate(widget.orders.length, (index) {
-              final isSelected = index == _currentIndex;
+            children: List.generate(eligibleOrders.length, (index) {
+              final isSelected = index == safeIndex;
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -143,7 +151,9 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
 
   Widget _buildTrackerCard(BuildContext context, OrderModel order) {
     final statusLower = order.status.toLowerCase();
-    final isCancelled = statusLower == 'cancelled';
+    final isCancelled = order.isCancelled ||
+        statusLower == 'cancelled' ||
+        statusLower == 'canceled';
 
     int currentStep = 0;
     if (statusLower == 'processing' || statusLower == 'packed') {
@@ -163,8 +173,8 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
 
     if (isCancelled) {
       badgeColor = const Color(0xFFDC2626);
-      badgeBg = const Color(0xFFFEE2E2);
-      badgeIcon = Icons.cancel_outlined;
+      badgeBg = const Color(0xFFFEF2F2);
+      badgeIcon = Icons.cancel_rounded;
       badgeLabel = 'CANCELLED';
     } else if (currentStep == 3) {
       badgeColor = const Color(0xFF059669);
@@ -231,6 +241,9 @@ class _ActiveOrdersCarouselState extends State<ActiveOrdersCarousel> {
                       decoration: BoxDecoration(
                         color: badgeBg,
                         borderRadius: BorderRadius.circular(20),
+                        border: isCancelled
+                            ? Border.all(color: const Color(0xFFFCA5A5), width: 1)
+                            : null,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

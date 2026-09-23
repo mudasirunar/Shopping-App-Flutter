@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -15,6 +16,8 @@ class OrderProvider extends ChangeNotifier {
   String? _errorMessage;
   String _currentUserId = 'guest';
   StreamSubscription<QuerySnapshot>? _ordersSubscription;
+  final Set<String> _cancelledOrderIds = {};
+  final Map<String, String> _cancellationReasons = {};
 
   OrderProvider({FirebaseFirestore? firestore}) {
     try {
@@ -42,12 +45,36 @@ class OrderProvider extends ChangeNotifier {
   Future<void> _loadLocalOrders(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+
+      // Restore cancelled order IDs & reasons cache
+      final savedCancelled = prefs.getStringList('cancelled_order_ids') ?? [];
+      for (final id in savedCancelled) {
+        _cancelledOrderIds.add(id.toLowerCase());
+      }
+      final rawReasons = prefs.getString('cancellation_reasons');
+      if (rawReasons != null && rawReasons.isNotEmpty) {
+        final Map<String, dynamic> decoded = json.decode(rawReasons) as Map<String, dynamic>;
+        decoded.forEach((key, val) {
+          if (val is String) _cancellationReasons[key.toLowerCase()] = val;
+        });
+      }
+
       final key = 'local_orders_$userId';
       final raw = prefs.getString(key);
       if (raw != null && raw.isNotEmpty) {
         final List<dynamic> decoded = json.decode(raw) as List<dynamic>;
         _userOrders = decoded
             .map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e as Map)))
+            .map((o) {
+              final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
+              if (_cancelledOrderIds.contains(id)) {
+                return o.copyWith(
+                  status: 'cancelled',
+                  cancellationReason: _cancellationReasons[id] ?? o.cancellationReason,
+                );
+              }
+              return o;
+            })
             .toList();
         notifyListeners();
       }
@@ -60,6 +87,14 @@ class OrderProvider extends ChangeNotifier {
       final key = 'local_orders_$userId';
       final encoded = json.encode(_userOrders.map((e) => e.toJson()).toList());
       await prefs.setString(key, encoded);
+    } catch (_) {}
+  }
+
+  Future<void> _saveCancelledState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('cancelled_order_ids', _cancelledOrderIds.toList());
+      await prefs.setString('cancellation_reasons', json.encode(_cancellationReasons));
     } catch (_) {}
   }
 
@@ -107,8 +142,29 @@ class OrderProvider extends ChangeNotifier {
                   .map((doc) => OrderModel.fromFirestore(doc))
                   .toList();
               orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-              _userOrders = orders;
+
+              // Map orders and respect Firestore server status updates (e.g. when changed in Firebase Console)
+              final sanitizedOrders = orders.map((o) {
+                final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
+                if (o.isCancelled) {
+                  _cancelledOrderIds.add(id);
+                  if (o.cancellationReason != null && o.cancellationReason!.isNotEmpty) {
+                    _cancellationReasons[id] = o.cancellationReason!;
+                  }
+                  return o;
+                } else if (_cancelledOrderIds.contains(id)) {
+                  // If Firestore server explicitly reflects a non-cancelled status (e.g. admin changed in Console),
+                  // allow the Firebase Console change to take effect immediately
+                  _cancelledOrderIds.remove(id);
+                  _cancellationReasons.remove(id);
+                  return o;
+                }
+                return o;
+              }).toList();
+
+              _userOrders = sanitizedOrders;
               _saveLocalOrders(effectiveUserId);
+              _saveCancelledState();
               _isLoading = false;
               _errorMessage = null;
               notifyListeners();
@@ -156,6 +212,7 @@ class OrderProvider extends ChangeNotifier {
             deliveryPaisa: order.deliveryPaisa,
             totalPaisa: order.totalPaisa,
             status: order.status,
+            cancellationReason: order.cancellationReason,
             createdAt: order.createdAt,
           );
           batch.set(
@@ -234,6 +291,95 @@ class OrderProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Cancels an active in-flight order (until delivered).
+  /// Saves cancellation status and feedback reason to Firestore and local storage.
+  Future<bool> cancelOrder(String orderId, {String? reason}) async {
+    final cleanId = orderId.replaceAll('#', '').trim().toLowerCase();
+
+    // 1. Immediately record in cancelled set & reason map so incoming snapshots can never revert it
+    _cancelledOrderIds.add(cleanId);
+    if (reason != null && reason.isNotEmpty) {
+      _cancellationReasons[cleanId] = reason;
+    }
+
+    int index = _userOrders.indexWhere(
+      (o) => o.orderId.replaceAll('#', '').trim().toLowerCase() == cleanId,
+    );
+
+    // Fallback: Reload from local storage if memory list was somehow empty or stale
+    if (index < 0) {
+      await _loadLocalOrders(_currentUserId);
+      index = _userOrders.indexWhere(
+        (o) => o.orderId.replaceAll('#', '').trim().toLowerCase() == cleanId,
+      );
+    }
+
+    if (index < 0) {
+      debugPrint('[OrderProvider] cancelOrder failed: Order $orderId not found in user orders');
+      return false;
+    }
+
+    final currentOrder = _userOrders[index];
+    final statusLower = currentOrder.status.toLowerCase();
+    if (statusLower == 'delivered') {
+      debugPrint('[OrderProvider] cancelOrder: Order already in delivered state: ${currentOrder.status}');
+      return false; // Cannot cancel delivered orders
+    }
+
+    // Determine the active authenticated userId for Firestore sync
+    final authUser = FirebaseAuth.instance.currentUser;
+    String effectiveUserId = (authUser != null && authUser.uid.isNotEmpty)
+        ? authUser.uid
+        : ((_currentUserId.isNotEmpty && _currentUserId != 'guest')
+            ? _currentUserId
+            : (currentOrder.userId.isNotEmpty ? currentOrder.userId : 'guest'));
+
+    final updated = currentOrder.copyWith(
+      status: 'cancelled',
+      cancellationReason: reason,
+    );
+
+    // 2. Update active memory and notify UI immediately
+    _userOrders[index] = updated;
+    notifyListeners();
+
+    // 3. Persist locally to SharedPreferences for instant offline recall
+    await _saveCancelledState();
+
+    await _saveLocalOrders(effectiveUserId);
+    if (effectiveUserId != 'guest') {
+      await _saveLocalOrders('guest');
+    }
+
+    // 4. Write directly to Cloud Firestore with merge to guarantee cloud sync
+    if (effectiveUserId != 'guest') {
+      try {
+        final firestore = _safeFirestore;
+        if (firestore != null) {
+          final cancelPayload = <String, dynamic>{
+            'status': 'cancelled',
+            if (reason != null && reason.isNotEmpty) 'cancellationReason': reason,
+            'cancelledAt': FieldValue.serverTimestamp(),
+          };
+
+          // Update user-scoped subcollection
+          await firestore
+              .collection('users')
+              .doc(effectiveUserId)
+              .collection('orders')
+              .doc(currentOrder.orderId)
+              .set(cancelPayload, SetOptions(merge: true));
+
+          debugPrint('[OrderProvider] Order ${currentOrder.orderId} cancellation synced to Cloud Firestore');
+        }
+      } catch (e) {
+        debugPrint('[OrderProvider] Firestore cancel order sync error: $e');
+      }
+    }
+
+    return true;
   }
 
   @override

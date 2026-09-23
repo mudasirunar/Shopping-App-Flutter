@@ -31,8 +31,11 @@ service cloud.firestore {
         // Allow read only if the authenticated user is the owner
         allow read: if request.auth != null && request.auth.uid == userId;
 
-        // Strictly deny client updates and deletions of existing orders
-        allow update, delete: if false;
+        // Allow user to update their order (e.g. status changes such as cancellation)
+        allow update: if request.auth != null && request.auth.uid == userId;
+
+        // Strictly deny deletions of existing orders
+        allow delete: if false;
       }
     }
 

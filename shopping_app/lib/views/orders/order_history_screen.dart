@@ -145,34 +145,75 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.emeraldContainer,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.emeraldSuccess,
-                          shape: BoxShape.circle,
-                        ),
+                Builder(
+                  builder: (context) {
+                    final statusLower = order.status.toLowerCase();
+                    final isCancelled = order.isCancelled ||
+                        statusLower == 'cancelled' ||
+                        statusLower == 'canceled';
+                    Color badgeBg;
+                    Color badgeColor;
+                    BoxBorder? badgeBorder;
+
+                    if (isCancelled) {
+                      badgeBg = const Color(0xFFFEF2F2);
+                      badgeColor = const Color(0xFFDC2626);
+                      badgeBorder = Border.all(color: const Color(0xFFFCA5A5), width: 1);
+                    } else if (statusLower == 'delivered') {
+                      badgeBg = AppTheme.emeraldContainer;
+                      badgeColor = AppTheme.emeraldSuccess;
+                    } else if (statusLower == 'shipped' ||
+                        statusLower == 'in transit' ||
+                        statusLower == 'out for delivery') {
+                      badgeBg = const Color(0xFFCCFBF1);
+                      badgeColor = const Color(0xFF0D9488);
+                    } else if (statusLower == 'processing' || statusLower == 'packed') {
+                      badgeBg = const Color(0xFFDBEAFE);
+                      badgeColor = const Color(0xFF2563EB);
+                    } else {
+                      badgeBg = const Color(0xFFFEF3C7);
+                      badgeColor = const Color(0xFFD97706);
+                    }
+
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                      decoration: BoxDecoration(
+                        color: badgeBg,
+                        border: badgeBorder,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        order.status,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.emeraldSuccess,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isCancelled)
+                            const Icon(
+                              Icons.cancel_rounded,
+                              size: 11,
+                              color: Color(0xFFDC2626),
+                            )
+                          else
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: badgeColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isCancelled ? 'CANCELLED' : order.status.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: badgeColor,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ],
             ),

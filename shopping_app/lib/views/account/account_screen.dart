@@ -305,13 +305,19 @@ class AccountScreen extends StatelessWidget {
     final displayName = user?.displayName ?? (isGuest ? 'Guest Shopper' : 'Registered Member');
     final email = user?.email ?? (isGuest ? 'Browsing in Guest Mode' : '');
 
-    final activeOrders = orders.userOrders.where((o) {
+    final nonCancelledOrders = orders.userOrders.where((o) {
       final s = o.status.toLowerCase();
-      return s != 'delivered' && s != 'cancelled';
+      return !o.isCancelled && s != 'cancelled' && s != 'canceled';
     }).toList();
+
+    final activeOrders = nonCancelledOrders.where((o) {
+      final s = o.status.toLowerCase();
+      return s != 'delivered';
+    }).toList();
+
     final List<OrderModel> trackerOrders = activeOrders.isNotEmpty
         ? activeOrders
-        : (orders.userOrders.isNotEmpty ? [orders.userOrders.first] : <OrderModel>[]);
+        : (nonCancelledOrders.isNotEmpty ? [nonCancelledOrders.first] : <OrderModel>[]);
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
@@ -365,10 +371,7 @@ class AccountScreen extends StatelessWidget {
                           ),
                         );
                       }
-                    : () {
-                        HapticFeedback.lightImpact();
-                        _showEditProfileDialog(context, displayName);
-                      },
+                    : null,
                 borderRadius: BorderRadius.circular(22),
                 child: Container(
                   width: double.infinity,
@@ -466,28 +469,31 @@ class AccountScreen extends StatelessWidget {
                                   const SizedBox(width: 6),
                                   const Icon(Icons.verified_rounded, size: 16, color: Color(0xFF2563EB)),
                                   const SizedBox(width: 6),
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        HapticFeedback.lightImpact();
-                                        _showEditProfileDialog(context, displayName);
-                                      },
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                          color: AppTheme.surfaceContainerLow,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: AppTheme.outlineVariant.withOpacity(0.5),
-                                            width: 0.8,
+                                  Tooltip(
+                                    message: 'Edit Name',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          _showEditProfileDialog(context, displayName);
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.surfaceContainerLow,
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: AppTheme.outlineVariant.withOpacity(0.5),
+                                              width: 0.8,
+                                            ),
                                           ),
-                                        ),
-                                        child: const Icon(
-                                          Icons.edit_rounded,
-                                          size: 13,
-                                          color: AppTheme.primary,
+                                          child: const Icon(
+                                            Icons.edit_rounded,
+                                            size: 14,
+                                            color: AppTheme.primary,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -562,7 +568,7 @@ class AccountScreen extends StatelessWidget {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      'Verified Member · Tap to edit',
+                                      'Verified Member',
                                       style: TextStyle(
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w700,
