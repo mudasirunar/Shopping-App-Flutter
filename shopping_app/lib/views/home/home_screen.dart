@@ -663,39 +663,48 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.auto_awesome_rounded, color: Color(0xFF6366F1), size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'More From The Catalog',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.onSurface,
-                            letterSpacing: -0.3,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.auto_awesome_rounded, color: Color(0xFF6366F1), size: 18),
+                          const SizedBox(width: 6),
+                          const Expanded(
+                            child: Text(
+                              'More From The Catalog',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.onSurface,
+                                letterSpacing: -0.3,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Curated picks from 50+ items across 6 departments',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        color: AppTheme.secondary,
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Curated picks from 50+ items across 6 departments',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: AppTheme.secondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 TextButton(
                   onPressed: () => nav.openExplore('All'),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
