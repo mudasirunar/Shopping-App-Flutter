@@ -21,8 +21,13 @@ import '../search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final ScrollController? scrollController;
+  final VoidCallback? onOpenCart;
 
-  const HomeScreen({super.key, this.scrollController});
+  const HomeScreen({
+    super.key,
+    this.scrollController,
+    this.onOpenCart,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -185,7 +190,9 @@ class _HomeScreenState extends State<HomeScreen> {
               label: Text('${cart.totalItemCount}'),
               child: const Icon(Icons.shopping_cart_outlined, color: AppTheme.onSurface, size: 22),
             ),
-            onPressed: () => AppNavigator.openCart(),
+            onPressed: () => widget.onOpenCart != null
+                ? widget.onOpenCart!()
+                : nav.openCart(),
           ),
           const SizedBox(width: 4),
         ],
