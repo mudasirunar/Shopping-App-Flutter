@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
@@ -67,6 +68,7 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: Navigator.canPop(context)
             ? IconButton(
@@ -75,18 +77,27 @@ class CartScreen extends StatelessWidget {
               )
             : null,
         titleSpacing: Navigator.canPop(context) ? 0 : 16,
-        backgroundColor: AppTheme.surface,
+        backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              color: AppTheme.surface.withOpacity(0.65),
+            ),
+          ),
+        ),
         title: Row(
           children: [
             const Text(
               'Your Cart',
               style: TextStyle(
                 color: AppTheme.primary,
-                fontWeight: FontWeight.w700,
-                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                letterSpacing: -0.4,
               ),
             ),
             const SizedBox(width: 8),
@@ -94,7 +105,7 @@ class CartScreen extends StatelessWidget {
               '(${cart.totalItemCount} ${cart.totalItemCount == 1 ? 'item' : 'items'})',
               style: const TextStyle(
                 color: AppTheme.secondary,
-                fontSize: 14,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -120,7 +131,12 @@ class CartScreen extends StatelessWidget {
           ? _EmptyCartView(onExplore: onExplore)
           : SingleChildScrollView(
               controller: scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+              padding: EdgeInsets.fromLTRB(
+                16,
+                MediaQuery.of(context).padding.top + kToolbarHeight + 12,
+                16,
+                100,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -756,8 +772,13 @@ class _EmptyCartView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          32,
+          MediaQuery.of(context).padding.top + kToolbarHeight + 20,
+          32,
+          32,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
