@@ -151,8 +151,9 @@ void main() {
       final secondId = provider.addresses[1].id;
       await provider.setDefaultAddress(secondId);
 
-      expect(provider.addresses[0].isDefault, false);
-      expect(provider.addresses[1].isDefault, true);
+      expect(provider.addresses[0].id, secondId);
+      expect(provider.addresses[0].isDefault, true);
+      expect(provider.addresses[1].isDefault, false);
       expect(provider.defaultAddress?.id, secondId);
     });
 

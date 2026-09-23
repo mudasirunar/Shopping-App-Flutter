@@ -16,6 +16,8 @@ class AddressesScreen extends StatefulWidget {
 }
 
 class _AddressesScreenState extends State<AddressesScreen> {
+  String? _deletingAddressId;
+
   @override
   void initState() {
     super.initState();
@@ -33,8 +35,15 @@ class _AddressesScreenState extends State<AddressesScreen> {
       message: 'Are you sure you want to remove "${address.recipientName} - ${address.label}" from your saved addresses?',
       confirmLabel: 'Delete',
       isDestructive: true,
-      onConfirm: () {
-        context.read<AddressProvider>().deleteAddress(address.id);
+      onConfirm: () async {
+        setState(() => _deletingAddressId = address.id);
+        try {
+          await context.read<AddressProvider>().deleteAddress(address.id);
+        } finally {
+          if (mounted) {
+            setState(() => _deletingAddressId = null);
+          }
+        }
       },
     );
   }
@@ -175,89 +184,134 @@ class _AddressesScreenState extends State<AddressesScreen> {
   }
 
   Widget _buildAddressCard(BuildContext context, AddressModel address) {
-    final isDefault = address.isDefault;
+    final addressProvider = context.watch<AddressProvider>();
+    final isDeleting = _deletingAddressId == address.id || addressProvider.isDeleting(address.id);
+    final isDefault = address.isDefault && !isDeleting;
 
-    return Material(
-      color: AppTheme.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 0,
-      shadowColor: Colors.black.withOpacity(0.03),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+    return IgnorePointer(
+      ignoring: isDeleting,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: isDeleting ? 0.45 : 1.0,
+        child: Material(
+          color: isDeleting ? AppTheme.surfaceContainerLow : AppTheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDefault ? AppTheme.primary : AppTheme.surfaceContainerHigh,
-            width: isDefault ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Row: Label & Default Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        address.label,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ),
-                    if (isDefault) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F5E9),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.check, size: 12, color: AppTheme.success),
-                            SizedBox(width: 3),
-                            Text(
-                              'Default',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.success,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                // Quick Action Icons
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 18, color: AppTheme.secondary),
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => AddEditAddressDialog.show(context, existingAddress: address),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.error),
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => _confirmDelete(context, address),
-                    ),
-                  ],
-                ),
-              ],
+          elevation: 0,
+          shadowColor: Colors.black.withOpacity(0.03),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDefault ? AppTheme.primary : AppTheme.surfaceContainerHigh,
+                width: isDefault ? 1.5 : 1,
+              ),
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Row: Label & Default Badge / Deleting Indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            address.label,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.primary,
+                            ),
+                          ),
+                        ),
+                        if (isDeleting) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceContainerLow,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                SizedBox(
+                                  width: 10,
+                                  height: 10,
+                                  child: CircularProgressIndicator(strokeWidth: 1.5, color: AppTheme.error),
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Deleting...',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.error,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ] else if (isDefault) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8F5E9),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: const [
+                                Icon(Icons.check, size: 12, color: AppTheme.success),
+                                SizedBox(width: 3),
+                                Text(
+                                  'Default',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.success,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    // Quick Action Icons
+                    if (isDeleting)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.error),
+                        ),
+                      )
+                    else
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined, size: 18, color: AppTheme.secondary),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => AddEditAddressDialog.show(context, existingAddress: address),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.error),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => _confirmDelete(context, address),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
             const SizedBox(height: 8),
 
             // Recipient Name
@@ -332,6 +386,8 @@ class _AddressesScreenState extends State<AddressesScreen> {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }

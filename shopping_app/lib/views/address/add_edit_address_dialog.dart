@@ -25,9 +25,8 @@ class AddEditAddressDialog extends StatefulWidget {
 }
 
 class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
-  final _formKey = GlobalKey<FormState>();
-
   late String _selectedLabel;
+  late TextEditingController _customLabelController;
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _streetController;
@@ -35,6 +34,13 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
   String? _selectedProvince;
   late bool _isDefault;
   bool _isSaving = false;
+
+  String? _customLabelError;
+  String? _nameError;
+  String? _phoneError;
+  String? _streetError;
+  String? _cityError;
+  String? _provinceError;
 
   final List<String> _labels = ['Home', 'Work', 'Other'];
   final List<String> _provinces = [
@@ -51,7 +57,14 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
   void initState() {
     super.initState();
     final a = widget.existingAddress;
-    _selectedLabel = a?.label ?? 'Home';
+    final existingLabel = a?.label;
+    if (existingLabel != null && !_labels.contains(existingLabel)) {
+      _selectedLabel = 'Other';
+      _customLabelController = TextEditingController(text: existingLabel);
+    } else {
+      _selectedLabel = existingLabel ?? 'Home';
+      _customLabelController = TextEditingController();
+    }
     _nameController = TextEditingController(text: a?.recipientName ?? '');
     _phoneController = TextEditingController(text: a?.phoneNumber ?? '');
     _streetController = TextEditingController(text: a?.streetAddress ?? '');
@@ -62,6 +75,7 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
 
   @override
   void dispose() {
+    _customLabelController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
     _streetController.dispose();
@@ -70,33 +84,90 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _selectedProvince == null) return;
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final street = _streetController.text.trim();
+    final city = _cityController.text.trim();
+    final customLabel = _customLabelController.text.trim();
+
+    String? customLabelErr;
+    if (_selectedLabel == 'Other') {
+      if (customLabel.isEmpty) {
+        customLabelErr = 'Please enter address label name';
+      }
+    }
+
+    String? nameErr;
+    if (name.isEmpty) {
+      nameErr = 'Please enter recipient name';
+    }
+
+    String? phoneErr;
+    if (phone.isEmpty) {
+      phoneErr = 'Please enter phone number';
+    } else {
+      phoneErr = PhoneValidator.validate(phone);
+    }
+
+    String? streetErr;
+    if (street.isEmpty) {
+      streetErr = 'Please enter street address';
+    }
+
+    String? cityErr;
+    if (city.isEmpty) {
+      cityErr = 'Please enter city';
+    }
+
+    String? provinceErr;
+    if (_selectedProvince == null || _selectedProvince!.isEmpty) {
+      provinceErr = 'Please select a province';
+    }
+
+    if (customLabelErr != null || nameErr != null || phoneErr != null || streetErr != null || cityErr != null || provinceErr != null) {
+      setState(() {
+        _customLabelError = customLabelErr;
+        _nameError = nameErr;
+        _phoneError = phoneErr;
+        _streetError = streetErr;
+        _cityError = cityErr;
+        _provinceError = provinceErr;
+      });
+      return;
+    }
 
     setState(() => _isSaving = true);
     final provider = context.read<AddressProvider>();
+    final isOnlyAddress = widget.existingAddress == null
+        ? provider.addresses.isEmpty
+        : (provider.addresses.length <= 1 && (widget.existingAddress?.isDefault ?? true));
+    final effectiveIsDefault = isOnlyAddress ? true : _isDefault;
+    final effectiveLabel = _selectedLabel == 'Other'
+        ? (customLabel.isNotEmpty ? customLabel : 'Other')
+        : _selectedLabel;
 
     try {
       if (widget.existingAddress != null) {
         final updated = widget.existingAddress!.copyWith(
-          label: _selectedLabel,
-          recipientName: _nameController.text.trim(),
-          phoneNumber: _phoneController.text.trim(),
-          streetAddress: _streetController.text.trim(),
-          city: _cityController.text.trim(),
+          label: effectiveLabel,
+          recipientName: name,
+          phoneNumber: phone,
+          streetAddress: street,
+          city: city,
           province: _selectedProvince!,
-          isDefault: _isDefault,
+          isDefault: effectiveIsDefault,
         );
         await provider.updateAddress(updated);
         if (mounted) Navigator.pop(context, updated);
       } else {
         final success = await provider.addAddress(
-          label: _selectedLabel,
-          recipientName: _nameController.text.trim(),
-          phoneNumber: _phoneController.text.trim(),
-          streetAddress: _streetController.text.trim(),
-          city: _cityController.text.trim(),
+          label: effectiveLabel,
+          recipientName: name,
+          phoneNumber: phone,
+          streetAddress: street,
+          city: city,
           province: _selectedProvince!,
-          isDefault: _isDefault,
+          isDefault: effectiveIsDefault,
         );
 
         if (!success) {
@@ -123,6 +194,11 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.existingAddress != null;
     final keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
+    final addressProvider = context.watch<AddressProvider>();
+    final isOnlyAddress = widget.existingAddress == null
+        ? addressProvider.addresses.isEmpty
+        : (addressProvider.addresses.length <= 1 && (widget.existingAddress?.isDefault ?? true));
+    final effectiveDefault = isOnlyAddress ? true : _isDefault;
 
     return Material(
       color: AppTheme.surfaceContainerLowest,
@@ -133,8 +209,6 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
         ),
         padding: EdgeInsets.fromLTRB(20, 16, 20, keyboardPadding + 20),
         child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,55 +263,74 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
                         fontSize: 12,
                       ),
                       onSelected: (val) {
-                        if (val) setState(() => _selectedLabel = label);
+                        if (val) {
+                          setState(() {
+                            _selectedLabel = label;
+                            if (label != 'Other') {
+                              _customLabelError = null;
+                            }
+                          });
+                        }
                       },
                     ),
                   );
                 }).toList(),
               ),
+
+              if (_selectedLabel == 'Other') ...[
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _customLabelController,
+                  textInputAction: TextInputAction.next,
+                  textCapitalization: TextCapitalization.words,
+                  onChanged: (val) {
+                    if (_customLabelError != null) setState(() => _customLabelError = null);
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Address Label Name',
+                    hintText: 'e.g. Studio, Warehouse, Vacation Home',
+                    prefixIcon: const Icon(Icons.bookmark_outline, size: 20),
+                    errorText: _customLabelError,
+                  ),
+                ),
+              ],
               const SizedBox(height: 16),
 
               // Recipient Name
               TextFormField(
                 controller: _nameController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: 'Recipient Full Name',
-                  hintText: 'e.g. Mudasir Ali',
-                  prefixIcon: Icon(Icons.person_outline, size: 20),
-                ),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Please enter recipient name';
-                  }
-                  return null;
+                onChanged: (val) {
+                  if (_nameError != null) setState(() => _nameError = null);
                 },
+                decoration: InputDecoration(
+                  labelText: 'Recipient Full Name',
+                  hintText: 'e.g. Ahmed Khan',
+                  prefixIcon: const Icon(Icons.person_outline, size: 20),
+                  errorText: _nameError,
+                ),
               ),
               const SizedBox(height: 12),
 
-              // Phone Number (Pakistan 03XXXXXXXXX)
+              // Phone Number (Flexible Pakistan format)
               TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.next,
+                onChanged: (val) {
+                  setState(() {
+                    if (_phoneError != null) _phoneError = null;
+                  });
+                },
                 decoration: InputDecoration(
                   labelText: 'Mobile Number',
-                  hintText: '03XXXXXXXXX (11 digits)',
+                  hintText: '03XXXXXXXXX',
                   prefixIcon: const Icon(Icons.phone_outlined, size: 20),
-                  suffixIcon: PhoneValidator.isValidPakistanMobile(_phoneController.text)
-                      ? const Icon(Icons.check_circle, color: AppTheme.success, size: 18)
+                  errorText: _phoneError,
+                  suffixIcon: PhoneValidator.isValid(_phoneController.text)
+                      ? const Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 20)
                       : null,
                 ),
-                onChanged: (_) => setState(() {}),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Please enter mobile number';
-                  }
-                  if (!PhoneValidator.isValidPakistanMobile(val)) {
-                    return 'Must be an 11-digit Pakistani number starting with 03';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 12),
 
@@ -245,17 +338,15 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
               TextFormField(
                 controller: _streetController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
+                onChanged: (val) {
+                  if (_streetError != null) setState(() => _streetError = null);
+                },
+                decoration: InputDecoration(
                   labelText: 'Street Address',
                   hintText: 'House / Apartment, Street, Area',
-                  prefixIcon: Icon(Icons.home_outlined, size: 20),
+                  prefixIcon: const Icon(Icons.home_outlined, size: 20),
+                  errorText: _streetError,
                 ),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Please enter street address';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 12),
 
@@ -263,17 +354,15 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
               TextFormField(
                 controller: _cityController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: 'City',
-                  hintText: 'e.g. Lahore, Karachi, Islamabad',
-                  prefixIcon: Icon(Icons.location_city_outlined, size: 20),
-                ),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return 'Please enter city';
-                  }
-                  return null;
+                onChanged: (val) {
+                  if (_cityError != null) setState(() => _cityError = null);
                 },
+                decoration: InputDecoration(
+                  labelText: 'City',
+                  hintText: 'e.g. Karachi',
+                  prefixIcon: const Icon(Icons.location_city_outlined, size: 20),
+                  errorText: _cityError,
+                ),
               ),
               const SizedBox(height: 12),
 
@@ -289,9 +378,10 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
                   'Select Province',
                   style: TextStyle(fontSize: 14, color: AppTheme.secondary),
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Province',
-                  prefixIcon: Icon(Icons.map_outlined, size: 20),
+                  prefixIcon: const Icon(Icons.map_outlined, size: 20),
+                  errorText: _provinceError,
                 ),
                 items: _provinces.map((prov) {
                   return DropdownMenuItem(
@@ -303,9 +393,11 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
                   );
                 }).toList(),
                 onChanged: (val) {
-                  setState(() => _selectedProvince = val);
+                  setState(() {
+                    _selectedProvince = val;
+                    if (_provinceError != null) _provinceError = null;
+                  });
                 },
-                validator: (val) => (val == null || val.isEmpty) ? 'Please select a province' : null,
               ),
               const SizedBox(height: 12),
 
@@ -315,10 +407,40 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
                 child: SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   activeColor: AppTheme.primary,
-                  title: const Text('Set as default address', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                  subtitle: const Text('Prefill automatically during checkout', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
-                  value: _isDefault,
-                  onChanged: (val) => setState(() => _isDefault = val),
+                  title: Row(
+                    children: [
+                      const Text(
+                        'Set as default address',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                      if (isOnlyAddress) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Default',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.success,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  subtitle: Text(
+                    isOnlyAddress
+                        ? 'First address is automatically set as default'
+                        : 'Prefill automatically during checkout',
+                    style: const TextStyle(fontSize: 12, color: AppTheme.secondary),
+                  ),
+                  value: effectiveDefault,
+                  onChanged: isOnlyAddress ? null : (val) => setState(() => _isDefault = val),
                 ),
               ),
               const SizedBox(height: 16),
@@ -342,7 +464,6 @@ class _AddEditAddressDialogState extends State<AddEditAddressDialog> {
             ],
           ),
         ),
-      ),
       ),
     );
   }

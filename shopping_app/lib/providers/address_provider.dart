@@ -17,6 +17,9 @@ class AddressProvider extends ChangeNotifier {
   AddressModel? _selectedAddress;
   String _currentUserId = 'guest';
   bool _isLoading = false;
+  final Set<String> _deletingAddressIds = {};
+
+  bool isDeleting(String addressId) => _deletingAddressIds.contains(addressId);
 
   AddressProvider({FirebaseFirestore? firestore}) {
     try {
@@ -37,7 +40,15 @@ class AddressProvider extends ChangeNotifier {
     }
   }
 
-  List<AddressModel> get addresses => List.unmodifiable(_addresses);
+  List<AddressModel> get addresses {
+    final list = List<AddressModel>.from(_addresses);
+    list.sort((a, b) {
+      if (a.isDefault && !b.isDefault) return -1;
+      if (!a.isDefault && b.isDefault) return 1;
+      return 0;
+    });
+    return List.unmodifiable(list);
+  }
   bool get isLoading => _isLoading;
   bool get canAddMore => _addresses.length < maxAddresses;
   int get count => _addresses.length;
@@ -90,9 +101,11 @@ class AddressProvider extends ChangeNotifier {
             .listen((snapshot) {
               _addresses = snapshot.docs
                   .map((doc) => AddressModel.fromFirestore(doc))
+                  .where((a) => !_deletingAddressIds.contains(a.id))
                   .take(maxAddresses)
                   .toList();
               _ensureDefaultDesignation();
+              _sortAddressesDefaultFirst();
               _saveToLocal(effectiveId);
               _isLoading = false;
               notifyListeners();
@@ -208,6 +221,7 @@ class AddressProvider extends ChangeNotifier {
     );
 
     _addresses.add(newAddress);
+    _sortAddressesDefaultFirst();
     _selectedAddress = newAddress;
 
     notifyListeners();
@@ -221,11 +235,12 @@ class AddressProvider extends ChangeNotifier {
     if (index < 0) return;
 
     if (updated.isDefault) {
-      _addresses = _addresses.map((a) => a.copyWith(isDefault: false)).toList();
+      _addresses = _addresses.map((a) => a.copyWith(isDefault: a.id == updated.id)).toList();
     }
 
     _addresses[index] = updated;
     _ensureDefaultDesignation();
+    _sortAddressesDefaultFirst();
 
     if (_selectedAddress?.id == updated.id) {
       _selectedAddress = updated;
@@ -237,31 +252,42 @@ class AddressProvider extends ChangeNotifier {
 
   /// Deletes an address and promotes another address to default if needed.
   Future<void> deleteAddress(String addressId) async {
-    final wasDefault = _addresses.any((a) => a.id == addressId && a.isDefault);
-    _addresses.removeWhere((a) => a.id == addressId);
-
-    if (_selectedAddress?.id == addressId) {
-      _selectedAddress = null;
-    }
-
-    if (wasDefault && _addresses.isNotEmpty) {
-      _addresses[0] = _addresses[0].copyWith(isDefault: true);
-    }
-
+    _deletingAddressIds.add(addressId);
     notifyListeners();
-    await _persistAll();
 
-    // If online, also remove document from Firestore
-    if (_currentUserId != 'guest') {
-      try {
-        final firestore = _safeFirestore;
-        await firestore
-            ?.collection('users')
-            .doc(_currentUserId)
-            .collection('addresses')
-            .doc(addressId)
-            .delete();
-      } catch (_) {}
+    try {
+      final wasDefault = _addresses.any((a) => a.id == addressId && a.isDefault);
+      _addresses.removeWhere((a) => a.id == addressId);
+
+      if (_selectedAddress?.id == addressId) {
+        _selectedAddress = null;
+      }
+
+      // Only assign default to another address after deleting address is fully removed
+      if (wasDefault && _addresses.isNotEmpty) {
+        _addresses = _addresses.map((a) => a.copyWith(isDefault: false)).toList();
+        _addresses[0] = _addresses[0].copyWith(isDefault: true);
+      }
+      _sortAddressesDefaultFirst();
+
+      notifyListeners();
+      await _persistAll();
+
+      // If online, also remove document from Firestore
+      if (_currentUserId != 'guest') {
+        try {
+          final firestore = _safeFirestore;
+          await firestore
+              ?.collection('users')
+              .doc(_currentUserId)
+              .collection('addresses')
+              .doc(addressId)
+              .delete();
+        } catch (_) {}
+      }
+    } finally {
+      _deletingAddressIds.remove(addressId);
+      notifyListeners();
     }
   }
 
@@ -271,6 +297,8 @@ class AddressProvider extends ChangeNotifier {
       return a.copyWith(isDefault: a.id == addressId);
     }).toList();
 
+    _sortAddressesDefaultFirst();
+
     final match = _addresses.where((a) => a.id == addressId);
     if (match.isNotEmpty) {
       _selectedAddress = match.first;
@@ -278,6 +306,14 @@ class AddressProvider extends ChangeNotifier {
 
     notifyListeners();
     await _persistAll();
+  }
+
+  void _sortAddressesDefaultFirst() {
+    _addresses.sort((a, b) {
+      if (a.isDefault && !b.isDefault) return -1;
+      if (!a.isDefault && b.isDefault) return 1;
+      return 0;
+    });
   }
 
   void _ensureDefaultDesignation() {
@@ -289,6 +325,7 @@ class AddressProvider extends ChangeNotifier {
     if (!hasDefault) {
       _addresses[0] = _addresses[0].copyWith(isDefault: true);
     }
+    _sortAddressesDefaultFirst();
   }
 
   // --- Persistence Internals ---
@@ -304,12 +341,9 @@ class AddressProvider extends ChangeNotifier {
             .map((item) => AddressModel.fromJson(Map<String, dynamic>.from(item as Map)))
             .take(maxAddresses)
             .toList();
-      } else {
-        _addresses = [];
+        _sortAddressesDefaultFirst();
       }
-    } catch (_) {
-      _addresses = [];
-    }
+    } catch (_) {}
   }
 
   Future<void> _saveToLocal(String userId) async {

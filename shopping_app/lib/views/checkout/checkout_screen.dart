@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/app_snackbar.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../core/utils/phone_validator.dart';
 import '../../models/address.dart';
 import '../../models/delivery_info.dart';
+import '../../models/order.dart';
 import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/navigation_provider.dart';
 import '../../providers/order_provider.dart';
 import '../address/add_edit_address_dialog.dart';
-import '../orders/order_history_screen.dart';
+import '../main_shell.dart';
+import '../orders/order_details_screen.dart';
 import '../../widgets/app_network_image.dart';
-import '../../core/utils/app_snackbar.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -28,6 +31,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   String? _selectedProvince;
+
+  String? _nameError;
+  String? _phoneError;
+  String? _addressError;
+  String? _cityError;
+  String? _provinceError;
 
   bool _isPlacingOrder = false;
   bool _saveAddressForFuture = true;
@@ -66,6 +75,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _addressController.text = address.streetAddress;
       _cityController.text = address.city;
       _selectedProvince = _provinces.contains(address.province) ? address.province : null;
+      _nameError = null;
+      _phoneError = null;
+      _addressError = null;
+      _cityError = null;
+      _provinceError = null;
     });
   }
 
@@ -78,10 +92,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.dispose();
   }
 
-  bool get _isPhoneValid => PhoneValidator.isValidPakistanMobile(_phoneController.text);
+  bool get _isPhoneValid => PhoneValidator.isValid(_phoneController.text);
 
   Future<void> _handlePlaceOrder() async {
-    if (!_formKey.currentState!.validate() || _selectedProvince == null) {
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final address = _addressController.text.trim();
+    final city = _cityController.text.trim();
+
+    String? nameErr;
+    if (name.isEmpty) {
+      nameErr = 'Please enter recipient name';
+    }
+
+    String? phoneErr;
+    if (phone.isEmpty) {
+      phoneErr = 'Please enter phone number';
+    } else {
+      phoneErr = PhoneValidator.validate(phone);
+    }
+
+    String? addressErr;
+    if (address.isEmpty) {
+      addressErr = 'Please enter delivery address';
+    }
+
+    String? cityErr;
+    if (city.isEmpty) {
+      cityErr = 'Please enter city';
+    }
+
+    String? provinceErr;
+    if (_selectedProvince == null || _selectedProvince!.isEmpty) {
+      provinceErr = 'Please select a province';
+    }
+
+    setState(() {
+      _nameError = nameErr;
+      _phoneError = phoneErr;
+      _addressError = addressErr;
+      _cityError = cityErr;
+      _provinceError = provinceErr;
+    });
+
+    if (nameErr != null ||
+        phoneErr != null ||
+        addressErr != null ||
+        cityErr != null ||
+        provinceErr != null) {
       return;
     }
 
@@ -141,7 +199,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (newOrder != null && mounted) {
       await cart.clearCart();
-      _showSuccessDialog(newOrder.id, newOrder.totalPaisa);
+      _showSuccessDialog(newOrder);
     } else if (mounted) {
       AppSnackBar.show(
         context,
@@ -151,7 +209,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  void _showSuccessDialog(String orderId, int totalPaisa) {
+  void _showSuccessDialog(OrderModel order) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -186,7 +244,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Order #$orderId has been placed successfully.',
+              'Order #${order.orderId} has been placed successfully.',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13, color: AppTheme.secondary),
             ),
@@ -212,7 +270,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     children: [
                       const Text('Due on Arrival:', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                       Text(
-                        CurrencyFormatter.formatPaisa(totalPaisa),
+                        CurrencyFormatter.formatPaisa(order.totalPaisa),
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -225,26 +283,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
+            ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryContainer,
-                minimumSize: const Size.fromHeight(44),
+                foregroundColor: Colors.white,
+                minimumSize: const Size.fromHeight(46),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
+              icon: const Icon(Icons.local_shipping_outlined, size: 18),
               onPressed: () {
                 Navigator.pop(ctx); // dismiss dialog
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+                  MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
                 );
               },
-              child: const Text('View Order History'),
+              label: const Text(
+                'Track Order',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              ),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                Navigator.pop(context); // back to catalog
+                context.read<NavigationProvider>().switchTab(0);
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 0)),
+                  (route) => false,
+                );
               },
               child: const Text('Continue Shopping'),
             ),
@@ -511,76 +578,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               if (addresses.isNotEmpty)
                 TextButton.icon(
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     visualDensity: VisualDensity.compact,
+                    backgroundColor: AppTheme.surfaceContainerLow,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   icon: const Icon(Icons.swap_horiz, size: 16, color: AppTheme.primary),
-                  label: Text('Addresses (${addresses.length}/3)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.primary)),
+                  label: Text(
+                    selected != null
+                        ? '${selected.label} (${addresses.length}/3)'
+                        : 'Addresses (${addresses.length}/3)',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  ),
                   onPressed: () => _showAddressPicker(context, addressProvider),
                 ),
             ],
           ),
-
-          // If addresses exist, show quick-select chips bar
-          if (addresses.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (final addr in addresses)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        selected: selected?.id == addr.id,
-                        selectedColor: AppTheme.primary,
-                        backgroundColor: AppTheme.surfaceContainerLow,
-                        label: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              addr.label,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: selected?.id == addr.id ? FontWeight.w700 : FontWeight.w500,
-                                color: selected?.id == addr.id ? Colors.white : AppTheme.secondary,
-                              ),
-                            ),
-                            if (addr.isDefault) ...[
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.star,
-                                size: 12,
-                                color: selected?.id == addr.id ? Colors.amberAccent : AppTheme.primary,
-                              ),
-                            ],
-                          ],
-                        ),
-                        onSelected: (val) {
-                          if (val) {
-                            addressProvider.selectAddress(addr);
-                            _populateFromAddress(addr);
-                          }
-                        },
-                      ),
-                    ),
-                  if (addressProvider.canAddMore)
-                    ActionChip(
-                      backgroundColor: AppTheme.surfaceContainerLowest,
-                      side: const BorderSide(color: AppTheme.primary, width: 1),
-                      avatar: const Icon(Icons.add, size: 14, color: AppTheme.primary),
-                      label: const Text('+ New', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primary)),
-                      onPressed: () async {
-                        final newAddr = await AddEditAddressDialog.show(context);
-                        if (newAddr != null) {
-                          _populateFromAddress(newAddr);
-                        }
-                      },
-                    ),
-                ],
-              ),
-            ),
-          ],
 
           const SizedBox(height: 14),
 
@@ -588,33 +601,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           TextFormField(
             controller: _nameController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            onChanged: (val) {
+              if (_nameError != null) setState(() => _nameError = null);
+            },
+            decoration: InputDecoration(
               labelText: 'Recipient Full Name',
-              hintText: 'Enter recipient name',
-              prefixIcon: Icon(Icons.person_outline, size: 20, color: AppTheme.secondary),
+              hintText: 'e.g. Ahmed Khan',
+              prefixIcon: const Icon(Icons.person_outline, size: 20, color: AppTheme.secondary),
+              errorText: _nameError,
             ),
-            validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter recipient name' : null,
           ),
 
           const SizedBox(height: 12),
 
-          // Mobile Number with live Pakistan validation
+          // Mobile Number with live validation
           TextFormField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
-            onChanged: (_) => setState(() {}),
+            onChanged: (val) {
+              setState(() {
+                if (_phoneError != null) _phoneError = null;
+              });
+            },
             decoration: InputDecoration(
               labelText: 'Mobile Contact',
-              hintText: '03001234567',
-              helperText: '11-digit Pakistan mobile starting with 03',
+              hintText: '03XXXXXXXXX',
+              helperText: 'e.g. 03001234567, 021XXXXXXX, or +92...',
               helperStyle: const TextStyle(fontSize: 11, color: AppTheme.secondary),
               prefixIcon: const Icon(Icons.phone_outlined, size: 20, color: AppTheme.secondary),
+              errorText: _phoneError,
               suffixIcon: _isPhoneValid
                   ? const Icon(Icons.check_circle, color: AppTheme.emeraldSuccess, size: 20)
                   : null,
             ),
-            validator: (val) => PhoneValidator.validate(val),
           ),
 
           const SizedBox(height: 12),
@@ -623,12 +643,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           TextFormField(
             controller: _addressController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            onChanged: (val) {
+              if (_addressError != null) setState(() => _addressError = null);
+            },
+            decoration: InputDecoration(
               labelText: 'Street Address',
-              hintText: 'House / Flat, Street, Area',
-              prefixIcon: Icon(Icons.home_outlined, size: 20, color: AppTheme.secondary),
+              hintText: 'House / Apartment, Street, Area',
+              prefixIcon: const Icon(Icons.home_outlined, size: 20, color: AppTheme.secondary),
+              errorText: _addressError,
             ),
-            validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter address' : null,
           ),
 
           const SizedBox(height: 12),
@@ -637,12 +660,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           TextFormField(
             controller: _cityController,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            onChanged: (val) {
+              if (_cityError != null) setState(() => _cityError = null);
+            },
+            decoration: InputDecoration(
               labelText: 'City',
-              hintText: 'e.g. Lahore, Karachi, Islamabad',
-              prefixIcon: Icon(Icons.location_city_outlined, size: 20, color: AppTheme.secondary),
+              hintText: 'e.g. Karachi',
+              prefixIcon: const Icon(Icons.location_city_outlined, size: 20, color: AppTheme.secondary),
+              errorText: _cityError,
             ),
-            validator: (val) => (val == null || val.trim().isEmpty) ? 'Please enter city' : null,
           ),
 
           const SizedBox(height: 12),
@@ -659,9 +685,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               'Select Province',
               style: TextStyle(fontSize: 14, color: AppTheme.secondary),
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Province',
-              prefixIcon: Icon(Icons.map_outlined, size: 20, color: AppTheme.secondary),
+              prefixIcon: const Icon(Icons.map_outlined, size: 20, color: AppTheme.secondary),
+              errorText: _provinceError,
             ),
             items: _provinces.map((prov) {
               return DropdownMenuItem<String>(
@@ -673,9 +700,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               );
             }).toList(),
             onChanged: (val) {
-              setState(() => _selectedProvince = val);
+              setState(() {
+                _selectedProvince = val;
+                if (_provinceError != null) _provinceError = null;
+              });
             },
-            validator: (val) => (val == null || val.isEmpty) ? 'Please select a province' : null,
           ),
 
           // Save address checkbox if user can add more
