@@ -12,6 +12,7 @@ import '../../providers/catalog_provider.dart';
 import '../../providers/navigation_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
+import '../../widgets/hero_promotional_carousel.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
 
@@ -25,10 +26,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _bannerController = PageController();
-  int _currentBannerIndex = 0;
-  Timer? _bannerTimer;
-
   // Flash Sale Countdown Demo (e.g. 4 hours remaining)
   late Duration _countdown;
   Timer? _countdownTimer;
@@ -37,19 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _countdown = const Duration(hours: 4, minutes: 28, seconds: 45);
-
-    // Auto-advance banner every 4.5 seconds
-    _bannerTimer = Timer.periodic(const Duration(milliseconds: 4500), (timer) {
-      if (!mounted) return;
-      if (_bannerController.hasClients) {
-        final next = (_currentBannerIndex + 1) % 3;
-        _bannerController.animateToPage(
-          next,
-          duration: const Duration(milliseconds: 450),
-          curve: Curves.easeInOutCubic,
-        );
-      }
-    });
 
     // Countdown ticker with auto-looping cycle for continuous flash deal rounds
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -67,9 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _bannerTimer?.cancel();
     _countdownTimer?.cancel();
-    _bannerController.dispose();
     super.dispose();
   }
 
@@ -246,8 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // 2. Hero Promotional Carousel
-          SliverToBoxAdapter(
-            child: _buildHeroCarousel(nav),
+          const SliverToBoxAdapter(
+            child: HeroPromotionalCarousel(),
           ),
 
           // 3. Voucher Codes Wallet Strip
@@ -297,182 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Hero Carousel
-  // ---------------------------------------------------------------------------
-  Widget _buildHeroCarousel(NavigationProvider nav) {
-    final banners = [
-      _PromoBannerData(
-        badge: 'FESTIVAL SPECIAL',
-        title: 'Up to 35% Off\nCurated Collection',
-        subtitle: 'Handpicked electronics, living & premium apparel',
-        actionLabel: 'Shop Deals',
-        gradientColors: [const Color(0xFF0F172A), const Color(0xFF1E293B)],
-        accentColor: const Color(0xFFF59E0B),
-        onTap: () => nav.openExplore('Electronics'),
-      ),
-      _PromoBannerData(
-        badge: 'EXCLUSIVE VOUCHER',
-        title: 'Flat 20% Discount\nCode: FESTIVAL20',
-        subtitle: 'Apply at checkout on all orders above Rs. 5,000',
-        actionLabel: 'Copy & Explore',
-        gradientColors: [const Color(0xFF064E3B), const Color(0xFF047857)],
-        accentColor: const Color(0xFF34D399),
-        onTap: () {
-          _copyVoucher('FESTIVAL20');
-          nav.openExplore('Fashion');
-        },
-      ),
-      _PromoBannerData(
-        badge: 'NEW SEASON ARRIVALS',
-        title: 'Modern Everyday\nLifestyle Essentials',
-        subtitle: 'Designed for durability, aesthetics and everyday ease',
-        actionLabel: 'Discover Living',
-        gradientColors: [const Color(0xFF701A75), const Color(0xFF4C0519)],
-        accentColor: const Color(0xFFF472B6),
-        onTap: () => nav.openExplore('Home & Living'),
-      ),
-    ];
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 180,
-          child: PageView.builder(
-            controller: _bannerController,
-            onPageChanged: (i) {
-              setState(() {
-                _currentBannerIndex = i;
-              });
-            },
-            itemCount: banners.length,
-            itemBuilder: (context, index) {
-              final b = banners[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    gradient: LinearGradient(
-                      colors: b.gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: b.gradientColors.first.withOpacity(0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-                            decoration: BoxDecoration(
-                              color: b.accentColor.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: b.accentColor.withOpacity(0.6)),
-                            ),
-                            child: Text(
-                              b.badge,
-                              style: TextStyle(
-                                color: b.accentColor,
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                          const Icon(Icons.bolt_rounded, color: Colors.white70, size: 18),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            b.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              height: 1.15,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            b.subtitle,
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 11.5,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: ElevatedButton(
-                          onPressed: b.onTap,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black87,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            minimumSize: Size.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                b.actionLabel,
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.arrow_forward_rounded, size: 13),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(banners.length, (i) {
-            final active = i == _currentBannerIndex;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: active ? 18 : 6,
-              height: 5,
-              decoration: BoxDecoration(
-                color: active ? AppTheme.primary : AppTheme.outlineVariant,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
 
   // ---------------------------------------------------------------------------
   // Voucher Strip
@@ -1836,22 +1643,4 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _PromoBannerData {
-  final String badge;
-  final String title;
-  final String subtitle;
-  final String actionLabel;
-  final List<Color> gradientColors;
-  final Color accentColor;
-  final VoidCallback onTap;
 
-  _PromoBannerData({
-    required this.badge,
-    required this.title,
-    required this.subtitle,
-    required this.actionLabel,
-    required this.gradientColors,
-    required this.accentColor,
-    required this.onTap,
-  });
-}
