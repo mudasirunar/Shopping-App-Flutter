@@ -12,7 +12,9 @@ import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/app_search_bar.dart';
 import '../../widgets/hero_promotional_carousel.dart';
+import '../../widgets/home_curated_carousel_section.dart';
 import '../../widgets/voucher_wallet_strip.dart';
+import '../collection/curated_collection_screen.dart';
 import '../details/product_details_screen.dart';
 import '../search/search_screen.dart';
 
@@ -90,11 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final allProducts = catalog.allProducts;
 
-    // 1. Flash Deals: Curated preview of 6 discount products (Aura ANC Headphones remains here by merit)
-    final dealProducts = allProducts.where((p) => p.hasDiscount).take(6).toList();
+    // 1. Flash Deals: Curated preview of 6 discount products
+    final allDealProducts = allProducts.where((p) => p.hasDiscount).toList();
+    final dealProducts = allDealProducts.take(6).toList();
     final dealIds = dealProducts.map((p) => p.id).toSet();
 
     // 2. Top Rated: 4.7★+, prioritize fresh items not already featured in Flash Deals (curated 6 items)
+    final allTopRatedProducts = allProducts.where((p) => p.displayRating >= 4.7).toList();
     final topRatedFresh = allProducts
         .where((p) => p.displayRating >= 4.7 && !dealIds.contains(p.id))
         .toList();
@@ -105,6 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final topRatedIds = topRatedProducts.map((p) => p.id).toSet();
 
     // 3. Fast Delivery: 2-3 days transit, prioritize fresh items not already featured above (curated 6 items)
+    final allFastDeliveryProducts = allProducts
+        .where((p) => p.effectiveDeliveryDays == 2 || p.effectiveDeliveryDays == 3)
+        .toList();
     final fastDeliveryFresh = allProducts
         .where((p) =>
             (p.effectiveDeliveryDays == 2 || p.effectiveDeliveryDays == 3) &&
@@ -205,7 +212,61 @@ class _HomeScreenState extends State<HomeScreen> {
           // 5. Flash Deals Section (Countdown & Strike-Through Pricing)
           if (dealProducts.isNotEmpty)
             SliverToBoxAdapter(
-              child: _buildFlashDealsSection(dealProducts, nav),
+              child: HomeCuratedCarouselSection(
+                title: 'Flash Deals',
+                icon: Icons.flash_on_rounded,
+                iconColor: const Color(0xFFF59E0B),
+                badge: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFDC2626)),
+                      const SizedBox(width: 3),
+                      Text(
+                        _formatDuration(_countdown),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFFDC2626),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                products: dealProducts,
+                totalCollectionCount: allDealProducts.length,
+                showOriginalPrice: true,
+                badgeTagBuilder: (p) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDC2626),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    p.effectiveDealTag ?? '-${p.discountPercent}%',
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                onViewAll: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CuratedCollectionScreen(
+                        collectionType: CuratedCollectionType.flashDeals,
+                        initialCountdown: _countdown,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
 
           // 6. Curated Spotlight Dual Tiles
@@ -216,13 +277,132 @@ class _HomeScreenState extends State<HomeScreen> {
           // 7. Top Rated / Editor's Pick Section
           if (topRatedProducts.isNotEmpty)
             SliverToBoxAdapter(
-              child: _buildTopRatedSection(topRatedProducts, nav),
+              child: HomeCuratedCarouselSection(
+                title: 'Top Rated',
+                icon: Icons.star_rounded,
+                iconColor: const Color(0xFFF59E0B),
+                badge: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star_rounded, size: 11, color: Color(0xFFD97706)),
+                      SizedBox(width: 2),
+                      Text(
+                        '4.7★+',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFD97706),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                products: topRatedProducts,
+                totalCollectionCount: allTopRatedProducts.length,
+                badgeTagBuilder: (p) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${p.displayRating}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onViewAll: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CuratedCollectionScreen(
+                        collectionType: CuratedCollectionType.topRated,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
 
           // 8. Fast Delivery Section (2-3 Days Transit)
           if (fastDeliveryProducts.isNotEmpty)
             SliverToBoxAdapter(
-              child: _buildFastDeliverySection(fastDeliveryProducts, nav),
+              child: HomeCuratedCarouselSection(
+                title: 'Fast Delivery',
+                icon: Icons.bolt_rounded,
+                iconColor: const Color(0xFF059669),
+                badge: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFECFDF5),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFA7F3D0)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.bolt_rounded, size: 12, color: Color(0xFF059669)),
+                      SizedBox(width: 2),
+                      Text(
+                        '2-3 Days',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                products: fastDeliveryProducts,
+                totalCollectionCount: allFastDeliveryProducts.length,
+                badgeTagBuilder: (p) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF059669),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.bolt_rounded, color: Colors.white, size: 11),
+                      Text(
+                        '${p.effectiveDeliveryDays}d',
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                onViewAll: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CuratedCollectionScreen(
+                        collectionType: CuratedCollectionType.fastDelivery,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
 
           // 9. "Browse Full Catalog" Invitation Banner
@@ -339,204 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Flash Deals Section
-  // ---------------------------------------------------------------------------
-  Widget _buildFlashDealsSection(List<Product> deals, NavigationProvider nav) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with Countdown
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.flash_on_rounded, color: Color(0xFFF59E0B), size: 22),
-                    const SizedBox(width: 4),
-                    const Text(
-                      'Flash Deals',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.onSurface,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEE2E2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFDC2626)),
-                          const SizedBox(width: 3),
-                          Text(
-                            _formatDuration(_countdown),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFFDC2626),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () => nav.openExplore('All'),
-                  child: const Text('View All', style: TextStyle(fontSize: 12.5)),
-                ),
-              ],
-            ),
-          ),
 
-          const SizedBox(height: 8),
-
-          // Horizontal Deals Cards Carousel
-          SizedBox(
-            height: 214,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: deals.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                if (index < deals.length) {
-                  return _buildFlashDealCard(deals[index]);
-                }
-                return _buildEndArrowButton(nav);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFlashDealCard(Product p) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductDetailsScreen(product: p),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 154,
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.025),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Image Stack
-            AspectRatio(
-              aspectRatio: 1.15,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: AppNetworkImage(
-                      imageUrl: p.image,
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(10),
-                      category: p.category,
-                    ),
-                  ),
-                  Positioned(
-                    top: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDC2626),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        p.effectiveDealTag ?? '-${p.discountPercent}%',
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 7),
-
-            // Product Name
-            SizedBox(
-              height: 32,
-              child: Text(
-                p.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.onSurface,
-                  height: 1.2,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 5),
-
-            // Prices
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  CurrencyFormatter.formatPaisa(p.pricePaisa),
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.primary,
-                  ),
-                ),
-                if (p.hasDiscount)
-                  Text(
-                    CurrencyFormatter.formatPaisa(p.originalPricePaisa!),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.secondary.withOpacity(0.7),
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   // ---------------------------------------------------------------------------
   // Spotlight Dual Tiles
@@ -618,365 +601,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Top Rated Section
-  // ---------------------------------------------------------------------------
-  Widget _buildTopRatedSection(List<Product> products, NavigationProvider nav) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Top Rated (4.7★+)',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.onSurface,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => nav.openExplore('All'),
-                  child: const Text('See All', style: TextStyle(fontSize: 12.5)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 202,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: products.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                if (index < products.length) {
-                  return _buildTopRatedCard(products[index]);
-                }
-                return _buildEndArrowButton(nav);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildTopRatedCard(Product p) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductDetailsScreen(product: p),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 154,
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.025),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AspectRatio(
-              aspectRatio: 1.15,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: AppNetworkImage(
-                      imageUrl: p.image,
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(10),
-                      category: p.category,
-                    ),
-                  ),
-                  Positioned(
-                    top: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${p.displayRating}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 7),
-            SizedBox(
-              height: 32,
-              child: Text(
-                p.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.onSurface,
-                  height: 1.2,
-                ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              CurrencyFormatter.formatPaisa(p.pricePaisa),
-              style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Fast Delivery Section (2-3 Days Transit)
-  // ---------------------------------------------------------------------------
-  Widget _buildFastDeliverySection(List<Product> products, NavigationProvider nav) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Fast Delivery',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFA7F3D0)),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.bolt_rounded, size: 12, color: Color(0xFF059669)),
-                          SizedBox(width: 2),
-                          Text(
-                            '2-3 Days',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF059669),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () => nav.openExplore('All'),
-                  child: const Text('View All', style: TextStyle(fontSize: 12.5)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 202,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: products.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                if (index < products.length) {
-                  return _buildFastDeliveryCard(products[index]);
-                }
-                return _buildEndArrowButton(nav);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEndArrowButton(NavigationProvider nav) {
-    return Center(
-      child: InkWell(
-        onTap: () => nav.openExplore('All'),
-        borderRadius: BorderRadius.circular(24),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceContainerLowest,
-            shape: BoxShape.circle,
-            border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.6)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.arrow_forward_rounded,
-              color: AppTheme.primary,
-              size: 20,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFastDeliveryCard(Product p) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProductDetailsScreen(product: p),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 154,
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.025),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AspectRatio(
-              aspectRatio: 1.15,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: AppNetworkImage(
-                      imageUrl: p.image,
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(10),
-                      category: p.category,
-                    ),
-                  ),
-                  Positioned(
-                    top: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF047857),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.bolt_rounded, color: Colors.white, size: 11),
-                          const SizedBox(width: 1.5),
-                          Text(
-                            '${p.effectiveDeliveryDays}d Delivery',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 7),
-            SizedBox(
-              height: 32,
-              child: Text(
-                p.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.onSurface,
-                  height: 1.2,
-                ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              CurrencyFormatter.formatPaisa(p.pricePaisa),
-              style: const TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   // ---------------------------------------------------------------------------
   // Full Catalog Showcase & Master Navigation Gateway
