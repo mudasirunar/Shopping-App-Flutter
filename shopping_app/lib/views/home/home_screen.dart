@@ -252,6 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
       {'name': 'Electronics', 'icon': Icons.devices_rounded, 'color': const Color(0xFF0284C7)},
       {'name': 'Fashion', 'icon': Icons.checkroom_rounded, 'color': const Color(0xFFE11D48)},
       {'name': 'Home & Living', 'icon': Icons.chair_rounded, 'color': const Color(0xFFD97706)},
+      {'name': 'Beauty & Grooming', 'icon': Icons.spa_rounded, 'color': const Color(0xFFDB2777)},
       {'name': 'Footwear', 'icon': Icons.snowshoeing_rounded, 'color': const Color(0xFF059669)},
       {'name': 'Accessories', 'icon': Icons.watch_rounded, 'color': const Color(0xFF7C3AED)},
     ];
@@ -1192,6 +1193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildExploreChip('Electronics', Icons.devices_rounded, nav),
                         _buildExploreChip('Fashion', Icons.checkroom_rounded, nav),
                         _buildExploreChip('Home & Living', Icons.chair_rounded, nav),
+                        _buildExploreChip('Beauty & Grooming', Icons.spa_rounded, nav),
                         _buildExploreChip('Footwear', Icons.snowshoeing_rounded, nav),
                         _buildExploreChip('Accessories', Icons.watch_rounded, nav),
                       ],
