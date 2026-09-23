@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/navigation/app_navigator.dart';
@@ -127,12 +128,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         titleSpacing: 16,
-        backgroundColor: AppTheme.surface,
+        backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              color: AppTheme.surface.withOpacity(0.65),
+            ),
+          ),
+        ),
         title: Row(
           children: [
             ClipRRect(
@@ -179,22 +189,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(width: 4),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: AppSearchBar.trigger(
+              onTap: () => _openSearch(context),
+              hintText: 'Search products, electronics, deals...',
+            ),
+          ),
+        ),
       ),
       body: CustomScrollView(
         controller: widget.scrollController,
         slivers: [
-          // 1. Prominent Search Bar Trigger
+          // Top spacer to push content below the frosted glass AppBar + search bar
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
-              child: AppSearchBar.trigger(
-                onTap: () => _openSearch(context),
-                hintText: 'Search products, electronics, deals...',
-              ),
+            child: SizedBox(
+              height: MediaQuery.of(context).padding.top + kToolbarHeight + 52,
             ),
           ),
 
-          // 2. Hero Promotional Carousel
+          // 1. Hero Promotional Carousel
           const SliverToBoxAdapter(
             child: HeroPromotionalCarousel(),
           ),

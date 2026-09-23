@@ -95,12 +95,12 @@ class _AppSearchBarState extends State<AppSearchBar> {
         height: widget.height,
         margin: widget.margin,
         decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
+          color: AppTheme.surfaceContainerLowest.withOpacity(0.35),
           borderRadius: borderRadius,
-          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.6)),
+          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.025),
+              color: Colors.black.withOpacity(0.015),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
