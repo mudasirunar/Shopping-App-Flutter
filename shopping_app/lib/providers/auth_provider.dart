@@ -173,6 +173,40 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the display name of the currently authenticated user.
+  Future<bool> updateProfileName(String newName) async {
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty) {
+      _errorMessage = 'Name cannot be empty.';
+      notifyListeners();
+      return false;
+    }
+
+    final user = _safeAuth?.currentUser;
+    if (user == null) {
+      _errorMessage = 'No user signed in.';
+      notifyListeners();
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await user.updateDisplayName(trimmed);
+      await user.reload();
+      _currentUser = _safeAuth?.currentUser;
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to update profile name. Please try again.';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Sends a 6-digit OTP code to the given email using the Brevo Vercel serverless endpoint.
   Future<bool> sendResetOtp(String email) async {
     _isLoading = true;
