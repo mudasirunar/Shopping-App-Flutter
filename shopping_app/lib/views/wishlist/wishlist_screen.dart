@@ -151,6 +151,7 @@ class WishlistScreen extends StatelessWidget {
                 ResponsiveProductGrid(
                   products: items,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  showCategory: true,
                   onProductTap: (product) {
                     Navigator.push(
                       context,

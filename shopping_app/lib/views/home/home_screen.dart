@@ -1,0 +1,1857 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../core/navigation/app_navigator.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/utils/app_snackbar.dart';
+import '../../core/utils/currency_formatter.dart';
+import '../../models/product.dart';
+import '../../providers/cart_provider.dart';
+import '../../providers/catalog_provider.dart';
+import '../../providers/navigation_provider.dart';
+import '../../providers/wishlist_provider.dart';
+import '../../widgets/app_network_image.dart';
+import '../details/product_details_screen.dart';
+import '../search/search_screen.dart';
+
+class HomeScreen extends StatefulWidget {
+  final ScrollController? scrollController;
+
+  const HomeScreen({super.key, this.scrollController});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final PageController _bannerController = PageController();
+  int _currentBannerIndex = 0;
+  Timer? _bannerTimer;
+
+  // Flash Sale Countdown Demo (e.g. 4 hours remaining)
+  late Duration _countdown;
+  Timer? _countdownTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _countdown = const Duration(hours: 4, minutes: 28, seconds: 45);
+
+    // Auto-advance banner every 4.5 seconds
+    _bannerTimer = Timer.periodic(const Duration(milliseconds: 4500), (timer) {
+      if (!mounted) return;
+      if (_bannerController.hasClients) {
+        final next = (_currentBannerIndex + 1) % 3;
+        _bannerController.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.easeInOutCubic,
+        );
+      }
+    });
+
+    // Countdown ticker with auto-looping cycle for continuous flash deal rounds
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      setState(() {
+        if (_countdown.inSeconds > 1) {
+          _countdown = _countdown - const Duration(seconds: 1);
+        } else {
+          // When it hits 00:00:00, automatically rolls over to the next 4-hour Flash Deal Round
+          _countdown = const Duration(hours: 4, minutes: 0, seconds: 0);
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerTimer?.cancel();
+    _countdownTimer?.cancel();
+    _bannerController.dispose();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration d) {
+    final hours = d.inHours.toString().padLeft(2, '0');
+    final minutes = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
+  }
+
+  void _copyVoucher(String code) {
+    Clipboard.setData(ClipboardData(text: code));
+    HapticFeedback.lightImpact();
+    AppSnackBar.show(
+      context,
+      message: 'Voucher code "$code" copied to clipboard!',
+    );
+  }
+
+  void _openSearch(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const SearchScreen(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final catalog = context.watch<CatalogProvider>();
+    final cart = context.watch<CartProvider>();
+    final wishlist = context.watch<WishlistProvider>();
+    final nav = context.read<NavigationProvider>();
+
+    if (catalog.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppTheme.surface,
+        body: Center(
+          child: CircularProgressIndicator(color: AppTheme.primary),
+        ),
+      );
+    }
+
+    final allProducts = catalog.allProducts;
+
+    // 1. Flash Deals: Curated preview of 6 discount products (Aura ANC Headphones remains here by merit)
+    final dealProducts = allProducts.where((p) => p.hasDiscount).take(6).toList();
+    final dealIds = dealProducts.map((p) => p.id).toSet();
+
+    // 2. Top Rated: 4.7★+, prioritize fresh items not already featured in Flash Deals (curated 6 items)
+    final topRatedFresh = allProducts
+        .where((p) => p.displayRating >= 4.7 && !dealIds.contains(p.id))
+        .toList();
+    final topRatedProducts = [
+      ...topRatedFresh,
+      ...allProducts.where((p) => p.displayRating >= 4.7 && dealIds.contains(p.id)),
+    ].take(6).toList();
+    final topRatedIds = topRatedProducts.map((p) => p.id).toSet();
+
+    // 3. Fast Delivery: 2-3 days transit, prioritize fresh items not already featured above (curated 6 items)
+    final fastDeliveryFresh = allProducts
+        .where((p) =>
+            (p.effectiveDeliveryDays == 2 || p.effectiveDeliveryDays == 3) &&
+            !dealIds.contains(p.id) &&
+            !topRatedIds.contains(p.id))
+        .toList();
+    final fastDeliveryProducts = [
+      ...fastDeliveryFresh,
+      ...allProducts.where((p) =>
+          (p.effectiveDeliveryDays == 2 || p.effectiveDeliveryDays == 3) &&
+          !fastDeliveryFresh.contains(p)),
+    ].take(6).toList();
+
+    return Scaffold(
+      backgroundColor: AppTheme.surface,
+      appBar: AppBar(
+        titleSpacing: 16,
+        backgroundColor: AppTheme.surface,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/icon/app_icon.png',
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'Shopping App',
+              style: TextStyle(
+                color: AppTheme.primary,
+                fontWeight: FontWeight.w800,
+                fontSize: 19,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          // Wishlist Shortcut
+          IconButton(
+            icon: Badge(
+              isLabelVisible: wishlist.itemCount > 0,
+              backgroundColor: AppTheme.primary,
+              label: Text('${wishlist.itemCount}'),
+              child: const Icon(Icons.favorite_outline_rounded, color: AppTheme.onSurface, size: 22),
+            ),
+            onPressed: () => AppNavigator.openWishlist(),
+          ),
+          // Cart Shortcut
+          IconButton(
+            icon: Badge(
+              isLabelVisible: cart.totalItemCount > 0,
+              backgroundColor: const Color(0xFFFF3B30),
+              label: Text('${cart.totalItemCount}'),
+              child: const Icon(Icons.shopping_cart_outlined, color: AppTheme.onSurface, size: 22),
+            ),
+            onPressed: () => AppNavigator.openCart(),
+          ),
+          const SizedBox(width: 4),
+        ],
+      ),
+      body: CustomScrollView(
+        controller: widget.scrollController,
+        slivers: [
+          // 1. Prominent Search Bar Trigger
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 14),
+              child: InkWell(
+                onTap: () => _openSearch(context),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.6)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.025),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search_rounded, color: AppTheme.primary, size: 22),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'Search 50+ products, electronics, deals...',
+                          style: TextStyle(
+                            color: AppTheme.secondary,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // 2. Hero Promotional Carousel
+          SliverToBoxAdapter(
+            child: _buildHeroCarousel(nav),
+          ),
+
+          // 3. Voucher Codes Wallet Strip
+          SliverToBoxAdapter(
+            child: _buildVoucherStrip(),
+          ),
+
+          // 4. Category Quick Rail
+          SliverToBoxAdapter(
+            child: _buildCategoryQuickRail(nav),
+          ),
+
+          // 5. Flash Deals Section (Countdown & Strike-Through Pricing)
+          if (dealProducts.isNotEmpty)
+            SliverToBoxAdapter(
+              child: _buildFlashDealsSection(dealProducts, nav),
+            ),
+
+          // 6. Curated Spotlight Dual Tiles
+          SliverToBoxAdapter(
+            child: _buildSpotlightTiles(nav),
+          ),
+
+          // 7. Top Rated / Editor's Pick Section
+          if (topRatedProducts.isNotEmpty)
+            SliverToBoxAdapter(
+              child: _buildTopRatedSection(topRatedProducts, nav),
+            ),
+
+          // 8. Fast Delivery Section (2-3 Days Transit)
+          if (fastDeliveryProducts.isNotEmpty)
+            SliverToBoxAdapter(
+              child: _buildFastDeliverySection(fastDeliveryProducts, nav),
+            ),
+
+          // 9. "Browse Full Catalog" Invitation Banner
+          SliverToBoxAdapter(
+            child: _buildFullCatalogInvitation(nav, allProducts),
+          ),
+
+          // Bottom padding for navigation bar
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 100),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Hero Carousel
+  // ---------------------------------------------------------------------------
+  Widget _buildHeroCarousel(NavigationProvider nav) {
+    final banners = [
+      _PromoBannerData(
+        badge: 'FESTIVAL SPECIAL',
+        title: 'Up to 35% Off\nCurated Collection',
+        subtitle: 'Handpicked electronics, living & premium apparel',
+        actionLabel: 'Shop Deals',
+        gradientColors: [const Color(0xFF0F172A), const Color(0xFF1E293B)],
+        accentColor: const Color(0xFFF59E0B),
+        onTap: () => nav.openExplore('Electronics'),
+      ),
+      _PromoBannerData(
+        badge: 'EXCLUSIVE VOUCHER',
+        title: 'Flat 20% Discount\nCode: FESTIVAL20',
+        subtitle: 'Apply at checkout on all orders above Rs. 5,000',
+        actionLabel: 'Copy & Explore',
+        gradientColors: [const Color(0xFF064E3B), const Color(0xFF047857)],
+        accentColor: const Color(0xFF34D399),
+        onTap: () {
+          _copyVoucher('FESTIVAL20');
+          nav.openExplore('Fashion');
+        },
+      ),
+      _PromoBannerData(
+        badge: 'NEW SEASON ARRIVALS',
+        title: 'Modern Everyday\nLifestyle Essentials',
+        subtitle: 'Designed for durability, aesthetics and everyday ease',
+        actionLabel: 'Discover Living',
+        gradientColors: [const Color(0xFF701A75), const Color(0xFF4C0519)],
+        accentColor: const Color(0xFFF472B6),
+        onTap: () => nav.openExplore('Home & Living'),
+      ),
+    ];
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 180,
+          child: PageView.builder(
+            controller: _bannerController,
+            onPageChanged: (i) {
+              setState(() {
+                _currentBannerIndex = i;
+              });
+            },
+            itemCount: banners.length,
+            itemBuilder: (context, index) {
+              final b = banners[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    gradient: LinearGradient(
+                      colors: b.gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: b.gradientColors.first.withOpacity(0.35),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            decoration: BoxDecoration(
+                              color: b.accentColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: b.accentColor.withOpacity(0.6)),
+                            ),
+                            child: Text(
+                              b.badge,
+                              style: TextStyle(
+                                color: b.accentColor,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.bolt_rounded, color: Colors.white70, size: 18),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            b.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            b.subtitle,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 11.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: ElevatedButton(
+                          onPressed: b.onTap,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black87,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            minimumSize: Size.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                b.actionLabel,
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.arrow_forward_rounded, size: 13),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(banners.length, (i) {
+            final active = i == _currentBannerIndex;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: active ? 18 : 6,
+              height: 5,
+              decoration: BoxDecoration(
+                color: active ? AppTheme.primary : AppTheme.outlineVariant,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Voucher Strip
+  // ---------------------------------------------------------------------------
+  Widget _buildVoucherStrip() {
+    final vouchers = [
+      {'code': 'FESTIVAL20', 'label': '20% OFF Orders over Rs. 5,000', 'color': const Color(0xFF047857)},
+      {'code': 'FREESHIP', 'label': 'Free Insured Air Courier', 'color': const Color(0xFF1D4ED8)},
+      {'code': 'SAVE15', 'label': 'Flat 15% OFF Audio & Tech', 'color': const Color(0xFFB45309)},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(Icons.confirmation_number_outlined, size: 18, color: AppTheme.primary),
+                SizedBox(width: 6),
+                Text(
+                  'Exclusive Promo Codes',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 56,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: vouchers.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final v = vouchers[index];
+                final code = v['code'] as String;
+                final label = v['label'] as String;
+                final col = v['color'] as Color;
+
+                return InkWell(
+                  onTap: () => _copyVoucher(code),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: col.withOpacity(0.35)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.02),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: col.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            code,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: col,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          label,
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.copy_rounded, size: 14, color: col),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Category Quick Rail
+  // ---------------------------------------------------------------------------
+  Widget _buildCategoryQuickRail(NavigationProvider nav) {
+    final categories = [
+      {'name': 'All', 'icon': Icons.apps_rounded, 'color': const Color(0xFF1E293B)},
+      {'name': 'Electronics', 'icon': Icons.devices_rounded, 'color': const Color(0xFF0284C7)},
+      {'name': 'Fashion', 'icon': Icons.checkroom_rounded, 'color': const Color(0xFFE11D48)},
+      {'name': 'Home & Living', 'icon': Icons.chair_rounded, 'color': const Color(0xFFD97706)},
+      {'name': 'Footwear', 'icon': Icons.snowshoeing_rounded, 'color': const Color(0xFF059669)},
+      {'name': 'Accessories', 'icon': Icons.watch_rounded, 'color': const Color(0xFF7C3AED)},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Shop by Category',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.onSurface,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => nav.openExplore('All'),
+                  child: const Text('See All Catalog', style: TextStyle(fontSize: 12.5)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 94,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (context, index) {
+                final c = categories[index];
+                final name = c['name'] as String;
+                final icon = c['icon'] as IconData;
+                final color = c['color'] as Color;
+
+                return InkWell(
+                  onTap: () => nav.openExplore(name),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.09),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: color.withOpacity(0.25), width: 1.2),
+                        ),
+                        child: Center(
+                          child: Icon(icon, color: color, size: 26),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        width: 68,
+                        child: Text(
+                          name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Flash Deals Section
+  // ---------------------------------------------------------------------------
+  Widget _buildFlashDealsSection(List<Product> deals, NavigationProvider nav) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with Countdown
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.flash_on_rounded, color: Color(0xFFF59E0B), size: 22),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Flash Deals',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.onSurface,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEE2E2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFDC2626)),
+                          const SizedBox(width: 3),
+                          Text(
+                            _formatDuration(_countdown),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFDC2626),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => nav.openExplore('All'),
+                  child: const Text('View All', style: TextStyle(fontSize: 12.5)),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Horizontal Deals Cards Carousel
+          SizedBox(
+            height: 214,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: deals.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                if (index < deals.length) {
+                  return _buildFlashDealCard(deals[index]);
+                }
+                return _buildEndArrowButton(nav);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFlashDealCard(Product p) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(product: p),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 154,
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.025),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Image Stack
+            AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: AppNetworkImage(
+                      imageUrl: p.image,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(10),
+                      category: p.category,
+                    ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDC2626),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        p.effectiveDealTag ?? '-${p.discountPercent}%',
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 7),
+
+            // Product Name
+            SizedBox(
+              height: 32,
+              child: Text(
+                p.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onSurface,
+                  height: 1.2,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 5),
+
+            // Prices
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  CurrencyFormatter.formatPaisa(p.pricePaisa),
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.primary,
+                  ),
+                ),
+                if (p.hasDiscount)
+                  Text(
+                    CurrencyFormatter.formatPaisa(p.originalPricePaisa!),
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.secondary.withOpacity(0.7),
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Spotlight Dual Tiles
+  // ---------------------------------------------------------------------------
+  Widget _buildSpotlightTiles(NavigationProvider nav) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: () => nav.openExplore('Electronics'),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.headphones_rounded, color: Color(0xFF38BDF8), size: 24),
+                    SizedBox(height: 10),
+                    Text(
+                      'Next-Gen Audio',
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'ANC & Hi-Res Sound',
+                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: InkWell(
+              onTap: () => nav.openExplore('Home & Living'),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF831843), Color(0xFF500724)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.coffee_maker_rounded, color: Color(0xFFF472B6), size: 24),
+                    SizedBox(height: 10),
+                    Text(
+                      'Modern Living',
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Artisan Essentials',
+                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Top Rated Section
+  // ---------------------------------------------------------------------------
+  Widget _buildTopRatedSection(List<Product> products, NavigationProvider nav) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Top Rated (4.7★+)',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.onSurface,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => nav.openExplore('All'),
+                  child: const Text('See All', style: TextStyle(fontSize: 12.5)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 202,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: products.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                if (index < products.length) {
+                  return _buildTopRatedCard(products[index]);
+                }
+                return _buildEndArrowButton(nav);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopRatedCard(Product p) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(product: p),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 154,
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.025),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: AppNetworkImage(
+                      imageUrl: p.image,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(10),
+                      category: p.category,
+                    ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
+                          const SizedBox(width: 2),
+                          Text(
+                            '${p.displayRating}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 7),
+            SizedBox(
+              height: 32,
+              child: Text(
+                p.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onSurface,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              CurrencyFormatter.formatPaisa(p.pricePaisa),
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Fast Delivery Section (2-3 Days Transit)
+  // ---------------------------------------------------------------------------
+  Widget _buildFastDeliverySection(List<Product> products, NavigationProvider nav) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Fast Delivery',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFECFDF5),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFA7F3D0)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt_rounded, size: 12, color: Color(0xFF059669)),
+                          SizedBox(width: 2),
+                          Text(
+                            '2-3 Days',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF059669),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => nav.openExplore('All'),
+                  child: const Text('View All', style: TextStyle(fontSize: 12.5)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 202,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: products.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                if (index < products.length) {
+                  return _buildFastDeliveryCard(products[index]);
+                }
+                return _buildEndArrowButton(nav);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEndArrowButton(NavigationProvider nav) {
+    return Center(
+      child: InkWell(
+        onTap: () => nav.openExplore('All'),
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainerLowest,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.6)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              color: AppTheme.primary,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFastDeliveryCard(Product p) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(product: p),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 154,
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.025),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: AppNetworkImage(
+                      imageUrl: p.image,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(10),
+                      category: p.category,
+                    ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF047857),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.bolt_rounded, color: Colors.white, size: 11),
+                          const SizedBox(width: 1.5),
+                          Text(
+                            '${p.effectiveDeliveryDays}d Delivery',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 7),
+            SizedBox(
+              height: 32,
+              child: Text(
+                p.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onSurface,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              CurrencyFormatter.formatPaisa(p.pricePaisa),
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Full Catalog Showcase & Master Navigation Gateway
+  // ---------------------------------------------------------------------------
+  Widget _buildFullCatalogInvitation(NavigationProvider nav, List<Product> products) {
+    // Pick 4 diverse products across different categories, favoring fresh items not featured as top deals
+    final showcaseProducts = <Product>[];
+    final seenCategories = <String>{};
+
+    for (final p in products) {
+      if (!seenCategories.contains(p.category) &&
+          p.id != 'prod-001' &&
+          showcaseProducts.length < 4) {
+        showcaseProducts.add(p);
+        seenCategories.add(p.category);
+      }
+    }
+    if (showcaseProducts.length < 4 && products.isNotEmpty) {
+      for (final p in products) {
+        if (!showcaseProducts.contains(p) && showcaseProducts.length < 4) {
+          showcaseProducts.add(p);
+        }
+      }
+    }
+
+    final avatarProducts = showcaseProducts.take(3).toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.auto_awesome_rounded, color: Color(0xFF6366F1), size: 18),
+                        SizedBox(width: 6),
+                        Text(
+                          'More From The Catalog',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.onSurface,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Curated picks from 50+ items across 6 departments',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: AppTheme.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => nav.openExplore('All'),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('View All', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                      SizedBox(width: 2),
+                      Icon(Icons.arrow_forward_rounded, size: 13),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // 2x2 Showcase Product Grid
+          if (showcaseProducts.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _buildShowcaseCard(showcaseProducts[0])),
+                  if (showcaseProducts.length > 1) ...[
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildShowcaseCard(showcaseProducts[1])),
+                  ],
+                ],
+              ),
+            ),
+          if (showcaseProducts.length > 2) ...[
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _buildShowcaseCard(showcaseProducts[2])),
+                  if (showcaseProducts.length > 3) ...[
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildShowcaseCard(showcaseProducts[3])),
+                  ],
+                ],
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 18),
+
+          // Master "Explore All Collections" Navigation Banner
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: InkWell(
+              onTap: () => nav.openExplore('All'),
+              borderRadius: BorderRadius.circular(22),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0F172A), Color(0xFF1E1B4B), Color(0xFF312E81)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1E1B4B).withOpacity(0.35),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFF6366F1).withOpacity(0.35),
+                    width: 1.2,
+                  ),
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Badge & Avatar Stack Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6366F1).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFF818CF8).withOpacity(0.4)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.explore_rounded, size: 12, color: Color(0xFFA5B4FC)),
+                              SizedBox(width: 5),
+                              Text(
+                                '50+ PRODUCTS IN CATALOG',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFFA5B4FC),
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Overlapping Avatar Stack
+                        _buildAvatarStack(avatarProducts),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Title & Description
+                    const Text(
+                      'Explore Complete Catalog',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Search, sort by price & rating, or jump directly into any department.',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Colors.white.withOpacity(0.75),
+                        height: 1.35,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Category Quick Filter Chips
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildExploreChip('Electronics', Icons.devices_rounded, nav),
+                        _buildExploreChip('Fashion', Icons.checkroom_rounded, nav),
+                        _buildExploreChip('Home & Living', Icons.chair_rounded, nav),
+                        _buildExploreChip('Footwear', Icons.snowshoeing_rounded, nav),
+                        _buildExploreChip('Accessories', Icons.watch_rounded, nav),
+                      ],
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // Primary Navigation Action Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => nav.openExplore('All'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF0F172A),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.explore_rounded, size: 18, color: Color(0xFF4F46E5)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Browse Full 50+ Catalog',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.1,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF0F172A)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShowcaseCard(Product p) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(product: p),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.outlineVariant.withOpacity(0.5),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.025),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image with Category Tag and Discount Badge
+            AspectRatio(
+              aspectRatio: 1.15,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: AppNetworkImage(
+                      imageUrl: p.image,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(12),
+                      category: p.category,
+                    ),
+                  ),
+                  // Top-Left: Discount Tag (if available) or Category Tag
+                  if (p.hasDiscount)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDC2626),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.18),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          '-${p.discountPercent}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  // Bottom-Left (or Top-Left if no discount): Category Chip
+                  Positioned(
+                    top: p.hasDiscount ? null : 6,
+                    bottom: p.hasDiscount ? 6 : null,
+                    left: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.72),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        p.category,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Title
+            SizedBox(
+              height: 32,
+              child: Text(
+                p.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onSurface,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            // Price & Rating
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      CurrencyFormatter.formatPaisa(p.pricePaisa),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                    if (p.hasDiscount)
+                      Text(
+                        CurrencyFormatter.formatPaisa(p.originalPricePaisa!),
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          color: AppTheme.secondary.withOpacity(0.7),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, size: 13, color: Color(0xFFF59E0B)),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${p.displayRating}',
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarStack(List<Product> products) {
+    final count = products.length.clamp(0, 3);
+    const itemSize = 30.0;
+    const overlap = 18.0;
+    final totalWidth = (count * overlap) + 36.0;
+
+    return SizedBox(
+      width: totalWidth,
+      height: itemSize,
+      child: Stack(
+        children: [
+          for (int i = 0; i < count; i++)
+            Positioned(
+              left: i * overlap,
+              child: Container(
+                width: itemSize,
+                height: itemSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: AppNetworkImage(
+                    imageUrl: products[i].image,
+                    fit: BoxFit.cover,
+                    category: products[i].category,
+                  ),
+                ),
+              ),
+            ),
+          Positioned(
+            left: count * overlap,
+            child: Container(
+              width: itemSize,
+              height: itemSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF6366F1),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Center(
+                child: Text(
+                  '+46',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExploreChip(String category, IconData icon, NavigationProvider nav) {
+    return InkWell(
+      onTap: () => nav.openExplore(category),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: Colors.white70),
+            const SizedBox(width: 5),
+            Text(
+              category,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 8, color: Colors.white54),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PromoBannerData {
+  final String badge;
+  final String title;
+  final String subtitle;
+  final String actionLabel;
+  final List<Color> gradientColors;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  _PromoBannerData({
+    required this.badge,
+    required this.title,
+    required this.subtitle,
+    required this.actionLabel,
+    required this.gradientColors,
+    required this.accentColor,
+    required this.onTap,
+  });
+}

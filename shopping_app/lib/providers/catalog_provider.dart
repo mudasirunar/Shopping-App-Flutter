@@ -6,6 +6,7 @@ enum ProductSortOption {
   featured,
   priceLowToHigh,
   priceHighToLow,
+  nameAToZ,
 }
 
 class CatalogProvider extends ChangeNotifier {
@@ -79,14 +80,28 @@ class CatalogProvider extends ChangeNotifier {
       results = results.where((p) => p.category.toLowerCase() == _selectedCategory.toLowerCase()).toList();
     }
 
-    // 2. Search Query Filter
+    // 2. Search Query Filter with Title Prioritization
     if (_searchQuery.isNotEmpty) {
+      final tokens = _searchQuery.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
       results = results.where((p) {
-        final nameMatch = p.name.toLowerCase().contains(_searchQuery);
-        final descMatch = p.description.toLowerCase().contains(_searchQuery);
-        final catMatch = p.category.toLowerCase().contains(_searchQuery);
-        return nameMatch || descMatch || catMatch;
+        final name = p.name.toLowerCase();
+        final desc = p.description.toLowerCase();
+        final cat = p.category.toLowerCase();
+        final badge = (p.badgeTag ?? '').toLowerCase();
+        final deal = (p.dealTag ?? '').toLowerCase();
+        final fullBlob = '$name $desc $cat $badge $deal';
+        return tokens.every((token) => fullBlob.contains(token));
       }).toList();
+
+      if (_sortOption == ProductSortOption.featured) {
+        results.sort((a, b) {
+          final aInTitle = a.name.toLowerCase().contains(_searchQuery);
+          final bInTitle = b.name.toLowerCase().contains(_searchQuery);
+          if (aInTitle && !bInTitle) return -1;
+          if (!aInTitle && bInTitle) return 1;
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+      }
     }
 
     // 3. Sorting
@@ -97,8 +112,11 @@ class CatalogProvider extends ChangeNotifier {
       case ProductSortOption.priceHighToLow:
         results.sort((a, b) => b.pricePaisa.compareTo(a.pricePaisa));
         break;
+      case ProductSortOption.nameAToZ:
+        results.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        break;
       case ProductSortOption.featured:
-        // Keep catalog default order
+        // Keep order or search relevance
         break;
     }
 

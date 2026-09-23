@@ -39,7 +39,7 @@ final class NativeTabBarPlatformView: NSObject, FlutterPlatformView, UITabBarDel
         tabBar.delegate = self
         tabBar.items = [
             makeItem("Shop", "storefront", "storefront.fill", 0),
-            makeItem("Categories", "square.grid.2x2", "square.grid.2x2.fill", 1),
+            makeItem("Explore", "safari", "safari.fill", 1),
             makeItem("Cart", "cart", "cart.fill", 2),
             makeItem("Account", "person", "person.fill", 3),
         ]

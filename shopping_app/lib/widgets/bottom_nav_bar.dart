@@ -138,9 +138,9 @@ class _AndroidBottomBarState extends State<_AndroidBottomBar>
       activeIcon: Icons.storefront_rounded,
     ),
     _NavItem(
-      label: 'Categories',
-      icon: Icons.grid_view_outlined,
-      activeIcon: Icons.grid_view_rounded,
+      label: 'Explore',
+      icon: Icons.explore_outlined,
+      activeIcon: Icons.explore_rounded,
     ),
     _NavItem(
       label: 'Cart',

@@ -101,6 +101,20 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       },
                     ),
                   ),
+                  Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: const Icon(Icons.sort_by_alpha_rounded, color: AppTheme.primary),
+                      title: const Text('Name: A to Z'),
+                      trailing: catalog.sortOption == ProductSortOption.nameAToZ
+                          ? const Icon(Icons.check, color: AppTheme.primary)
+                          : null,
+                      onTap: () {
+                        catalog.setSortOption(ProductSortOption.nameAToZ);
+                        Navigator.pop(ctx);
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -407,6 +421,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 ResponsiveProductGrid(
                   products: products,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
+                  showCategory: catalog.selectedCategory.trim().toLowerCase() == 'all',
                   onProductTap: (product) {
                     Navigator.push(
                       context,
@@ -431,6 +446,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
         return 'Price: High';
       case ProductSortOption.featured:
         return 'Featured';
+      case ProductSortOption.nameAToZ:
+        return 'Name: A to Z';
     }
   }
 }

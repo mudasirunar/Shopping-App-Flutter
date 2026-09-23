@@ -77,6 +77,9 @@ class Product {
   final String category;
   final String image;
   final int pricePaisa;
+  final int? originalPricePaisa;
+  final String? dealTag; // e.g. "25% OFF", "FLASH SALE", "FESTIVAL SPECIAL"
+  final String? voucherCode; // e.g. "FESTIVAL20", "SAVE15"
 
   // Dynamic E-Commerce Attributes
   final double? rating;
@@ -99,6 +102,9 @@ class Product {
     required this.category,
     required this.image,
     required this.pricePaisa,
+    this.originalPricePaisa,
+    this.dealTag,
+    this.voucherCode,
     this.rating = 4.8,
     this.reviewCount = 18,
     this.stockStatus = StockStatus.inStock,
@@ -115,6 +121,15 @@ class Product {
 
   /// Price formatted as floating PKR for display when needed.
   double get priceInRupees => pricePaisa / 100.0;
+  double? get originalPriceInRupees =>
+      originalPricePaisa != null ? originalPricePaisa! / 100.0 : null;
+
+  bool get hasDiscount =>
+      originalPricePaisa != null && originalPricePaisa! > pricePaisa;
+
+  int get discountPercent => hasDiscount
+      ? (((originalPricePaisa! - pricePaisa) / originalPricePaisa!) * 100).round()
+      : 0;
 
   bool get isOutOfStock => stockStatus == StockStatus.outOfStock;
   bool get isLowStock => stockStatus == StockStatus.lowStock;
@@ -130,6 +145,7 @@ class Product {
   String get effectiveCondition => conditionHighlight ?? 'Brand New · 100% Authentic';
   Map<String, String> get safeSpecifications => specifications ?? const {};
   List<ProductReview> get safeReviews => reviews ?? const [];
+  String? get effectiveDealTag => dealTag ?? (hasDiscount ? '$discountPercent% OFF' : null);
 
   factory Product.fromJson(Map<String, dynamic> json) {
     // Parse reviews if present
@@ -159,6 +175,9 @@ class Product {
       category: json['category'] as String? ?? '',
       image: json['image'] as String? ?? '',
       pricePaisa: (json['pricePaisa'] as num?)?.toInt() ?? 0,
+      originalPricePaisa: (json['originalPricePaisa'] as num?)?.toInt(),
+      dealTag: json['dealTag'] as String?,
+      voucherCode: json['voucherCode'] as String?,
       rating: (json['rating'] as num?)?.toDouble() ?? 4.8,
       reviewCount: (json['reviewCount'] as num?)?.toInt() ??
           (reviewsList.isNotEmpty ? reviewsList.length : 16),
@@ -185,6 +204,9 @@ class Product {
       'category': category,
       'image': image,
       'pricePaisa': pricePaisa,
+      if (originalPricePaisa != null) 'originalPricePaisa': originalPricePaisa,
+      if (dealTag != null) 'dealTag': dealTag,
+      if (voucherCode != null) 'voucherCode': voucherCode,
       'rating': rating,
       'reviewCount': reviewCount,
       'stockStatus': stockStatus?.name,
@@ -207,6 +229,9 @@ class Product {
     String? category,
     String? image,
     int? pricePaisa,
+    int? originalPricePaisa,
+    String? dealTag,
+    String? voucherCode,
     double? rating,
     int? reviewCount,
     StockStatus? stockStatus,
@@ -227,6 +252,9 @@ class Product {
       category: category ?? this.category,
       image: image ?? this.image,
       pricePaisa: pricePaisa ?? this.pricePaisa,
+      originalPricePaisa: originalPricePaisa ?? this.originalPricePaisa,
+      dealTag: dealTag ?? this.dealTag,
+      voucherCode: voucherCode ?? this.voucherCode,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       stockStatus: stockStatus ?? this.stockStatus,

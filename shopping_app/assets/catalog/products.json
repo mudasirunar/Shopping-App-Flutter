@@ -12,7 +12,7 @@
     "deliveryDays": 2,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -35,7 +35,10 @@
       }
     ],
     "badgeTag": "EDITION 01",
-    "qualityTag": "Verified Quality"
+    "qualityTag": "Verified Quality",
+    "originalPricePaisa": 3120000,
+    "dealTag": "FLASH SALE",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-002",
@@ -50,7 +53,7 @@
     "deliveryDays": 3,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -78,7 +81,10 @@
         "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
       }
     ],
-    "qualityTag": "Verified Quality"
+    "qualityTag": "Verified Quality",
+    "originalPricePaisa": 1710000,
+    "dealTag": "WEEKEND DEAL",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-003",
@@ -116,7 +122,10 @@
       }
     ],
     "badgeTag": "SIGNATURE",
-    "qualityTag": "Best Seller"
+    "qualityTag": "Best Seller",
+    "originalPricePaisa": 1100000,
+    "dealTag": "MEGA DEAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-004",
@@ -131,7 +140,7 @@
     "deliveryDays": 5,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -159,7 +168,10 @@
         "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
       }
     ],
-    "qualityTag": "Verified Quality"
+    "qualityTag": "Verified Quality",
+    "originalPricePaisa": 830000,
+    "dealTag": "FESTIVAL SPECIAL",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-005",
@@ -174,7 +186,7 @@
     "deliveryDays": 2,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -197,7 +209,10 @@
       }
     ],
     "stockCount": 2,
-    "qualityTag": "Handcrafted"
+    "qualityTag": "Handcrafted",
+    "originalPricePaisa": 490000,
+    "dealTag": "LIMITED DROP",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-006",
@@ -212,7 +227,7 @@
     "deliveryDays": 3,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -278,7 +293,10 @@
         "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
       }
     ],
-    "qualityTag": "Customer Favorite"
+    "qualityTag": "Customer Favorite",
+    "originalPricePaisa": 720000,
+    "dealTag": "FLASH SALE",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-008",
@@ -293,7 +311,7 @@
     "deliveryDays": 5,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -337,7 +355,7 @@
     "deliveryDays": 2,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -359,7 +377,9 @@
         "comment": "High quality finish. Materials feel sturdy and artisanal. Arrived very well-cushioned and protected."
       }
     ],
-    "qualityTag": "Verified Quality"
+    "qualityTag": "Verified Quality",
+    "originalPricePaisa": 870000,
+    "dealTag": "BEST VALUE"
   },
   {
     "id": "prod-010",
@@ -374,7 +394,7 @@
     "deliveryDays": 3,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -454,7 +474,7 @@
     "deliveryDays": 5,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -482,7 +502,10 @@
         "comment": "The material feels soft yet durable. Looks even better in person than in pictures. Highly recommended."
       }
     ],
-    "badgeTag": "ESSENTIAL"
+    "badgeTag": "ESSENTIAL",
+    "originalPricePaisa": 690000,
+    "dealTag": "RAMADAN DEAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-013",
@@ -497,7 +520,7 @@
     "deliveryDays": 2,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -534,7 +557,7 @@
     "deliveryDays": 3,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -599,7 +622,10 @@
         "comment": "Really good experience. High quality components, sturdy design, and works out of the box without issues."
       }
     ],
-    "qualityTag": "Verified Quality"
+    "qualityTag": "Verified Quality",
+    "originalPricePaisa": 2220000,
+    "dealTag": "HOT PICK",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-016",
@@ -614,7 +640,7 @@
     "deliveryDays": 5,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -658,7 +684,7 @@
     "deliveryDays": 2,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -694,7 +720,7 @@
     "deliveryDays": 3,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -722,7 +748,10 @@
         "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
       }
     ],
-    "stockCount": 3
+    "stockCount": 3,
+    "originalPricePaisa": 600000,
+    "dealTag": "CLEARANCE",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-019",
@@ -774,7 +803,7 @@
     "deliveryDays": 5,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -817,7 +846,7 @@
     "deliveryDays": 2,
     "warranty": "14-Day Size Replacement",
     "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Upper Material": "Calfskin Leather / Heavyweight Canvas",
       "Insole": "Ergonomic Cushioning with Arch Support",
@@ -839,7 +868,10 @@
         "comment": "Sizing is accurate and leather finish is supple. Sturdy sole with great grip on all surfaces."
       }
     ],
-    "badgeTag": "EDITION 01"
+    "badgeTag": "EDITION 01",
+    "originalPricePaisa": 1820000,
+    "dealTag": "SPECIAL OFFER",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-022",
@@ -854,7 +886,7 @@
     "deliveryDays": 3,
     "warranty": "14-Day Size Replacement",
     "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Upper Material": "Calfskin Leather / Heavyweight Canvas",
       "Insole": "Ergonomic Cushioning with Arch Support",
@@ -934,7 +966,7 @@
     "deliveryDays": 5,
     "warranty": "14-Day Size Replacement",
     "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Upper Material": "Calfskin Leather / Heavyweight Canvas",
       "Insole": "Ergonomic Cushioning with Arch Support",
@@ -976,7 +1008,7 @@
     "deliveryDays": 2,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -999,7 +1031,10 @@
       }
     ],
     "stockCount": 2,
-    "badgeTag": "LIMITED RUN"
+    "badgeTag": "LIMITED RUN",
+    "originalPricePaisa": 2800000,
+    "dealTag": "FESTIVAL SPECIAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-026",
@@ -1014,7 +1049,7 @@
     "deliveryDays": 3,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -1094,7 +1129,7 @@
     "deliveryDays": 5,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -1122,7 +1157,10 @@
         "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
       }
     ],
-    "badgeTag": "SIGNATURE"
+    "badgeTag": "SIGNATURE",
+    "originalPricePaisa": 3350000,
+    "dealTag": "FLASH SALE",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-029",
@@ -1137,7 +1175,7 @@
     "deliveryDays": 2,
     "warranty": "Hygienic Seal Protected",
     "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Ingredients": "100% Natural Botanical Oils & Extracts",
       "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
@@ -1174,7 +1212,7 @@
     "deliveryDays": 3,
     "warranty": "Hygienic Seal Protected",
     "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Ingredients": "100% Natural Botanical Oils & Extracts",
       "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
@@ -1253,7 +1291,7 @@
     "deliveryDays": 5,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -1280,7 +1318,10 @@
         "date": "1 week ago",
         "comment": "Sound staging is clear and crisp. Build feels solid and premium. Great packaging delivery as well."
       }
-    ]
+    ],
+    "originalPricePaisa": 90000,
+    "dealTag": "MEGA DEAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-033",
@@ -1295,7 +1336,7 @@
     "deliveryDays": 2,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -1324,7 +1365,7 @@
     "name": "Fast Wireless Charging Pad",
     "description": "Ultra-slim aluminum charging pad supporting up to 15W Qi wireless output with foreign object detection, thermal management, and non-slip rubber base.",
     "category": "Electronics",
-    "image": "https://images.unsplash.com/photo-1622445262464-84b1456045b6?w=800&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1737882171913-f4ced0ce73d8?w=800&auto=format&fit=crop&q=80",
     "pricePaisa": 240000,
     "rating": 4.7,
     "reviewCount": 16,
@@ -1332,7 +1373,7 @@
     "deliveryDays": 3,
     "warranty": "1-Year Brand Warranty",
     "warrantyDetail": "Official replacement & repair coverage against internal defects.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Connectivity": "Wireless / USB-C Fast Interface",
       "Battery / Power": "Energy-efficient low-heat architecture",
@@ -1396,7 +1437,9 @@
         "date": "1 month ago",
         "comment": "Very comfortable for daily wear. Colors are rich and the seams are reinforced cleanly."
       }
-    ]
+    ],
+    "originalPricePaisa": 150000,
+    "dealTag": "WEEKEND DEAL"
   },
   {
     "id": "prod-036",
@@ -1411,7 +1454,7 @@
     "deliveryDays": 5,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -1453,7 +1496,7 @@
     "deliveryDays": 2,
     "warranty": "7-Day Easy Exchange",
     "warrantyDetail": "Hassle-free size replacement and verified genuine textile guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Material": "100% Pure Combed Textile / Flax Linen",
       "Fit Type": "Modern Tailored Regular Fit",
@@ -1489,7 +1532,7 @@
     "deliveryDays": 3,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -1516,7 +1559,10 @@
         "date": "3 weeks ago",
         "comment": "Very pleased with the craftsmanship. Heat distribution and texture are remarkably well executed."
       }
-    ]
+    ],
+    "originalPricePaisa": 110000,
+    "dealTag": "HOT PICK",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-039",
@@ -1567,7 +1613,7 @@
     "deliveryDays": 5,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -1610,7 +1656,7 @@
     "deliveryDays": 2,
     "warranty": "Damage-Free Guarantee",
     "warrantyDetail": "Full replacement if damaged in transit plus lifetime durability guarantee.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Composition": "High-Grade Stoneware / Food-Safe Stainless",
       "Finish": "Matte Artisan Glaze / Brushed Metal",
@@ -1646,7 +1692,7 @@
     "deliveryDays": 3,
     "warranty": "14-Day Size Replacement",
     "warrantyDetail": "Guaranteed fit with complimentary return pickup for size exchanges.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Upper Material": "Calfskin Leather / Heavyweight Canvas",
       "Insole": "Ergonomic Cushioning with Arch Support",
@@ -1673,7 +1719,10 @@
         "date": "3 weeks ago",
         "comment": "Lightweight yet durable. Breathable lining keeps feet fresh. Definitely worth the price."
       }
-    ]
+    ],
+    "originalPricePaisa": 350000,
+    "dealTag": "RAMADAN DEAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-043",
@@ -1724,7 +1773,7 @@
     "deliveryDays": 5,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -1767,7 +1816,7 @@
     "deliveryDays": 2,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -1789,7 +1838,10 @@
         "comment": "Precision engineering. You can immediately feel the quality in hand. Hardware is crisp and durable."
       }
     ],
-    "qualityTag": "Customer Favorite"
+    "qualityTag": "Customer Favorite",
+    "originalPricePaisa": 40000,
+    "dealTag": "LIMITED DROP",
+    "voucherCode": "SAVE15"
   },
   {
     "id": "prod-046",
@@ -1804,7 +1856,7 @@
     "deliveryDays": 3,
     "warranty": "Lifetime Hardware Warranty",
     "warrantyDetail": "Covers structural integrity, brass zippers, and hardware rivets.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Hardware": "Corrosion-Resistant Surgical Steel / Brass",
       "Lining": "Reinforced Weatherproof Ripstop",
@@ -1882,7 +1934,7 @@
     "deliveryDays": 5,
     "warranty": "Hygienic Seal Protected",
     "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
-    "conditionHighlight": "Precision Crafted · Batch Inspected",
+    "conditionHighlight": "Precision Crafted \u00b7 Batch Inspected",
     "specifications": {
       "Ingredients": "100% Natural Botanical Oils & Extracts",
       "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
@@ -1910,7 +1962,10 @@
         "comment": "Pure ingredients with zero sticky residue. Very refreshing and leaves a clean, hydrated feel."
       }
     ],
-    "qualityTag": "Handcrafted"
+    "qualityTag": "Handcrafted",
+    "originalPricePaisa": 110000,
+    "dealTag": "FESTIVAL SPECIAL",
+    "voucherCode": "FESTIVAL20"
   },
   {
     "id": "prod-049",
@@ -1925,7 +1980,7 @@
     "deliveryDays": 2,
     "warranty": "Hygienic Seal Protected",
     "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
-    "conditionHighlight": "Brand New · 100% Authentic",
+    "conditionHighlight": "Brand New \u00b7 100% Authentic",
     "specifications": {
       "Ingredients": "100% Natural Botanical Oils & Extracts",
       "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
@@ -1961,7 +2016,7 @@
     "deliveryDays": 3,
     "warranty": "Hygienic Seal Protected",
     "warrantyDetail": "100% tamper-proof sealed packaging with batch freshness assurance.",
-    "conditionHighlight": "Artisan Finished · Inspected Quality",
+    "conditionHighlight": "Artisan Finished \u00b7 Inspected Quality",
     "specifications": {
       "Ingredients": "100% Natural Botanical Oils & Extracts",
       "Formulation": "Paraben-Free, Cruelty-Free & Dermatologist Tested",
@@ -1988,6 +2043,9 @@
         "date": "1 month ago",
         "comment": "Authentic and gentle. Delivers noticeable results within a few days of daily use. Loved it."
       }
-    ]
+    ],
+    "originalPricePaisa": 60000,
+    "dealTag": "FLASH SALE",
+    "voucherCode": "SAVE15"
   }
 ]

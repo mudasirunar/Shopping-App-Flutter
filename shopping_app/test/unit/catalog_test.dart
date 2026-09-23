@@ -70,5 +70,57 @@ void main() {
       expect(provider.selectedCategory, 'All');
       expect(provider.searchQuery, '');
     });
+
+    test('nameAToZ sorting sorts products alphabetically', () async {
+      final provider = CatalogProvider(service: MockCatalogService(sampleProducts));
+      await Future.delayed(Duration.zero);
+
+      provider.setSortOption(ProductSortOption.nameAToZ);
+      final names = provider.filteredProducts.map((p) => p.name).toList();
+      expect(names, ['Chronograph Watch', 'Leather Sneakers', 'Wireless Headphones']);
+    });
+
+    test('Search prioritizes title matches over description matches and sorts alphabetically', () async {
+      final testProducts = [
+        const Product(
+          id: 'p1',
+          name: 'Zebra Print Canvas Bag',
+          description: 'Special bag featuring genuine leather trims',
+          category: 'Fashion',
+          image: 'https://test/1',
+          pricePaisa: 1000,
+        ),
+        const Product(
+          id: 'p2',
+          name: 'Vintage Leather Belt',
+          description: 'Classic accessory',
+          category: 'Accessories',
+          image: 'https://test/2',
+          pricePaisa: 2000,
+        ),
+        const Product(
+          id: 'p3',
+          name: 'Brown Leather Boots',
+          description: 'Durable winter footwear',
+          category: 'Footwear',
+          image: 'https://test/3',
+          pricePaisa: 3000,
+        ),
+      ];
+
+      final provider = CatalogProvider(service: MockCatalogService(testProducts));
+      await Future.delayed(Duration.zero);
+
+      provider.setSearchQuery('leather');
+      final names = provider.filteredProducts.map((p) => p.name).toList();
+
+      // "Brown Leather Boots" and "Vintage Leather Belt" have "Leather" in title -> prioritized first in alphabetical order
+      // "Zebra Print Canvas Bag" only has "leather" in description -> sorted last
+      expect(names, [
+        'Brown Leather Boots',
+        'Vintage Leather Belt',
+        'Zebra Print Canvas Bag',
+      ]);
+    });
   });
 }

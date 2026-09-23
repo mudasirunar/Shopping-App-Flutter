@@ -8,12 +8,14 @@ class ResponsiveProductGrid extends StatelessWidget {
   final List<Product> products;
   final void Function(Product product) onProductTap;
   final EdgeInsetsGeometry padding;
+  final bool? showCategory;
 
   const ResponsiveProductGrid({
     super.key,
     required this.products,
     required this.onProductTap,
     this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 32),
+    this.showCategory,
   });
 
   @override
@@ -39,6 +41,7 @@ class ResponsiveProductGrid extends StatelessWidget {
                 product: p1,
                 onTap: () => onProductTap(p1),
                 isWide: true,
+                showCategory: showCategory,
               ),
             );
           }
@@ -55,6 +58,7 @@ class ResponsiveProductGrid extends StatelessWidget {
                     product: p1,
                     onTap: () => onProductTap(p1),
                     isWide: false,
+                    showCategory: showCategory,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -63,6 +67,7 @@ class ResponsiveProductGrid extends StatelessWidget {
                     product: p2,
                     onTap: () => onProductTap(p2),
                     isWide: false,
+                    showCategory: showCategory,
                   ),
                 ),
               ],

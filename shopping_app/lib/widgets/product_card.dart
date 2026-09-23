@@ -4,6 +4,7 @@ import '../core/theme/app_theme.dart';
 import '../core/utils/currency_formatter.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
+import '../providers/catalog_provider.dart';
 import 'app_network_image.dart';
 import '../core/utils/app_snackbar.dart';
 import '../core/navigation/app_navigator.dart';
@@ -15,13 +16,25 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onTap;
   final bool? isWide;
+  final bool? showCategory;
 
   const ProductCard({
     super.key,
     required this.product,
     required this.onTap,
     this.isWide,
+    this.showCategory,
   });
+
+  bool _resolveShowCategory(BuildContext context) {
+    if (showCategory != null) return showCategory!;
+    try {
+      final catalog = context.watch<CatalogProvider>();
+      return catalog.selectedCategory.trim().toLowerCase() == 'all';
+    } catch (_) {
+      return true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +55,7 @@ class ProductCard extends StatelessWidget {
   Widget _buildCompactCard(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final inCart = cart.isInCart(product.id);
+    final shouldShowCategory = _resolveShowCategory(context);
 
     return InkWell(
       onTap: onTap,
@@ -81,14 +95,16 @@ class ProductCard extends StatelessWidget {
                       category: product.category,
                     ),
                   ),
-                  if (product.badgeTag != null)
+                  if (product.hasDiscount)
+                    _buildDiscountBadge(product.effectiveDealTag ?? '-${product.discountPercent}%')
+                  else if (product.badgeTag != null)
                     _buildBadgeTag(product.badgeTag!),
-                  if (product.qualityTag != null)
-                    _buildQualityTag(product.qualityTag!),
                   if (product.isOutOfStock)
                     _buildSoldOutBadge()
                   else if (product.isLowStock)
-                    _buildLowStockBadge(product.stockCount),
+                    _buildLowStockBadge(product.stockCount)
+                  else if (product.hasDiscount && product.badgeTag != null)
+                    _buildBadgeTag(product.badgeTag!, isBottom: true),
                 ],
               ),
             ),
@@ -99,18 +115,50 @@ class ProductCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Text(
-                    product.category.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.secondary,
-                      letterSpacing: 0.7,
+                if (shouldShowCategory || product.qualityTag != null)
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (shouldShowCategory) ...[
+                          Flexible(
+                            child: Text(
+                              product.category.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.secondary,
+                                letterSpacing: 0.7,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (product.qualityTag != null) const SizedBox(width: 4),
+                        ],
+                        if (product.qualityTag != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: const Color(0xFFA7F3D0), width: 0.8),
+                            ),
+                            child: Text(
+                              product.qualityTag!,
+                              style: const TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF047857),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                  )
+                else
+                  const SizedBox.shrink(),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -181,16 +229,35 @@ class ProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Text(
-                    CurrencyFormatter.formatPaisa(product.pricePaisa),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.primary,
-                      letterSpacing: -0.3,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        CurrencyFormatter.formatPaisa(product.pricePaisa),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primary,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (product.hasDiscount)
+                        Text(
+                          CurrencyFormatter.formatPaisa(product.originalPricePaisa!),
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.secondary.withOpacity(0.7),
+                            decoration: TextDecoration.lineThrough,
+                            decorationColor: AppTheme.secondary.withOpacity(0.7),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
                 ),
                 _buildCartActionButton(context, cart, inCart, isWide: false),
@@ -206,6 +273,7 @@ class ProductCard extends StatelessWidget {
   Widget _buildWideCard(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final inCart = cart.isInCart(product.id);
+    final shouldShowCategory = _resolveShowCategory(context);
 
     return InkWell(
       onTap: onTap,
@@ -244,12 +312,16 @@ class ProductCard extends StatelessWidget {
                       category: product.category,
                     ),
                   ),
-                  if (product.badgeTag != null)
+                  if (product.hasDiscount)
+                    _buildDiscountBadge(product.effectiveDealTag ?? '-${product.discountPercent}%')
+                  else if (product.badgeTag != null)
                     _buildBadgeTag(product.badgeTag!),
                   if (product.isOutOfStock)
                     _buildSoldOutBadge()
                   else if (product.isLowStock)
-                    _buildLowStockBadge(product.stockCount),
+                    _buildLowStockBadge(product.stockCount)
+                  else if (product.hasDiscount && product.badgeTag != null)
+                    _buildBadgeTag(product.badgeTag!, isBottom: true),
                 ],
               ),
             ),
@@ -265,22 +337,24 @@ class ProductCard extends StatelessWidget {
                   // Row 1: Category, Transit Duration, Quality Tag (Defensively flexed)
                   Row(
                     children: [
-                      Flexible(
-                        child: Text(
-                          product.category.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.secondary,
-                            letterSpacing: 0.7,
+                      if (shouldShowCategory) ...[
+                        Flexible(
+                          child: Text(
+                            product.category.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.secondary,
+                              letterSpacing: 0.7,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text('•', style: TextStyle(color: AppTheme.secondary.withOpacity(0.4), fontSize: 10)),
-                      const SizedBox(width: 4),
+                        const SizedBox(width: 4),
+                        Text('•', style: TextStyle(color: AppTheme.secondary.withOpacity(0.4), fontSize: 10)),
+                        const SizedBox(width: 4),
+                      ],
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -399,16 +473,39 @@ class ProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: Text(
-                          CurrencyFormatter.formatPaisa(product.pricePaisa),
-                          style: const TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.primary,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              CurrencyFormatter.formatPaisa(product.pricePaisa),
+                              style: const TextStyle(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.primary,
+                                letterSpacing: -0.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (product.hasDiscount) ...[
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  CurrencyFormatter.formatPaisa(product.originalPricePaisa!),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppTheme.secondary.withOpacity(0.7),
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: AppTheme.secondary.withOpacity(0.7),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -522,15 +619,56 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBadgeTag(String tag) {
+  Widget _buildDiscountBadge(String label) {
     return Positioned(
       top: 6,
       left: 6,
       child: Container(
+        constraints: const BoxConstraints(maxWidth: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: const Color(0xFFDC2626),
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: -0.2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBadgeTag(String tag, {bool isBottom = false}) {
+    return Positioned(
+      top: isBottom ? null : 6,
+      bottom: isBottom ? 6 : null,
+      left: 6,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 120),
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.72),
+          color: Colors.black.withOpacity(0.75),
           borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 3,
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -544,13 +682,17 @@ class ProductCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 4),
-            Text(
-              tag,
-              style: const TextStyle(
-                fontSize: 8.5,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 0.4,
+            Flexible(
+              child: Text(
+                tag,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.4,
+                ),
               ),
             ),
           ],
@@ -559,33 +701,6 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  Widget _buildQualityTag(String tag) {
-    return Positioned(
-      top: 6,
-      right: 6,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.92),
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 4,
-            ),
-          ],
-        ),
-        child: Text(
-          tag,
-          style: const TextStyle(
-            fontSize: 8.5,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.primary,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildSoldOutBadge() {
     return Positioned(
