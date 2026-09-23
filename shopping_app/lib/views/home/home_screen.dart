@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: HomeCuratedCarouselSection(
                 title: 'Flash Deals',
                 icon: Icons.flash_on_rounded,
-                iconColor: const Color(0xFFF59E0B),
+                iconColor: const Color(0xFFDC2626),
                 badge: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
