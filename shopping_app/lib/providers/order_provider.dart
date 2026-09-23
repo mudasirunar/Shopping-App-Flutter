@@ -38,7 +38,18 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  List<OrderModel> get userOrders => List.unmodifiable(_userOrders);
+  List<OrderModel> get userOrders {
+    final seen = <String>{};
+    final unique = <OrderModel>[];
+    for (final o in _userOrders) {
+      final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
+      if (seen.add(id)) {
+        unique.add(o);
+      }
+    }
+    return List.unmodifiable(unique);
+  }
+
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -63,19 +74,23 @@ class OrderProvider extends ChangeNotifier {
       final raw = prefs.getString(key);
       if (raw != null && raw.isNotEmpty) {
         final List<dynamic> decoded = json.decode(raw) as List<dynamic>;
-        _userOrders = decoded
-            .map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e as Map)))
-            .map((o) {
-              final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
-              if (_cancelledOrderIds.contains(id)) {
-                return o.copyWith(
-                  status: 'cancelled',
-                  cancellationReason: _cancellationReasons[id] ?? o.cancellationReason,
-                );
-              }
-              return o;
-            })
-            .toList();
+        final seen = <String>{};
+        final parsed = <OrderModel>[];
+        for (final e in decoded) {
+          final o = OrderModel.fromJson(Map<String, dynamic>.from(e as Map));
+          final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
+          if (seen.add(id)) {
+            if (_cancelledOrderIds.contains(id)) {
+              parsed.add(o.copyWith(
+                status: 'cancelled',
+                cancellationReason: _cancellationReasons[id] ?? o.cancellationReason,
+              ));
+            } else {
+              parsed.add(o);
+            }
+          }
+        }
+        _userOrders = parsed;
         notifyListeners();
       }
     } catch (_) {}
@@ -85,7 +100,15 @@ class OrderProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final key = 'local_orders_$userId';
-      final encoded = json.encode(_userOrders.map((e) => e.toJson()).toList());
+      final seen = <String>{};
+      final uniqueList = <OrderModel>[];
+      for (final o in _userOrders) {
+        final id = o.orderId.replaceAll('#', '').trim().toLowerCase();
+        if (seen.add(id)) {
+          uniqueList.add(o);
+        }
+      }
+      final encoded = json.encode(uniqueList.map((e) => e.toJson()).toList());
       await prefs.setString(key, encoded);
     } catch (_) {}
   }
@@ -280,7 +303,9 @@ class OrderProvider extends ChangeNotifier {
         }
       }
 
-      // Add to beginning of local orders list and persist
+      // Add to beginning of local orders list and persist (deduplicating in case stream already emitted)
+      final cleanNewId = newOrder.orderId.replaceAll('#', '').trim().toLowerCase();
+      _userOrders.removeWhere((o) => o.orderId.replaceAll('#', '').trim().toLowerCase() == cleanNewId);
       _userOrders.insert(0, newOrder);
       await _saveLocalOrders(effectiveUserId);
       return newOrder;
