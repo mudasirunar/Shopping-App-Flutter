@@ -25,6 +25,7 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   final ScrollController _categoryScrollController = ScrollController();
   final Map<String, GlobalKey> _categoryKeys = {};
+  bool _isGridView = true;
 
   @override
   void initState() {
@@ -300,43 +301,71 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           color: AppTheme.secondary,
                         ),
                       ),
-                      InkWell(
-                        onTap: () => _showSortModal(context),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceContainerLowest,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: () => _showSortModal(context),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceContainerLowest,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                    'Sort: ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppTheme.secondary,
+                                    ),
+                                  ),
+                                  Text(
+                                    _getSortLabel(catalog.sortOption),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    size: 16,
+                                    color: AppTheme.secondary,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Sort: ',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppTheme.secondary,
-                                ),
+                          const SizedBox(width: 8),
+                          // Shape Changing View Toggle Button
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _isGridView = !_isGridView;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceContainerLowest,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
                               ),
-                              Text(
-                                _getSortLabel(catalog.sortOption),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.onSurface,
-                                ),
+                              child: Icon(
+                                _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
+                                size: 18,
+                                color: AppTheme.onSurface,
                               ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 16,
-                                color: AppTheme.secondary,
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
@@ -376,6 +405,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               else
                 ResponsiveProductGrid(
                   products: products,
+                  isWideView: !_isGridView,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
                   showCategory: catalog.selectedCategory.trim().toLowerCase() == 'all',
                   onProductTap: (product) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../models/product.dart';
 import '../../providers/navigation_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
@@ -8,8 +9,23 @@ import '../../widgets/responsive_product_grid.dart';
 import '../details/product_details_screen.dart';
 import '../../core/utils/app_snackbar.dart';
 
-class WishlistScreen extends StatelessWidget {
+enum WishlistSortOption {
+  recentlyAdded,
+  priceLowToHigh,
+  priceHighToLow,
+  nameAToZ,
+}
+
+class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
+
+  @override
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
+  bool _isGridView = true;
+  WishlistSortOption _sortOption = WishlistSortOption.recentlyAdded;
 
   void _confirmClear(BuildContext context) {
     AppConfirmationDialog.show(
@@ -29,10 +45,102 @@ class WishlistScreen extends StatelessWidget {
     );
   }
 
+  String _getSortLabel(WishlistSortOption option) {
+    switch (option) {
+      case WishlistSortOption.recentlyAdded:
+        return 'Recently Added';
+      case WishlistSortOption.priceLowToHigh:
+        return 'Price: Low to High';
+      case WishlistSortOption.priceHighToLow:
+        return 'Price: High to Low';
+      case WishlistSortOption.nameAToZ:
+        return 'Name: A to Z';
+    }
+  }
+
+  List<Product> _getSortedItems(List<Product> raw) {
+    final list = List<Product>.from(raw);
+    switch (_sortOption) {
+      case WishlistSortOption.recentlyAdded:
+        return list;
+      case WishlistSortOption.priceLowToHigh:
+        list.sort((a, b) => a.pricePaisa.compareTo(b.pricePaisa));
+        return list;
+      case WishlistSortOption.priceHighToLow:
+        list.sort((a, b) => b.pricePaisa.compareTo(a.pricePaisa));
+        return list;
+      case WishlistSortOption.nameAToZ:
+        list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        return list;
+    }
+  }
+
+  void _showSortModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surfaceContainerLowest,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Text(
+                    'Sort Wishlist',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.onSurface,
+                    ),
+                  ),
+                ),
+                const Divider(),
+                _buildSortTile(ctx, 'Recently Added', WishlistSortOption.recentlyAdded, Icons.access_time_rounded),
+                _buildSortTile(ctx, 'Price: Low to High', WishlistSortOption.priceLowToHigh, Icons.arrow_upward_rounded),
+                _buildSortTile(ctx, 'Price: High to Low', WishlistSortOption.priceHighToLow, Icons.arrow_downward_rounded),
+                _buildSortTile(ctx, 'Name: A to Z', WishlistSortOption.nameAToZ, Icons.sort_by_alpha_rounded),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSortTile(BuildContext ctx, String label, WishlistSortOption option, IconData icon) {
+    final isSelected = _sortOption == option;
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? AppTheme.primary : AppTheme.secondary, size: 20),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          color: isSelected ? AppTheme.primary : AppTheme.onSurface,
+        ),
+      ),
+      trailing: isSelected ? const Icon(Icons.check_rounded, color: AppTheme.primary) : null,
+      onTap: () {
+        setState(() {
+          _sortOption = option;
+        });
+        Navigator.pop(ctx);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final wishlist = context.watch<WishlistProvider>();
     final items = wishlist.items;
+    final sortedItems = _getSortedItems(items);
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
@@ -134,22 +242,95 @@ class WishlistScreen extends StatelessWidget {
             )
           : CustomScrollView(
               slivers: [
+                // Count & Toolbar Row (Sort + Shape Changer)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Text(
-                      '${items.length} ${items.length == 1 ? 'PRODUCT' : 'PRODUCTS'}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary,
-                        letterSpacing: 0.8,
-                      ),
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${sortedItems.length} ${sortedItems.length == 1 ? 'Product Saved' : 'Products Saved'}',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.secondary,
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Sort Button
+                            InkWell(
+                              onTap: () => _showSortModal(context),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceContainerLowest,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Sort: ',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppTheme.secondary,
+                                      ),
+                                    ),
+                                    Text(
+                                      _getSortLabel(_sortOption),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down,
+                                      size: 16,
+                                      color: AppTheme.secondary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Shape Changing View Toggle Button
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isGridView = !_isGridView;
+                                });
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceContainerLowest,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.4)),
+                                ),
+                                child: Icon(
+                                  _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
+                                  size: 18,
+                                  color: AppTheme.onSurface,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 ResponsiveProductGrid(
-                  products: items,
+                  products: sortedItems,
+                  isWideView: !_isGridView,
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                   showCategory: true,
                   onProductTap: (product) {
