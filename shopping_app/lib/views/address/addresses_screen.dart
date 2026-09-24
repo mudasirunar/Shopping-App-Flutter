@@ -5,7 +5,7 @@ import '../../models/address.dart';
 import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_confirmation_dialog.dart';
-import 'add_edit_address_dialog.dart';
+import 'add_edit_address_screen.dart';
 import '../../core/utils/app_snackbar.dart';
 
 class AddressesScreen extends StatefulWidget {
@@ -83,7 +83,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${addressProvider.count} / 3',
+                  '${addressProvider.count} / ${AddressProvider.maxAddresses}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -106,8 +106,10 @@ class _AddressesScreenState extends State<AddressesScreen> {
                 return _buildAddressCard(context, addr);
               },
             ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
+      bottomNavigationBar: addresses.isEmpty
+          ? null
+          : Container(
+              padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppTheme.surfaceContainerLowest,
           boxShadow: [
@@ -131,15 +133,15 @@ class _AddressesScreenState extends State<AddressesScreen> {
               ),
               icon: Icon(canAdd ? Icons.add_location_alt_outlined : Icons.lock_outline, size: 20),
               label: Text(
-                canAdd ? 'Add New Address' : 'Address Limit Reached (3 Max)',
+                canAdd ? 'Add New Address' : 'Address Limit Reached (${AddressProvider.maxAddresses} Max)',
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
               ),
               onPressed: canAdd
-                  ? () => AddEditAddressDialog.show(context)
+                  ? () => AddEditAddressScreen.open(context)
                   : () {
                       AppSnackBar.show(
                         context,
-                        message: 'Maximum 3 addresses reached. Delete an existing address to add a new one.',
+                        message: 'Maximum ${AddressProvider.maxAddresses} addresses reached. Delete an existing address to add a new one.',
                         backgroundColor: AppTheme.secondary,
                       );
                     },
@@ -172,10 +174,22 @@ class _AddressesScreenState extends State<AddressesScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppTheme.onSurface),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Save up to 3 delivery addresses to speed up your checkout process.',
+            Text(
+              'Save up to ${AddressProvider.maxAddresses} delivery addresses to speed up your checkout process.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: AppTheme.secondary, height: 1.4),
+              style: const TextStyle(fontSize: 13, color: AppTheme.secondary, height: 1.4),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              icon: const Icon(Icons.add_location_alt_outlined, size: 18),
+              label: const Text('Add Address', style: TextStyle(fontWeight: FontWeight.w700)),
+              onPressed: () => AddEditAddressScreen.open(context),
             ),
           ],
         ),
@@ -301,7 +315,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           IconButton(
                             icon: const Icon(Icons.edit_outlined, size: 18, color: AppTheme.secondary),
                             visualDensity: VisualDensity.compact,
-                            onPressed: () => AddEditAddressDialog.show(context, existingAddress: address),
+                            onPressed: () => AddEditAddressScreen.open(context, existingAddress: address),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.error),

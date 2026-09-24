@@ -621,7 +621,7 @@ class AccountScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 _buildBentoStatCard(
                   label: 'Addresses',
-                  value: '${address.count}/3',
+                  value: '${address.count}/${AddressProvider.maxAddresses}',
                   icon: Icons.location_on_rounded,
                   iconColor: const Color(0xFF059669),
                   bgColor: const Color(0xFFD1FAE5),

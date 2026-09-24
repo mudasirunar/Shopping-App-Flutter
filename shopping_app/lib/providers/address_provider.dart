@@ -6,11 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/address.dart';
 
-/// Provider managing up to 3 saved delivery/billing addresses with
+/// Provider managing up to 5 saved delivery/billing addresses with
 /// automatic default designation, guest SharedPreferences persistence,
 /// and authenticated Cloud Firestore synchronization.
 class AddressProvider extends ChangeNotifier {
-  static const int maxAddresses = 3;
+  static const int maxAddresses = 5;
 
   FirebaseFirestore? _firestore;
   List<AddressModel> _addresses = [];

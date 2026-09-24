@@ -77,7 +77,7 @@ void main() {
       expect(provider.defaultAddress?.id, provider.addresses.first.id);
     });
 
-    test('Strictly enforces maximum 3 addresses limit', () async {
+    test('Strictly enforces maximum 5 addresses limit', () async {
       final provider = AddressProvider();
 
       // Add 1
@@ -110,21 +110,76 @@ void main() {
         province: 'Islamabad Capital Territory',
       );
 
-      expect(provider.count, 3);
-      expect(provider.canAddMore, false);
-
-      // Attempt Add 4 -> should reject
-      final rejected = await provider.addAddress(
-        label: 'Warehouse',
+      // Add 4
+      await provider.addAddress(
+        label: 'Shop',
         recipientName: 'Person 4',
         phoneNumber: '03004444444',
         streetAddress: 'Street 4',
+        city: 'Rawalpindi',
+        province: 'Punjab',
+      );
+
+      // Add 5
+      await provider.addAddress(
+        label: 'Studio',
+        recipientName: 'Person 5',
+        phoneNumber: '03005555555',
+        streetAddress: 'Street 5',
+        city: 'Peshawar',
+        province: 'Khyber Pakhtunkhwa',
+      );
+
+      expect(provider.count, 5);
+      expect(provider.canAddMore, false);
+
+      // Attempt Add 6 -> should reject
+      final rejected = await provider.addAddress(
+        label: 'Warehouse',
+        recipientName: 'Person 6',
+        phoneNumber: '03006666666',
+        streetAddress: 'Street 6',
         city: 'Multan',
         province: 'Punjab',
       );
 
       expect(rejected, false);
-      expect(provider.count, 3);
+      expect(provider.count, 5);
+    });
+
+    test('Updating address updates details and manages default status', () async {
+      final provider = AddressProvider();
+
+      await provider.addAddress(
+        label: 'Home',
+        recipientName: 'Original Name',
+        phoneNumber: '03001111111',
+        streetAddress: 'Street 1',
+        city: 'Lahore',
+        province: 'Punjab',
+      );
+
+      await provider.addAddress(
+        label: 'Work',
+        recipientName: 'Person 2',
+        phoneNumber: '03002222222',
+        streetAddress: 'Street 2',
+        city: 'Karachi',
+        province: 'Sindh',
+      );
+
+      final second = provider.addresses[1];
+      final updatedSecond = second.copyWith(
+        recipientName: 'Updated Work Contact',
+        isDefault: true,
+      );
+
+      await provider.updateAddress(updatedSecond);
+
+      expect(provider.addresses.first.id, second.id);
+      expect(provider.addresses.first.recipientName, 'Updated Work Contact');
+      expect(provider.addresses.first.isDefault, true);
+      expect(provider.defaultAddress?.id, second.id);
     });
 
     test('Changing default address unsets previous default', () async {
